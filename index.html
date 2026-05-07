@@ -34,12 +34,11 @@ body { height: 100%; background: var(--bg); color: var(--ink);
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { display: flex; flex-direction: column;
   position: fixed; inset: 0;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px); }
+  padding-top: env(safe-area-inset-top, 0px); }
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(var(--tab-h) + 16px); }
+  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 16px); }
 .panel { display: none; padding: 20px 16px 0; animation: fadeIn .2s ease; }
 .panel.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -53,7 +52,8 @@ body { height: 100%; background: var(--bg); color: var(--ink);
 #tabbar { flex-shrink: 0; background: rgba(255,255,255,.94);
   backdrop-filter: saturate(200%) blur(24px); -webkit-backdrop-filter: saturate(200%) blur(24px);
   border-top: 1px solid var(--line);
-  display: flex; height: var(--tab-h); }
+  display: flex; height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px); }
 #tabbar button { flex: 1; border: none; background: transparent; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; padding: 6px 4px; color: var(--ink-muted); font-size: 10px; font-weight: 500;
