@@ -134,6 +134,9 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   font-family: inherit; color: var(--ink); transition: border-color .15s, background .15s;
   box-shadow: 0 1px 4px rgba(0,0,0,.04); }
 .mode-btn:active { border-color: var(--accent); background: var(--accent-bg); }
+.mode-btn.selected { border-color: var(--accent); background: var(--accent-bg);
+  box-shadow: 0 0 0 1px var(--accent), 0 1px 4px rgba(0,0,0,.04); }
+.mode-btn.selected .m-title { color: var(--accent); }
 .mode-btn .m-title { font-size: .95rem; font-weight: 700; margin-bottom: 4px; letter-spacing: -.01em; }
 .mode-btn .m-desc  { font-size: .78rem; color: var(--ink-muted); line-height: 1.45; }
 
@@ -921,6 +924,11 @@ function showEinheitSheet(nr) {
 //  PRAXIS
 // ═══════════════════════════════════════════════
 
+function selectModeBtn(el) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
 function renderPraxis() {
   const phase = getQ(S.arc.currentPhase);
   document.getElementById("panel-praxis").innerHTML = `
@@ -935,19 +943,19 @@ function renderPraxis() {
       </div>
     </div>
     <div class="mode-grid">
-      <button class="mode-btn" onclick="startMode('rezitation')">
+      <button class="mode-btn" onclick="selectModeBtn(this);startMode('rezitation')">
         <div class="m-title">Rezitation</div>
         <div class="m-desc">Die vier Zeilen als Ausrichtung des Geistes</div>
       </button>
-      <button class="mode-btn" onclick="startMode('verse')">
+      <button class="mode-btn" onclick="selectModeBtn(this);startMode('verse')">
         <div class="m-title">Vers lesen</div>
         <div class="m-desc">Einen Vers Longchenpas kontemplieren</div>
       </button>
-      <button class="mode-btn" onclick="showKontemplationListe(S.arc.currentPhase)">
+      <button class="mode-btn" onclick="selectModeBtn(this);showKontemplationListe(S.arc.currentPhase)">
         <div class="m-title">Kontemplation</div>
         <div class="m-desc">Schritt-für-Schritt Anleitung</div>
       </button>
-      <button class="mode-btn" onclick="startMode('stille')">
+      <button class="mode-btn" onclick="selectModeBtn(this);startMode('stille')">
         <div class="m-title">Stille + Timer</div>
         <div class="m-desc">Ruhe mit Glocke am Anfang und Ende</div>
       </button>
