@@ -21,7 +21,7 @@
   --accent-soft: #c97a82;
   --accent-bg: #faf0f1;
   --line: #e6dfd8;
-  --tab-h: 58px;
+  --tab-h: 52px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bot: env(safe-area-inset-bottom, 0px);
   --shadow: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.07);
@@ -35,13 +35,12 @@ body { height: 100%; background: var(--bg); color: var(--ink);
 #app { display: flex; flex-direction: column;
   position: fixed; inset: 0;
   padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: #fff; }
 #content { background: var(--bg); }
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(var(--tab-h) + 16px); }
+  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 16px); }
 .panel { display: none; padding: 20px 16px 0; animation: fadeIn .2s ease; }
 .panel.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -55,11 +54,13 @@ body { height: 100%; background: var(--bg); color: var(--ink);
 #tabbar { flex-shrink: 0; background: rgba(255,255,255,.94);
   backdrop-filter: saturate(200%) blur(24px); -webkit-backdrop-filter: saturate(200%) blur(24px);
   border-top: 1px solid var(--line);
-  display: flex; height: var(--tab-h); }
+  display: flex; align-items: flex-start;
+  height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px); }
 #tabbar button { flex: 1; border: none; background: transparent; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; padding: 6px 4px; color: var(--ink-muted); font-size: 10px; font-weight: 500;
-  font-family: inherit; transition: color .15s; min-height: 44px; touch-action: manipulation; }
+  font-family: inherit; transition: color .15s; height: var(--tab-h); touch-action: manipulation; }
 #tabbar button.active { color: var(--accent); }
 #tabbar button svg { width: 23px; height: 23px; fill: none; stroke: currentColor;
   stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -256,20 +257,22 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 #content { scroll-behavior: auto; }
 
 /* ── Lernpfad grid ── */
-.path-header { display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-.path-hcell { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+.path-header { display: grid; grid-template-columns: 1fr 60px 60px 60px; gap: 6px; margin-bottom: 4px; }
+.path-hcell { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
   color: var(--ink-muted); text-align: center; }
-.path-row { display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; align-items: center; }
-.path-q { padding-right: 4px; }
+.path-row { display: grid; grid-template-columns: 1fr 60px 60px 60px; gap: 6px; margin-bottom: 6px; align-items: center; }
+.path-q { min-width: 0; }
+.path-q-name { font-size: .82rem; font-weight: 700; line-height: 1.25; word-break: break-word; }
+.path-q-sub { font-size: .65rem; color: var(--ink-muted); margin-top: 1px; }
 .path-cell { border-radius: 10px; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; cursor: pointer; touch-action: manipulation; font-size: .62rem;
-  font-weight: 600; gap: 3px; padding: 8px 4px; text-align: center; min-height: 58px;
+  justify-content: center; cursor: pointer; touch-action: manipulation; font-size: .6rem;
+  font-weight: 700; gap: 3px; padding: 6px 2px; text-align: center; min-height: 54px;
   border: 1.5px solid var(--line); background: var(--bg-soft); color: var(--ink-muted);
   transition: transform .1s; }
 .path-cell:active { transform: scale(.94); }
 .path-cell.done { color: #fff; border-color: transparent; }
 .path-cell.soft-locked { opacity: .38; }
-.path-cell-icon { font-size: 1.1rem; line-height: 1; }
+.path-cell-icon { font-size: 1rem; line-height: 1; }
 
 /* ── Quiz ── */
 .quiz-opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
@@ -1527,7 +1530,10 @@ function renderLernpfad() {
       </div>`;
     }).join('');
     return `<div class="path-row">
-      <div class="path-q"><span class="pill ${q.farbe}" style="${locked?'opacity:.5':''}">${q.name}</span></div>
+      <div class="path-q">
+        <div class="path-q-name" style="color:${c}${locked?';opacity:.5':''}">${q.name}</div>
+        <div class="path-q-sub">${q.sanskrit}</div>
+      </div>
       ${cells}
     </div>`;
   }).join('');
