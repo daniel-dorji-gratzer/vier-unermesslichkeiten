@@ -1,4 +1,4 @@
-const CACHE = 'vum-v3';
+const CACHE = 'vum-v4';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/vier-unermesslichkeiten/'])));
@@ -9,7 +9,12 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    ).then(() => {
+      // Tell all open clients to reload so they pick up the new version
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => client.navigate(client.url));
+      });
+    })
   );
   self.clients.claim();
 });
