@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
+<title>Vier Unermesslichkeiten</title>
+<style>
+:root {
+  --bg: #f5f1ea;
+  --bg-card: #fbf8f2;
+  --bg-soft: #efe9dc;
+  --ink: #2c2620;
+  --ink-soft: #5b5048;
+  --ink-muted: #8a7f74;
+  --accent: #8b6f3d;
+  --accent-soft: #c4a875;
+  --line: #e2dac8;
+  --tab-h: 56px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+  --shadow: 0 1px 3px rgba(60,50,40,.07), 0 4px 12px rgba(60,50,40,.05);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body { height: 100%; background: var(--bg); color: var(--ink);
+  font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px;
+  line-height: 1.6; -webkit-font-smoothing: antialiased; }
+#app { display: flex; flex-direction: column;
+  height: 100dvh; height: 100vh; /* fallback then dvh */
+  position: fixed; inset: 0;
+  padding-top: var(--safe-top); }
+
+/* ── Tab content ── */
+#content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--tab-h) + var(--safe-bot) + 12px); }
+.panel { display: none; padding: 16px 16px 0; animation: fadeIn .18s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
+
+/* ── Bottom tab bar ── */
+#tabbar { flex-shrink: 0; background: rgba(251,248,242,.92);
+  backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 1px solid var(--line);
+  display: flex; height: calc(var(--tab-h) + var(--safe-bot));
+  padding-bottom: var(--safe-bot); }
+#tabbar button { flex: 1; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 6px 4px; color: var(--ink-muted); font-size: 10px;
+  font-family: inherit; transition: color .15s; min-height: 44px; touch-action: manipulation; }
+#tabbar button.active { color: var(--accent); }
+#tabbar button svg { width: 22px; height: 22px; fill: none; stroke: currentColor;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Cards ── */
+.card { background: var(--bg-card); border-radius: 14px; padding: 16px;
+  margin-bottom: 14px; box-shadow: var(--shadow); }
+.card-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--ink); }
+.card-sub { font-size: .82rem; color: var(--ink-muted); margin-bottom: 10px; }
+hr.divider { border: none; border-top: 1px solid var(--line); margin: 12px 0; }
+
+/* ── Typography ── */
+.muted { color: var(--ink-muted); }
+.small { font-size: .82rem; }
+.label { font-size: .78rem; font-weight: 500; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--ink-muted); }
+
+/* ── Pills ── */
+.pill { display: inline-block; padding: 2px 9px; border-radius: 100px;
+  font-size: .76rem; font-weight: 500; }
+.pill.gleichmut { background: rgba(107,142,156,.15); color: #3d6978; }
+.pill.liebe     { background: rgba(184,116,74,.15);  color: #8a5535; }
+.pill.mitgefuehl{ background: rgba(139,90,124,.15);  color: #6e4561; }
+.pill.freude    { background: rgba(196,162,58,.18);  color: #7a6315; }
+.pill.neutral   { background: var(--bg-soft); color: var(--ink-soft); }
+
+/* ── Buttons ── */
+button.btn-primary { background: var(--accent); color: #fbf8f2; border: none;
+  border-radius: 10px; padding: 11px 20px; font-size: .92rem; font-family: inherit;
+  font-weight: 500; cursor: pointer; touch-action: manipulation; transition: opacity .15s; }
+button.btn-primary:active { opacity: .8; }
+button.btn-secondary { background: var(--bg-soft); color: var(--ink); border: none;
+  border-radius: 10px; padding: 11px 20px; font-size: .92rem; font-family: inherit;
+  cursor: pointer; touch-action: manipulation; }
+button.btn-ghost { background: transparent; color: var(--accent); border: none;
+  padding: 8px 12px; font-size: .88rem; font-family: inherit; cursor: pointer;
+  touch-action: manipulation; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+/* ── List items ── */
+.list-item { padding: 12px 0; border-bottom: 1px solid var(--line);
+  cursor: pointer; touch-action: manipulation; }
+.list-item:last-child { border-bottom: none; }
+.list-item:active { background: var(--bg-soft); margin: 0 -4px; padding: 12px 4px;
+  border-radius: 8px; }
+.list-item .li-title { font-size: .95rem; font-weight: 500; color: var(--ink); }
+.list-item .li-sub   { font-size: .82rem; color: var(--ink-muted); margin-top: 2px; }
+
+/* ── Verse block ── */
+.verse { font-style: italic; color: var(--ink-soft); line-height: 1.85;
+  white-space: pre-line; border-left: 2px solid var(--line);
+  padding: 6px 0 6px 14px; margin: 8px 0; font-size: .92rem; }
+
+/* ── Streak ── */
+.streak-num { font-size: 2.8rem; font-weight: 200; color: var(--accent); line-height: 1; }
+.streak-row { display: flex; align-items: center; gap: 20px; padding: 4px 0; }
+
+/* ── Reminder quote ── */
+.reminder { background: linear-gradient(160deg, var(--bg-card), #f3eddf);
+  border-left: 3px solid var(--accent-soft); }
+.reminder .quote { font-style: italic; color: var(--ink-soft); line-height: 1.7; font-size: .93rem; }
+
+/* ── Mode buttons ── */
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.mode-btn { background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px; cursor: pointer; text-align: left; touch-action: manipulation;
+  font-family: inherit; color: var(--ink); transition: border-color .15s; }
+.mode-btn:active { border-color: var(--accent-soft); background: #f5f0e5; }
+.mode-btn .m-title { font-size: .93rem; font-weight: 600; margin-bottom: 4px; }
+.mode-btn .m-desc  { font-size: .78rem; color: var(--ink-muted); line-height: 1.4; }
+
+/* ── Practice runner ── */
+#runner { background: var(--bg-card); border-radius: 14px; padding: 24px 20px;
+  box-shadow: var(--shadow); display: none; margin-bottom: 14px; }
+.runner-stage { font-size: .78rem; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--ink-muted); margin-bottom: 10px; text-align: center; }
+.runner-text { font-size: 1rem; line-height: 1.8; color: var(--ink);
+  text-align: center; white-space: pre-line; max-width: 520px; margin: 0 auto 20px; }
+.runner-text.italic { font-style: italic; color: var(--ink-soft); }
+.runner-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.runner-progress { text-align: center; font-size: .78rem; color: var(--ink-muted);
+  margin-top: 12px; }
+.timer-display { font-size: 3.5rem; font-weight: 200; color: var(--accent);
+  text-align: center; padding: 24px 0; font-variant-numeric: tabular-nums; }
+
+/* ── Journal ── */
+.j-entry { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.j-entry:last-child { border-bottom: none; }
+.j-date { font-size: .8rem; color: var(--ink-muted); margin-bottom: 4px; }
+.j-text { font-size: .9rem; color: var(--ink); white-space: pre-wrap; line-height: 1.6; }
+
+/* ── Calendar ── */
+.cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-head { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+  font-size: .68rem; color: var(--ink-muted); text-align: center; margin-bottom: 4px; }
+.cal-day { aspect-ratio: 1; background: var(--bg-soft); border-radius: 4px;
+  font-size: .68rem; display: flex; align-items: center; justify-content: center;
+  color: var(--ink-muted); }
+.cal-day.done { background: var(--accent-soft); color: var(--ink); }
+.cal-day.today { outline: 2px solid var(--accent); }
+
+/* ── Arc dots ── */
+.arc-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+.arc-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line);
+  background: var(--bg-soft); flex-shrink: 0; }
+.arc-dot.active { background: var(--accent); border-color: var(--accent); }
+.arc-dot.done   { background: var(--accent-soft); border-color: var(--accent-soft); }
+.arc-line { width: 2px; height: 22px; background: var(--line); margin-left: 6px; }
+
+/* ── Segment control ── */
+.seg { display: flex; background: var(--bg-soft); border-radius: 9px; padding: 3px;
+  margin-bottom: 14px; }
+.seg button { flex: 1; border: none; background: transparent; border-radius: 7px;
+  padding: 7px; font-family: inherit; font-size: .85rem; color: var(--ink-soft);
+  cursor: pointer; transition: all .15s; touch-action: manipulation; }
+.seg button.active { background: var(--bg-card); color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+
+/* ── Modal / Sheet ── */
+#sheet-bg { display: none; position: fixed; inset: 0; background: rgba(44,38,32,.4);
+  z-index: 100; align-items: flex-end; justify-content: center; padding: 0; }
+#sheet-bg.show { display: flex; }
+#sheet { background: var(--bg-card); border-radius: 20px 20px 0 0; width: 100%;
+  max-height: 88vh; overflow-y: auto; padding: 12px 20px 0;
+  padding-bottom: calc(20px + var(--safe-bot)); box-shadow: 0 -4px 30px rgba(0,0,0,.15); }
+.sheet-handle { width: 36px; height: 4px; background: var(--line); border-radius: 2px;
+  margin: 0 auto 16px; }
+#sheet h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; }
+
+/* ── Forms ── */
+.field { display: block; margin-bottom: 14px; }
+.field span { display: block; font-size: .82rem; color: var(--ink-soft); margin-bottom: 5px; }
+input[type=text], input[type=number], textarea, select {
+  width: 100%; border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; font-family: inherit; font-size: .93rem;
+  background: var(--bg); color: var(--ink); -webkit-appearance: none; }
+textarea { resize: vertical; min-height: 90px; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-soft); }
+
+/* ── Toast ── */
+#toast { position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot) + 16px);
+  left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg-card);
+  padding: 9px 18px; border-radius: 100px; font-size: .85rem; opacity: 0;
+  transition: opacity .25s; pointer-events: none; z-index: 200; white-space: nowrap; }
+#toast.show { opacity: 1; }
+
+/* ── Details ── */
+details { margin: 6px 0; }
+details summary { cursor: pointer; color: var(--accent); font-size: .88rem;
+  padding: 4px 0; list-style: none; display: flex; justify-content: space-between;
+  align-items: center; touch-action: manipulation; }
+details summary::after { content: '›'; font-size: 1.1rem; transition: transform .2s; }
+details[open] summary::after { transform: rotate(90deg); }
+details[open] summary { margin-bottom: 8px; }
+
+/* ── Stat bars ── */
+.stat-bar-bg { background: var(--bg-soft); height: 5px; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.stat-bar    { height: 100%; background: var(--accent-soft); border-radius: 3px; }
+
+/* ── Blockquote ── */
+blockquote { margin: 8px 0; padding: 8px 14px; border-left: 3px solid var(--accent-soft);
+  color: var(--ink-soft); font-style: italic; font-size: .9rem; }
+
+/* ── Search ── */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-wrap input { padding-left: 36px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-muted); font-size: 1rem; pointer-events: none; }
+
+/* ── Scroll restoration ── */
+#content { scroll-behavior: auto; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="content">
+    <section class="panel active" id="panel-heute"></section>
+    <section class="panel" id="panel-lehre"></section>
+    <section class="panel" id="panel-praxis"></section>
+    <section class="panel" id="panel-tagebuch"></section>
+    <section class="panel" id="panel-bogen"></section>
+  </div>
+
+  <nav id="tabbar">
+    <button data-tab="heute" class="active" onclick="switchTab('heute')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      Heute
+    </button>
+    <button data-tab="lehre" onclick="switchTab('lehre')">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Lehre
+    </button>
+    <button data-tab="praxis" onclick="switchTab('praxis')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      Praxis
+    </button>
+    <button data-tab="tagebuch" onclick="switchTab('tagebuch')">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Tagebuch
+    </button>
+    <button data-tab="bogen" onclick="switchTab('bogen')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Bogen
+    </button>
+  </nav>
+</div>
+
+<div id="sheet-bg" onclick="closeSheet(event)">
+  <div id="sheet"><div class="sheet-handle"></div><div id="sheet-content"></div></div>
+</div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+
+const VERSE = [
+  { n:1,  text:"Diejenigen, die so Zuflucht genommen haben\nVerteilen auf dem Boden der Liebe\nDie Blumen des Mitgefühls,\nDie im kühlen Schatten der Freude\nMit dem reinen Wasser der Unvoreingenommenheit benetzt werden.\nSie schulen ihren Geist, damit sie durch ihn\nden wandernden Wesen von Nutzen sein können." },
+  { n:2,  text:"Wenn Liebe, Mitgefühl, Freude und Unvoreingenommenheit\nnicht mit dem Pfad zur Befreiung verbunden sind,\nsind sie die vier göttlichen Verweilzustände, Ursachen von Samsara.\nSind sie jedoch mit dem Pfad verbunden, der zum Frieden führt,\nführen sie über den Ozean der Existenz hinaus.\nSo sind sie die vier grenzenlosen Haltungen." },
+  { n:3,  text:"Sie richten sich auf die ganze Unendlichkeit der Wesen\nsowie auf den letztendlichen Zustand der Phänomene.\nSo haben sie eine zweifache, allumfassende Form:\nSie sind sowohl referenziell als auch nicht-referenziell." },
+  { n:4,  text:"Die vier göttlichen Verweilzustände sind in ihrem Umfang begrenzt.\nDie Wesen, die sie ins Auge fassen, sind nur wenige.\nIn ihrem Fokus und ihrer Form sind sie unrein\nund da sie parteiisch sind, sind sie die Ursache\nfür die himmlische Welt von Brahma.\nAber die vier grenzenlosen Haltungen sind frei von Parteilichkeit.\nSie sind auf den Zustand der Befreiung gerichtet.\nMögen diejenigen, die Mitgefühl haben, sich in ihnen üben." },
+  { n:5,  text:"Diejenigen, die unglücklich sind, die von Kummer zermürbt sind,\ndiejenigen, die sowohl Glück als auch Reichtum besitzen,\nund diejenigen, die das Nahe lieben und das Ferne hassen –\ndas sind die jeweiligen Bereiche\nder Liebe und des Mitgefühls,\nder mitfühlenden Freude und der Unvoreingenommenheit.\nDie Formen dieser vier Haltungen sind somit der Wunsch,\ndass Glück erlangt werde, dass Kummer beseitigt werde,\ndass Freude nicht verloren gehe,\ndass man einen heilsamen und unvoreingenommenen Geist habe." },
+  { n:6,  text:"Bei der Meditation über sie gibt es keine festgelegte Reihenfolge.\nAnfänger hingegen\nsollten mit dem Training in Unvoreingenommenheit beginnen.\nSobald sie die Gleichheit der nahen und fernen Wesen erkennen,\nsollten sie fortfahren, über die anderen drei zu meditieren." },
+  { n:7,  text:"Mit allen Wesen als Fokus besteht die Form der Meditation\naus dieser Überlegung:\n„Oh Geist, du bist an Vater, Mutter und Freunde gebunden.\nDeine Feinde hasst du, und auf diese Weise bist du unvollkommen.\nWandelnd im endlosen und anfanglosen Samsara,\nhaben dir diese Feinde von dir, als Vater, Mutter, Freund,\neinst Nutzen gebracht.\nWillst du nun ihre Güte mit Böswilligkeit vergelten?\nUnd diese, deine gegenwärtigen Freunde, waren einst deine schädlichen Feinde.\nDas Leid, das sie dir zugefügt haben, ist auch jetzt noch bei dir.\nWie macht es dann Sinn, ihnen als Vergeltung Gutes zu tun?\nUnd alle anderen dazwischen\nwaren sowohl Freund als auch Feind.\nSie mögen geholfen haben, sie mögen geschadet haben:\nEs hat keinen Sinn, sie zu hassen oder an ihnen zu hängen." },
+  { n:8,  text:"Deshalb, gleich zu Beginn,\nstelle deine Lieben in die mittlere Position der Neutralität\nund lege das Festhalten beiseite.\nUnd deine Feinde, als wären auch sie neutral.\nBefreie dich vom Hass.\nHabe kein „nah und fern”.\nDann beseitige deine Unwissenheit\ndarin, Wesen neutral zu betrachten, als weder gut noch schlecht.\nÜbe dich in dem, was dich von Samsara befreien wird:\ndie Absicht, unparteiisch\ndie Leiden zu beseitigen, die alle wandernden Wesen quälen." },
+  { n:9,  text:"In ihrem Wunsch, glücklich zu sein und ihren Schmerzen zu entfliehen,\nsind alle Wesen gleich.\nUnd doch ersinnen sie in ihrer Verwirrung\ndie Ursachen ihres Leidens.\nAch! Mögen alle Leiden unglücklicher Wesen\nund all ihre bösen Neigungen nachlassen.\nMögen sie einen ausgeglichenen Geist haben.\nMögen alle verkörperten Wesen,\ngequält von starkem Verlangen und Abneigung,\nvon Hass und Begierde befreit werden\nund einen Geist haben, für den\nNah und Fern gleich sind.\n\nDenke so und meditiere zunächst über ein einzelnes Wesen,\ndann über zwei, dann über drei.\nBeginne mit den Wesen einer Region,\ngehe dann zu einem Kontinent über und schließlich zu allen vier.\nMeditiere dann über das gesamte Universum." },
+  { n:10, text:"Das Zeichen deines Erfolgs wird sein, dass Selbst und Andere,\nFreund und Feind gleichgestellt sind.\nSchließlich denke daran, dass alle Objekte\ndieser unvoreingenommenen Haltung –\nalle nichts als der Geist sind.\nUnd dass die Natur des Geistes dem Raum gleicht.\nDann, mit einem Geist, der völlig frei von Konzepten ist,\nruhe im ultimativen Zustand, leer und ungeboren." },
+  { n:11, text:"Wenn dein Geist somit allen gegenüber ausgeglichen ist,\ndann denke, so wie du dir wünschen würdest,\ndass deine eigene Mutter Glück erlangt,\ndas Gleiche für alle verkörperten Wesen.\nAlle Lebewesen werden so zum Gegenstand deiner Liebe,\nderen Form darin besteht, zu wünschen,\ndass die Wesen das Glück der Götter und Menschen erlangen\nund letztendlich die Glückseligkeit der Buddhaschaft erreichen." },
+  { n:12, text:"Als Zeichen deiner Vollkommenheit\nwirst du höchste und allumfassende Liebe besitzen,\nmehr als jede Mutter für ihr einziges Kind.\nSchließlich ist große Liebe, die jenseits aller Anhaftung liegt,\nin dem Zustand zu ruhen,\nin dem alle als gleich angesehen werden.\nEs ist das Zeichen der Vereinigung von Liebe und Leerheit.\nUnd schon dein Anblick wird den Wesen Freude bereiten." },
+  { n:13, text:"Wenn du alle Wesen mit Liebe umarmt hast,\ndann so, wie du es in deinem Geist nicht ertragen kannst,\nüber das Leid deines Vaters oder deiner Mutter nachzudenken,\nso sei es auch mit den Leiden der wandernden Wesen,\nund entfalte Mitgefühl.\nSie gehen unter in den großen, tosenden Fluten\nvon Geburt, Alter, Krankheit, Tod –\nerschöpft von all ihren verschiedenen Leiden." },
+  { n:14, text:"Sie sind ohne gezähmte und friedvolle Geister.\nSie haben keine tugendhaften Freunde, die ihnen den wahren Weg zeigen.\nUnd so wandern sie endlos im Samsara umher.\nKannst du sie im Stich lassen?\nDenke aus der Tiefe deines Herzens:\n„Mein Körper, alles, was ich besitze,\nall die Tugend, die in der dreifachen Zeit gesammelt wurde –\nmöge sie alle Schmerzen vertreiben, die die Wesen haben!”" },
+  { n:15, text:"Das Zeichen deines Erfolgs soll sein\ndie Unfähigkeit zu ertragen, dass Wesen leiden.\nAnschließend solltest du gleichmäßig verweilen\nin einem Mitgefühl, das frei von jeglichem begrifflichen Bezug ist.\nDas Zeichen dafür ist Leerheit –\nLeerheit vereint mit Mitgefühl.\nDie Frucht: ein Geist, der frei von Bosheit ist." },
+  { n:16, text:"Erweicht durch Mitgefühl, übe dich darin, Freude zu empfinden,\nwenn andere ihre jeweilige Freude finden.\n„Welche Freude! Diese Wesen brauchen mich nicht,\num sie in den Zustand des Glücks zu bringen!\nDenn das Beste von allem ist, dass sie es selbst gefunden haben!\nVon diesem Tag an bis sie Erleuchtung erlangen,\nmögen sie niemals ihre Freude und ihren Trost verlieren!”" },
+  { n:17, text:"Das Zeichen deiner Meisterschaft wird sein,\ndass du, voller Freude, keine neidische Eifersucht empfinden wirst.\nGanz natürlich wirst du in Frieden sein\nmit Glückseligkeit in Körper, Sprache und Geist.\nAls Frucht wirst du Freude und beständigen Reichtum haben." },
+  { n:18, text:"Wenn du über Liebe meditierst und an jedem festhältst –\nwird dies durch Mitgefühl gestoppt.\nWenn Mitgefühl zu Depression führt –\nwird sie durch nicht-referentielle Freude gestoppt.\nWenn der Geist durch Freude beunruhigt wird –\nmeditiere über große Unvoreingenommenheit.\nUnd wenn Unvoreingenommenheit zu Gleichgültigkeit wird –\nmeditiere über Liebe, wie du es zuvor getan hast." },
+  { n:19, text:"Diejenigen, die in einer solchen Übung gefestigt sind,\nmeditieren über die Haltungen\nin direkter, indirekter, abwechselnder oder beliebiger Reihenfolge.\nSo wird ihre Verwirklichung der vier grenzenlosen Haltungen\nwachsen und frisch sein." },
+  { n:20, text:"Diese Praxis wird vier Ergebnisse hervorbringen.\nDie voll ausgereifte Frucht ist hohe Geburt und endgültige Vollkommenheit.\nDie Früchte, die der Ursache ähneln, sind die fortgesetzte Praxis\nund Glück und Freiheit von Widrigkeiten.\nDank des bedingten Ergebnisses wird man an angenehmen, heilsamen Orten geboren.\nDank der sich ausbreitenden Folge werden diese vier Haltungen an Stärke gewinnen." },
+  { n:21, text:"Durch Liebe wird der Zorn vertrieben;\nder Sambhogakaya und die spiegelgleiche Weisheit werden erlangt.\nDurch Mitgefühl wird anhaftende Liebe verbannt;\nder Dharmakaya und die allumfassende Weisheit werden erlangt.\nMitfühlende Freude beseitigt jeglichen Neid;\nder Nirmanakaya und die erhabene Weisheit werden erlangt.\nUnvoreingenommenheit beseitigt Stolz und Unwissenheit.\nDer Svabhavikakaya offenbart sich." },
+  { n:22, text:"Deshalb sind Liebe, Mitgefühl, Freude und Unvoreingenommenheit\nvon grenzenloser Vortrefflichkeit.\nJeder Weg, dem sie fehlen, ist falsch.\nUmgeben von den vier grenzenlosen Haltungen\nführt der Weg zur makellosen Befreiung." },
+  { n:23, text:"In Wahrheit, bei beiden Fahrzeugen, dem kausalen und dem resultierenden,\nist die Praxis in Harmonie. Sie ist dieselbe.\nEs ist Leerheit, belebt durch Mitgefühl." },
+  { n:24, text:"In den Fußstapfen der heiligen Kinder der Buddhas,\nbemühe dich mit Eifer in den vier grenzenlosen Haltungen." },
+  { n:25, text:"Mögen diese guten Worte, die zum Frieden führen,\nalle Unruhe in den Köpfen der wandernden Wesen stillen.\nErschöpft vom Verfolgen falscher, irriger und minderwertiger Pfade,\nmöge ihr Geist heute Ruhe finden." },
+];
+
+const REZITATION = "Mögen alle Wesen Glück und dessen Ursachen haben.\nMögen sie frei sein von Leid und dessen Ursachen.\nMögen sie niemals vom vollkommenen, leidfreien Glück getrennt sein.\nMögen sie ohne ein Nahes festzuhalten und Fernes abzulehnen,\nin grenzenlosem Gleichmut verweilen.";
+
+const QUALITAETEN = [
+  { id:"gleichmut",  name:"Gleichmut",      sanskrit:"upekṣā",  farbe:"gleichmut",
+    bild:"Ein ruhiger, klarer See – tief und unbewegt.",
+    metapher:"Das reine Wasser, das die Wiese benetzt.",
+    fokus:"Diejenigen, die das Nahe lieben und das Ferne hassen.",
+    wunsch:"Mögen sie einen heilsamen und unvoreingenommenen Geist haben.",
+    gegengift:"Stolz und Unwissenheit, Parteilichkeit",
+    verwechslung:"Gleichgültigkeit. Gleichmut ist der weite Raum, aus dem heraus echte Liebe möglich wird.",
+    kernpunkt:"Anfänger:innen sollen mit Gleichmut beginnen. Erst wenn die Gleichheit naher und ferner Wesen erkannt ist, werden die anderen drei wirklich grenzenlos.",
+    zeichen:"Selbst und Andere, Freund und Feind sind gleichgestellt." },
+  { id:"liebe",      name:"Liebende Güte",  sanskrit:"maitrī",  farbe:"liebe",
+    bild:"Eine Mutter, die ihr Kind hält – reine Güte ohne Erwartung.",
+    metapher:"Der Boden der Wiese.",
+    fokus:"Diejenigen, die nicht glücklich sind.",
+    wunsch:"Mögen sie das Glück erlangen, das sie suchen.",
+    gegengift:"Hass, Aggression",
+    verwechslung:"Anhaftung. Echte Liebe ist nicht durch das definiert, was andere uns bringen.",
+    kernpunkt:"Liebe ist Wunsch nach dem Glück anderer – mehr als eine Mutter für ihr einziges Kind.",
+    zeichen:"Umfassende Liebe; der eigene Anblick bringt Wesen Freude." },
+  { id:"mitgefuehl", name:"Mitgefühl",      sanskrit:"karuṇā",  farbe:"mitgefuehl",
+    bild:"Eine Mutter ohne Arme sieht ihr Kind im Wasser – die Unmöglichkeit, einfach zuzusehen.",
+    metapher:"Die Blumen der Wiese.",
+    fokus:"Diejenigen, die unglücklich, von Kummer zermürbt sind.",
+    wunsch:"Möge ihr Kummer beseitigt werden.",
+    gegengift:"Anhaftung, Begierde",
+    verwechslung:"Sentimentales Mitleid. Karuṇā ist Frieden und Bereitschaft zu handeln – wie ein:e Ärzt:in.",
+    kernpunkt:"Mitgefühl ist friedlich. Aus Frieden heraus ist Hilfe möglich.",
+    zeichen:"Unfähigkeit, das Leiden von Wesen zu ertragen, ohne zu handeln." },
+  { id:"freude",     name:"Mitfreude",      sanskrit:"muditā",  farbe:"freude",
+    bild:"Ein Kamel, das sein verlorenes Kalb wiederfindet – stille, tiefe Freude.",
+    metapher:"Der kühlende Schatten der Wiese.",
+    fokus:"Diejenigen, die Glück und Reichtum haben.",
+    wunsch:"Mögen sie ihre Freude nicht verlieren.",
+    gegengift:"Eifersucht, Neid",
+    verwechslung:"Aufregung. Gemeint ist Zufriedenheit – ein friedliches Verweilen.",
+    kernpunkt:"„Welche Freude! Diese Wesen brauchen mich nicht – sie haben es selbst gefunden!”",
+    zeichen:"Volle Freude ohne neidische Eifersucht." },
+];
+
+const KONTEMPLATIONEN = {
+  gleichmut: [
+    { titel:"Reflexion auf Diskriminierung", schritte:[
+      "Werde dir bewusst, wie du gerade zwischen Wesen unterscheidest – Freunde, Familie, Gleichgültige, Feinde.",
+      "Erinnere dich: Diese Kreise sind keine objektiven Tatsachen, sondern Anhaftungsgewohnheiten.",
+      "Frage: Wer war mein Freund, wer mein Feind über die Zeit? Diese Rollen wechseln ständig.",
+      "Erkenne: Wenn 'Freund' und 'Feind' substantiell wären, könnte sich nichts wandeln.",
+      "Ruhe in dieser Erkenntnis: Keine Grenze ist wirklich da."
+    ]},
+    { titel:"Rollen wechseln (Vers 7)", schritte:[
+      "Denke an jemanden, den du als störend oder schwierig erlebst.",
+      "Stell dir vor: In früheren Leben haben sie dir geholfen – als Mutter, als Freund.",
+      "Wie verändert sich dein inneres Gefühl ihnen gegenüber?",
+      "Stell dir vor: Deine jetzigen Freunde haben dir in früheren Leben Schmerz zugefügt.",
+      "Wie verändert sich dein Festhalten an Zuneigung?"
+    ]},
+    { titel:"Vom Einen zum Allen (Vers 9)", schritte:[
+      "Halte ein einzelnes Wesen im Geist. Wünsche ihm Frieden, frei von Anhaftung und Hass.",
+      "Erweitere auf zwei. Auf drei. Auf alle Wesen einer Region.",
+      "Auf einen Kontinent. Auf alle Kontinente. Auf alle Tiere – in der Wildnis, im Wasser.",
+      "Auf alle Wesen, die du nicht siehst. Auf das gesamte Universum.",
+      "Wünsche allen: einen ausgeglichenen Geist, frei von Hass und Begierde."
+    ]},
+    { titel:"Das Flugzeug-Beispiel", schritte:[
+      "Stell dir vor: Du, Familie, ein Freund, dein Lehrer, dein Feind sind in Gefahr. Eine Person wird gewählt.",
+      "Beobachte: Was wünscht sich dein Geist? Hoffst du, dass es jemand anderen trifft?",
+      "Beobachte auch: Hoffst du, dass es dich selbst trifft? Auch das ist Diskriminierung.",
+      "Gleichmut: keine Präferenz. Es ist gleich schmerzhaft, wer auch immer es trifft.",
+      "Ruhe einen Moment in diesem Erkennen."
+    ]},
+    { titel:"Ohne Referenz (Vers 10)", schritte:[
+      "Denke kurz an die Wesen, denen dein Gleichmut gilt.",
+      "Erkenne: Sie alle sind nichts als Erscheinung im Geist.",
+      "Die Natur des Geistes gleicht dem Raum – ohne Mitte, ohne Rand.",
+      "Lass alle Vorstellungen los: kein Subjekt, kein Objekt, kein Nahes, kein Fernes.",
+      "Verweile."
+    ]}
+  ],
+  liebe: [
+    { titel:"Wie eine Mutter (Vers 11)", schritte:[
+      "Dein Geist ist gegenüber allen ausgeglichen.",
+      "Erinnere dich, wie du dir wünschen würdest, dass deine eigene Mutter Glück erlangt.",
+      "Wünsche dasselbe einem einzelnen Wesen.",
+      "Wünsche es zweien. Erweitere langsam.",
+      "Bis hin zu den äußersten Grenzen der zehn Richtungen."
+    ]},
+    { titel:"Erweiterung von Einer zu Vielen", schritte:[
+      "Beginne mit der Mutter-Kind-Haltung: Wärme für eine Person.",
+      "Erweitere auf zwei Personen. Dann drei. Dann auf deine Familie.",
+      "Bemerke, wenn du anfängst zu selektieren. Kehre zur Gleichmut zurück.",
+      "Schließe am Ende dich selbst ausdrücklich ein: Du hast dieselbe Würde.",
+      "Ruhe in dieser allumfassenden Wärme."
+    ]},
+    { titel:"Liebe ohne Anhaftung", schritte:[
+      "Wähle ein Wesen, das dich zu Liebe inspiriert – ohne Begierde.",
+      "Spüre den Wunsch nach seinem Glück – ohne Bedingung, ohne Erwartung.",
+      "Beobachte, ob sich Anhaftung mischt: 'Wenn er glücklich ist, geht es mir besser' – das ist nicht maitrī.",
+      "Lass das los. Bleibe beim reinen Wunsch.",
+      "Erweitere auf alle Wesen."
+    ]}
+  ],
+  mitgefuehl: [
+    { titel:"Das Leid sehen (Verse 13–14)", schritte:[
+      "Erinnere dich an das Leid eines geliebten Menschen – wie du es nicht ertragen könntest.",
+      "Wende denselben Geist allen Wesen zu, die in Geburt, Alter, Krankheit, Tod erschöpft sind.",
+      "Spüre, ohne in Sentimentalität zu fallen: Aus dem Mark der Knochen, aus der Tiefe des Herzens.",
+      "Wünsche: 'Mein Körper, alles, was ich besitze – möge es alle Schmerzen vertreiben.'",
+      "Erkenne den Frieden, der mit Mitgefühl einhergeht."
+    ]},
+    { titel:"Der innere Arzt", schritte:[
+      "Stelle dir vor, du siehst ein Wesen leiden. Nicht sentimental – als Arzt.",
+      "Innere Haltung: Ich sehe das Leid. Ich kann etwas tun.",
+      "Spüre die Bereitschaft zu helfen – ruhig, mutig, frei von Panik.",
+      "Kultiviere den Wunsch: Möge dieses Wesen frei sein von Leid.",
+      "Erweitere auf alle leidenden Wesen."
+    ]}
+  ],
+  freude: [
+    { titel:"Welche Freude (Vers 16)", schritte:[
+      "Denke an ein Wesen, dem es gut geht.",
+      "Sprich innerlich: 'Welche Freude! Sie haben es selbst gefunden – das ist das Beste!'",
+      "Beobachte, ob Eifersucht aufkommt – und lass sie ziehen.",
+      "Erweitere: Mehrere Wesen, denen es gut geht.",
+      "Wünsche: 'Mögen sie Freude niemals verlieren.' Übe, bis du jedes Wesen einbezogen hast."
+    ]},
+    { titel:"Freude als Zufriedenheit", schritte:[
+      "Bemerke: Muditā ist nicht die Aufregung, wenn die eigene Mannschaft gewinnt.",
+      "Gemeint ist Zufriedenheit – ein friedliches Gestilltsein.",
+      "Denke an jemanden, dem es gut geht – auch einem Konkurrenten.",
+      "Bemerke die erste emotionale Reaktion. Übe: 'Gut so. Das ist gut.'",
+      "Kultiviere: Tiefe Zufriedenheit, wenn andere Glück haben."
+    ]}
+  ]
+};
+
+const MODULE = [
+  { nr:1, titel:"Grundlagen und Orientierung", verse:[1,2,3,4],
+    kernfragen:["Was sind die vier Unermesslichkeiten?","Was unterscheidet sie von den vier Brahmavihāras?","Wie verortet sich die Praxis im Theravāda, Mahāyāna und Vajrayāna?","Was ist Unwissenheit (avidyā)?"],
+    begriffe:[
+      {t:"Avidyā",                      d:"Nicht-Sehen der Wirklichkeit; angenommene Dualität von Subjekt und Objekt"},
+      {t:"Brahmavihāra",                d:"Göttlicher Verweilzustand; ohne Weisheit führt er zu Wiedergeburt in Formbereichen, nicht zur Befreiung"},
+      {t:"Unermesslichkeit (apramāṇa)", d:"Mit Weisheit verbunden; umfasst alle Wesen ohne Ausnahme; führt über Samsara hinaus"},
+      {t:"Referenziell / nicht-ref.",   d:"Mit Referenzpunkt: Praxis in gewöhnlichem Bewusstsein. Ohne: spontane Manifestation im natürlichen Geisteszustand"},
+      {t:"Yeshe (ye-shes)",             d:"Ursprüngliche Weisheit; natürliche Klarheit des Geistes – das, was durch die Praxis sichtbar wird"},
+    ],
+    kontemplation:"„Wenn Liebe, Mitgefühl, Freude und Unvoreingenommenheit nicht mit dem Pfad zur Befreiung verbunden sind, sind sie die vier göttlichen Verweilzustände, Ursachen von Samsara.” (Vers 2)\n\n• In welchen Momenten zeigt sich in mir etwas wie Liebende Güte? Wie fühlt sie sich von innen an?\n• Wo verwechsle ich Liebe mit Anhaftung, Mitgefühl mit Mitleid, Freude mit Aufregung, Gleichmut mit Gleichgültigkeit?\n• Was wäre es, wenn mein Geist von Natur aus friedlich wäre – und ich ihn nur durch meine Gedanken störe?",
+    meditation:"Praxis: Maitrī – Kontakt mit Liebender Güte\n\n• Setze dich aufrecht und entspannt. Lass den Geist ankommen.\n• Denke an eine Person, die in dir Wärme und Wohlwollen weckt – ohne Anhaftung.\n• Bleibe bei diesem Gefühl. Wie zeigt es sich im Körper? Im Geist?\n• Bemerke: Ist es Wärme – oder Begehren? Fürsorge – oder Besitz?\n• Ruhe in diesem Gefühl. Du musst es nicht steigern oder festhalten.\n\nEmpfohlene Dauer: 15–20 Minuten",
+    alltag:["Beobachte einen Tag lang, wie du Menschen spontan kategorisierst: Freund, Feind, neutral. Ohne Wertung – nur wahrnehmen.","Wenn du jemandem begegnest, der dir unangenehm ist: Pause. Bemerke die aufsteigende Emotion. Benenne sie innerlich.","Rezitiere täglich einmal die vier Zeilen der Unermesslichkeiten – mit Aufmerksamkeit, nicht mechanisch."]
+  },
+  { nr:2, titel:"Die vier Qualitäten im Detail", verse:[5],
+    kernfragen:["Was ist der genaue Gegenstand jeder der vier Qualitäten?","Was ist die Form / der Wunsch jeder Qualität?","Womit wird jede Qualität verwechselt?"],
+    begriffe:[
+      {t:"Maitrī ↔ Hass",        d:"Gegenstand: Unglückliche Wesen. Wunsch: Mögen sie Glück erlangen. Verwechslung: Anhaftung."},
+      {t:"Karuṇā ↔ Begierde",    d:"Gegenstand: Leidende Wesen. Wunsch: Mögen sie frei sein. Verwechslung: sentimentales Mitleid."},
+      {t:"Muditā ↔ Eifersucht",  d:"Gegenstand: Glückliche Wesen. Wunsch: Mögen sie es bewahren. Verwechslung: Aufregung."},
+      {t:"Upekṣa ↔ Unwissenheit",d:"Gegenstand: Parteiische Wesen. Wunsch: Unparteiischer Geist. Verwechslung: Gleichgültigkeit."},
+    ],
+    kontemplation:"„Die Natur des Mitgefühls ist Frieden. Wenn da Frieden ist, hat man die Kapazität zu helfen.” — Trinley Tulku\n\n• Maitrī: Wann habe ich echte Wärme erfahren – ohne Eigennutz?\n• Karuṇā: Wann war ich wirklich berührt vom Leid eines anderen – und was hielt mich zurück?\n• Muditā: Wann war ich aufrichtig froh über das Glück eines anderen – ohne Neid?\n• Upekṣa: Wann habe ich echten inneren Frieden erfahren – nach einem Abschluss, einem Loslassen?",
+    meditation:"Praxis: Maitrī – Erweiterung von Einer zu Vielen\n• Beginne mit der Mutter-Kind-Haltung: Wärme für eine Person.\n• Erweitere auf zwei. Dann drei. Dann auf deine Familie.\n• Bemerke, wenn du anfängst zu selektieren. Kehre zur Gleichmut zurück.\n• Schließe dich selbst ausdrücklich ein.\n\nPraxis: Karuṇā – Der innere Arzt\n• Stelle dir vor, du siehst ein Wesen leiden. Als Arzt: Ich sehe das Leid. Ich kann etwas tun.\n• Spüre die Bereitschaft zu helfen – ruhig, mutig, frei von Panik.\n• Kultiviere den Wunsch: Möge dieses Wesen frei sein von Leid.\n\nEmpfohlene Dauer: 15–20 Minuten",
+    alltag:["Wenn du jemanden leiden siehst: Übe drei Atemzüge lang den Karuṇā-Wunsch – ohne dich mitreißen zu lassen.","Wenn du Erfolg eines anderen bemerkst – sogar eines Konkurrenten: Bemerke die erste Reaktion. Übe: 'Gut so. Das ist gut.'","Abend-Journal: Welche der vier Qualitäten war heute präsent? Welche fehlte?"]
+  },
+  { nr:3, titel:"Mit Gleichmut beginnen", verse:[6,7,8,9,10],
+    kernfragen:["Warum sollen Anfänger mit Gleichmut beginnen?","Was sind die drei Schritte der diskursiven Gleichmuts-Praxis?","Was ist der Unterschied zwischen referenzieller und nicht-referenzieller Praxis?"],
+    begriffe:[
+      {t:"Schritt 1: Erkennen",   d:"Diskriminierung ist ein Fehler. Sie erzeugt getrübte Geisteszustände."},
+      {t:"Schritt 2: Reflektieren",d:"Die Diskriminierung hat keine solide Basis – Rollen wechseln über zahllose Leben."},
+      {t:"Schritt 3: Erweitern",  d:"Schrittweise alle Wesen einbeziehen – von einer Person bis zu Multiversen."},
+      {t:"Echte Upekṣa",          d:"Tiefer innerer Frieden, aus dem Güte fließt. Aktiver Wunsch für alle ohne Ausnahme."},
+    ],
+    kontemplation:"Reflexion 1: Rollen wechseln\n• Denke an jemanden, den du als störend erlebst.\n• Stell dir vor: Sie haben dir in früheren Leben geholfen – als Mutter, als Freund.\n• Wie verändert sich dein inneres Gefühl?\n\nReflexion 2: Alle wollen dasselbe\n• Blicke auf ein Wesen, das du kaum kennst.\n• Erkenne: Auch sie wollen glücklich sein und Leid vermeiden. Genau wie du.\n• In ihrer Verwirrung schaffen sie die Ursachen ihres Leidens. Genau wie du.",
+    meditation:"Praxis: Upekṣa mit Referenzpunkt (progressive Erweiterung)\n• Beginne: Du + eine neutrale Person.\n• Erzeuge den Wunsch: Möge dieser Geist frei sein von Anhaftung und Abneigung.\n• Erweitere: Wien → Österreich → Europa → Erde → alle Tiere → alle Wesen → Multiversen.\n\nPraxis: Upekṣa ohne Referenzpunkt\n• Nach der Erweiterung: Lass die Wesen als Objekte los.\n• Erkenne: Alle Erscheinungen sind nur Erscheinungen – wie ein Gesicht im Spiegel.\n• Lass den Geist ruhen – ohne Greifen, ohne Konstruktion.\n\nEmpfohlene Dauer: 20–30 Minuten",
+    alltag:["Das Flugzeug-Experiment: Du und andere in einer Gefahrensituation. Wer soll das Opfer sein? Beobachte deine erste Antwort. Dann übe: Es ist gleich schmerzhaft, egal wen es trifft.","Wenn du starke negative Reaktionen auf Nachrichten fühlst: Bemerke die Aufregung. Wut belastet deinen Geist, nicht die Welt. Was könnte ich von einem ruhigeren Geist aus tun?","Drei Tage: Wie oft unterscheidest du 'nah und fern'? Ohne Urteil beobachten."]
+  },
+  { nr:4, titel:"Integration und Vertiefung", verse:[11,12,13,14,15,16,17,18,19,20,21,22],
+    kernfragen:["Wie korrigieren die vier Qualitäten einander gegenseitig (Vers 18)?","Was sind die Früchte der Praxis (Verse 20–21)?","Was bedeutet: Leerheit, belebt durch Mitgefühl (Vers 23)?"],
+    begriffe:[
+      {t:"Liebe → Mitgefühl",    d:"Wenn Liebe zu Anhaftung wird: Mitgefühl auf Leid fokussieren."},
+      {t:"Mitgefühl → Freude",   d:"Wenn Mitgefühl zu Depression führt: nicht-referentielle Freude praktizieren."},
+      {t:"Freude → Gleichmut",   d:"Wenn Freude zu Ablenkung wird: Gleichmut, frei von nah und fern."},
+      {t:"Gleichmut → Liebe",    d:"Wenn Gleichmut zu Gleichgültigkeit wird: Liebe wie zuvor üben."},
+    ],
+    kontemplation:"„Leerheit, belebt durch Mitgefühl – das ist der Kern beider Fahrzeuge.” (Vers 23)\n\n• Was bedeutet es, dass mein Geist von Natur aus frei ist – und Praxis diese Freiheit enthüllt, nicht erzeugt?\n• Kann ich echte Fürsorge von Selbstbezug unterscheiden – auch subtil: 'Ich helfe, damit ich mich gut fühle'?\n• Was verändert sich, wenn ich erkenne: Alle Wesen suchen dasselbe wie ich, nur in Verwirrung?",
+    meditation:"Vollständige Sequenz (25–40 Minuten):\n\n1. Ankommen (3 Min.): Körper aufrichten. Drei tiefe Atemzüge.\n2. Motivation (2 Min.): Bodhicitta setzen. Die vier Zeilen rezitieren.\n3. Upekṣa (5–8 Min.): Progressive Erweiterung. Freunde und Feinde gleichstellen.\n4. Maitrī (5 Min.): Auf der Basis der Gleichheit: Wärme für alle.\n5. Karuṇā (5 Min.): Das Leid aller wahrnehmen. Mutige, ruhige Bereitschaft.\n6. Muditā (3 Min.): Freude an jedem Glück. Kein Neid.\n7. Ohne Referenz (5–10 Min.): Lass alle Objekte los. Lass den Geist ruhen.\n8. Widmung (2 Min.): Das Verdienst allen Wesen widmen.",
+    alltag:["Wenn Ärger aufsteigt: Pause. 'Da ist Ärger.' Wer wird zuerst verletzt? (Ich.) Warte. Handle dann aus Klarheit.","Bei anhaltender Abneigung: Diese Person war in früheren Leben mein Freund. Sie will dasselbe wie ich – in Verwirrung.","Jede Begegnung: Drei Sekunden Pause. 'Dieses Wesen will Glück. Wie ich.' Im Supermarkt, in der U-Bahn, vor dem Bildschirm.","Abends: Nicht Fehler bewerten – sondern bemerken, wo Diskriminierung aufgetaucht ist."]
+  },
+];
+
+const EINHEITEN = [
+  { nr:1, titel:"Grundlage und Maitrī", datum:"01. Mai 2026",
+    punkte:["Die vier Unermesslichkeiten – Überblick","Maitrī: Wunsch nach Glück für andere","Brahmavihāra als Zweck, nicht Mittel","Metapher der Wiese (Longchenpa)","Verwechslung: Anhaftung ≠ Liebende Güte"],
+    zitate:["„Wenn der Geist frei von Fiktionen ist, ist liebende Güte sein natürlicher Zustand.”","„Nützliche Fiktionen helfen, dorthin zu kommen – Andere als Familie sehen.”"],
+    link:"https://notes.granola.ai/t/d3db586d-d1e5-41d4-8e47-4b6a81610823-00best9l" },
+  { nr:2, titel:"Brahmavihāras vs. grenzenlose Haltungen", datum:"02. Mai 2026",
+    punkte:["Verse 2–4: Unterscheidung Brahmavihāra / Unermesslichkeit","Avidyā: Dualität von Wahrnehmendem und Wahrgenommenem","Mit / ohne Referenzpunkt","Meditation als Manifestation natürlicher Geistesruhe, nicht erzwungene Konzentration","Vier Unermesslichkeiten als Gegenmittel für die vier Geistesgifte"],
+    zitate:["„Sonst wird ein Meditationszentrum zum Konzentrationslager.”","„Schon eine Qualität praktiziert verändert alles.”"],
+    link:null },
+  { nr:3, titel:"Vier Bereiche, vier Wünsche", datum:"02. Mai 2026",
+    punkte:["Vers 5: Die Bereiche und Wünsche jeder Qualität","Patrul Rinpoches vier Bilder","Karuṇā: von der Wurzel kr- (handeln)","Muditā als Zufriedenheit, nicht Aufregung","Upekṣa: der Raum, aus dem echte Qualitäten fließen"],
+    zitate:["„Nach einer harten Prüfung – dieser freie Moment, wenn nichts mehr zu tun ist. Das ist Gleichmut.”","„Mitgefühl ist friedlich – aus Frieden heraus ist Hilfe möglich.”"],
+    link:null },
+  { nr:4, titel:"Wie zu praktizieren ist", datum:"03. Mai 2026",
+    punkte:["Verse 6–10: Praxis-Anleitung","Beginn mit Gleichmut","Drei Schritte: Diskriminierung erkennen → als Fehler sehen → als grundlos erkennen","Progressive Erweiterung bis zu Multiversen","Praxis ohne Referenz: ye-shes (ursprüngliches Wissen)"],
+    zitate:["„Diskriminierung ist nicht von den Umständen erzwungen – sie ist meine Entscheidung.”","„Gleichmut: Keine Präferenz. Es ist gleich schmerzhaft, wer auch immer es trifft.”"],
+    link:"https://notes.granola.ai/t/851ace9d-9975-48a0-8cf0-0a68ad3d602c-008umkv4" },
+];
+
+const ERINNERUNGEN = [
+  { q:"gleichmut",  t:"Ist da gerade ein Naher und ein Ferner in dir? Bemerke die Trennlinie – ohne sie zu erzwingen." },
+  { q:"gleichmut",  t:"Wenn Ärger aufsteigt: Wer wird verletzt? Mein eigener Geist ist das erste Opfer." },
+  { q:"gleichmut",  t:"Die Diskriminierung in mir ist mein Fehler, nicht das Verhalten der anderen." },
+  { q:"gleichmut",  t:"Freund wird zu Feind, Feind zu Freund. Keine Grenze ist substantiell." },
+  { q:"gleichmut",  t:"Gleichmut ist nicht Gleichgültigkeit – es ist der Raum, aus dem Liebe möglich wird." },
+  { q:"liebe",      t:"Wie eine Mutter zu ihrem einzigen Kind – kannst du das jetzt einer beliebigen Person wünschen?" },
+  { q:"liebe",      t:"Mag ich diese Person, weil sie mir etwas gibt? Das ist Anhaftung. Liebe wäre frei davon." },
+  { q:"liebe",      t:"Wenn dein Geist frei von Aggression ist – das ist liebende Güte. Sein natürlicher Zustand." },
+  { q:"mitgefuehl", t:"Sieh ein Lebewesen in Mühe – ohne in Trauer zu versinken. Was wäre die ruhige Antwort?" },
+  { q:"mitgefuehl", t:"Mitgefühl ist nicht: 'Wie unangenehm das für mich ist.' Es ist frei vom Imperativ des Ich." },
+  { q:"freude",     t:"Da freut sich gerade jemand. Kannst du dich mitfreuen, ohne dass es um dich geht?" },
+  { q:"freude",     t:"Welche Freude – sie brauchen mich nicht, um glücklich zu sein!" },
+  { q:"alle",       t:"Alle Wesen wollen Glück und scheuen Leid – darin sind sie gleich, ohne Ausnahme." },
+  { q:"alle",       t:"Vor der Sitzung: die vier Zeilen rezitieren. Ausrichtung des Geistes." },
+  { q:"alle",       t:"Jede Begegnung: drei Sekunden Pause. 'Dieses Wesen will Glück. Wie ich.'" },
+  { q:"alle",       t:"Wenn du die Pause spürst zwischen den Aufgaben – verweile darin. Das ist schon Gleichmut." },
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+
+const SK = "vier_unermesslichkeiten_v1";
+const defaultState = () => ({
+  sessions: [],
+  arc: { currentPhase:"gleichmut", phaseStarted:null, phaseHistory:[] },
+  prefs: { timerDefault:20, bell:true },
+  version: 1
+});
+let S = loadState();
+
+function loadState() {
+  try { const r = localStorage.getItem(SK); return r ? Object.assign(defaultState(), JSON.parse(r)) : defaultState(); }
+  catch(e) { return defaultState(); }
+}
+function save() { localStorage.setItem(SK, JSON.stringify(S)); }
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
+function dateISO(d) { return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function pad(n) { return String(n).padStart(2,"0"); }
+function fmtDateLong(iso) {
+  const dt = new Date(iso+"T12:00:00");
+  return dt.toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+}
+function esc(s) {
+  return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function getQ(id) { return QUALITAETEN.find(q=>q.id===id); }
+
+function toast(msg, ms=2200) {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), ms);
+}
+
+function streak() {
+  if (!S.sessions.length) return 0;
+  const dates = new Set(S.sessions.map(s=>s.date));
+  let n=0, d=new Date();
+  while (dates.has(dateISO(d))) { n++; d.setDate(d.getDate()-1); }
+  if (n===0) {
+    d = new Date(Date.now()-86400000);
+    while (dates.has(dateISO(d))) { n++; d.setDate(d.getDate()-1); }
+  }
+  return n;
+}
+
+function weekSessions() {
+  const start = dateISO(new Date(Date.now()-6*86400000));
+  return S.sessions.filter(s=>s.date>=start);
+}
+
+function todayReminder() {
+  const phase = S.arc.currentPhase;
+  const pool = ERINNERUNGEN.filter(r=>r.q===phase||r.q==="alle");
+  const seed = todayISO().split("-").reduce((a,b)=>a+parseInt(b),0);
+  return pool[seed % pool.length];
+}
+
+function bell() {
+  if (!S.prefs.bell) return;
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.value = 432;
+    g.gain.value = 0; o.connect(g); g.connect(ctx.destination); o.start();
+    g.gain.linearRampToValueAtTime(0.28, ctx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+2.8);
+    o.stop(ctx.currentTime+3); setTimeout(()=>ctx.close(),3500);
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════
+
+let activeTab = "heute";
+const scrollPos = {};
+
+function switchTab(name) {
+  if (name === activeTab) { document.getElementById("content").scrollTop=0; return; }
+  scrollPos[activeTab] = document.getElementById("content").scrollTop;
+  activeTab = name;
+  document.querySelectorAll("#tabbar button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+name));
+  renderPanel(name);
+  requestAnimationFrame(()=>{
+    document.getElementById("content").scrollTop = scrollPos[name]||0;
+  });
+}
+
+function renderPanel(name) {
+  const map = {heute:renderHeute,lehre:renderLehre,praxis:renderPraxis,tagebuch:renderTagebuch,bogen:renderBogen};
+  if (map[name]) map[name]();
+}
+
+// ═══════════════════════════════════════════════
+//  SHEET (bottom modal)
+// ═══════════════════════════════════════════════
+
+function openSheet(html) {
+  document.getElementById("sheet-content").innerHTML = html;
+  const bg = document.getElementById("sheet-bg");
+  bg.style.display = "flex";
+  requestAnimationFrame(()=>bg.classList.add("show"));
+}
+function closeSheet(e) {
+  if (e && e.target !== document.getElementById("sheet-bg")) return;
+  _closeSheet();
+}
+function _closeSheet() {
+  const bg = document.getElementById("sheet-bg");
+  bg.classList.remove("show");
+  setTimeout(()=>{ bg.style.display="none"; }, 250);
+}
+
+// ═══════════════════════════════════════════════
+//  HEUTE
+// ═══════════════════════════════════════════════
+
+function renderHeute() {
+  try {
+    const str = streak(), wk = weekSessions();
+    const wkMin = wk.reduce((s,x) => s + (x.duration||0), 0);
+    const phase = getQ(S.arc.currentPhase) || QUALITAETEN[0];
+    const rem = todayReminder() || ERINNERUNGEN[0];
+    const todaySess = S.sessions.filter(s => s.date === todayISO());
+
+    let sessHtml = '';
+    if (todaySess.length) {
+      let rows = '';
+      todaySess.forEach(function(s) {
+        const q = getQ(s.focus);
+        const pillClass = q ? q.farbe : 'neutral';
+        const pillName = q ? q.name : (s.focus || '–');
+        const notesHtml = s.notes ? '<div class="j-text">' + esc(s.notes) + '</div>' : '';
+        rows += '<div class="j-entry">'
+          + '<div class="j-date">' + (s.duration ? s.duration + ' min · ' : '')
+          + '<span class="pill ' + pillClass + '">' + pillName + '</span>'
+          + (s.mode ? ' · ' + esc(s.mode) : '') + '</div>'
+          + notesHtml + '</div>';
+      });
+      sessHtml = '<div class="card"><div class="label" style="margin-bottom:8px;">Heute geübt</div>' + rows + '</div>';
+    } else {
+      sessHtml = '<div class="card">'
+        + '<div class="label" style="margin-bottom:8px;">Noch nicht geübt</div>'
+        + '<div class="small muted" style="margin-bottom:12px;">Auch f\xFCnf Minuten z\xE4hlen. Was darf es heute sein?</div>'
+        + '<div class="btn-row">'
+        + '<button class="btn-primary" onclick="quickStart(\'verse\')">Vers lesen</button>'
+        + '<button class="btn-secondary" onclick="quickStart(\'rezitation\')">Rezitation</button>'
+        + '<button class="btn-secondary" onclick="quickStart(\'kontemplation\')">Kontemplation</button>'
+        + '</div>'
+        + '<button class="btn-ghost" onclick="showLogSheet()" style="margin-top:8px;padding-left:0;">Nur eintragen →</button>'
+        + '</div>';
+    }
+
+    const remPillClass = rem.q === 'alle' ? 'neutral' : rem.q;
+    const remPillText = rem.q === 'alle' ? 'alle vier' : (getQ(rem.q) ? getQ(rem.q).name : '');
+
+    const html = '<div style="text-align:center;padding:14px 0 6px;">'
+      + '<div style="font-size:.8rem;letter-spacing:.08em;color:var(--ink-muted);margin-bottom:2px;">DIE VIER UNERMESSLICHKEITEN</div>'
+      + '<div style="font-size:.88rem;font-style:italic;color:var(--ink-soft);">Ein Praxisbegleiter nach Longchenpa</div>'
+      + '</div>'
+      + '<div class="card"><div class="streak-row">'
+      + '<div><div class="streak-num">' + str + '</div><div class="small muted">Tage in Folge</div></div>'
+      + '<div style="border-left:1px solid var(--line);padding-left:20px;">'
+      + '<div style="font-size:1.05rem;font-weight:500;">' + wk.length + ' <span class="small muted">Sitzungen</span></div>'
+      + '<div style="font-size:1.05rem;font-weight:500;">' + wkMin + ' <span class="small muted">Min. diese Woche</span></div>'
+      + '</div></div></div>'
+      + '<div class="card reminder">'
+      + '<div class="label" style="margin-bottom:6px;">Impuls f\xFCr heute</div>'
+      + '<div class="quote">„' + esc(rem.t) + '“</div>'
+      + '<div style="margin-top:8px;"><span class="pill ' + remPillClass + '">' + remPillText + '</span></div>'
+      + '</div>'
+      + '<div class="card">'
+      + '<div class="label" style="margin-bottom:8px;">Aktueller Fokus</div>'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+      + '<span class="pill ' + phase.farbe + '">' + phase.name + '</span>'
+      + '<span class="small muted">' + phase.sanskrit + '</span></div>'
+      + '<div class="small" style="color:var(--ink-soft);margin-bottom:12px;">' + esc(phase.kernpunkt) + '</div>'
+      + '<div class="btn-row">'
+      + '<button class="btn-primary" onclick="switchTab(\'praxis\')">Jetzt \xFCben</button>'
+      + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">Bogen</button>'
+      + '</div></div>'
+      + sessHtml;
+
+    document.getElementById("panel-heute").innerHTML = html;
+  } catch(err) {
+    document.getElementById("panel-heute").innerHTML = '<div class="card"><div class="card-title">Fehler beim Laden</div><div class="small muted">' + String(err) + '</div></div>';
+    console.error("renderHeute:", err);
+  }
+}
+
+function quickStart(mode) {
+  switchTab('praxis');
+  setTimeout(()=>startMode(mode),80);
+}
+
+// ═══════════════════════════════════════════════
+//  LEHRE
+// ═══════════════════════════════════════════════
+
+let lehreTab = "module";
+
+function renderLehre() {
+  document.getElementById("panel-lehre").innerHTML = `
+    <div style="padding-top:6px;">
+      <div class="seg">
+        <button class="${lehreTab==='module'?'active':''}" onclick="setLehreTab('module')">Module</button>
+        <button class="${lehreTab==='sitzungen'?'active':''}" onclick="setLehreTab('sitzungen')">Sitzungen</button>
+        <button class="${lehreTab==='verse'?'active':''}" onclick="setLehreTab('verse')">Verse</button>
+      </div>
+      <div id="lehre-body"></div>
+    </div>
+  `;
+  renderLehreBody();
+}
+
+function setLehreTab(t) {
+  lehreTab = t;
+  document.querySelectorAll("#panel-lehre .seg button").forEach(b=>{
+    b.classList.toggle("active", b.textContent.toLowerCase()===({module:"module",sitzungen:"sitzungen",verse:"verse"}[t]));
+  });
+  renderLehreBody();
+}
+
+function renderLehreBody() {
+  const el = document.getElementById("lehre-body");
+  if (!el) return;
+  if (lehreTab === "module") {
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-title">Vier Qualitäten</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+          ${QUALITAETEN.map(q=>`
+            <div onclick="showQSheet('${q.id}')" style="background:var(--bg-soft);border-radius:10px;padding:12px;cursor:pointer;">
+              <span class="pill ${q.farbe}">${q.name}</span>
+              <div class="small muted" style="margin-top:6px;">${q.sanskrit}</div>
+              <div class="small" style="color:var(--ink-soft);margin-top:4px;line-height:1.3;">${esc(q.bild)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ${MODULE.map(m=>`
+        <div class="card" onclick="showModulSheet(${m.nr})" style="cursor:pointer;">
+          <div class="label" style="margin-bottom:4px;">Modul ${m.nr}</div>
+          <div class="card-title">${esc(m.titel)}</div>
+          <div class="small muted">${m.verse.length} Vers${m.verse.length===1?'':'e'} · Studium · Kontemplation · Meditation · Alltag</div>
+        </div>
+      `).join('')}
+    `;
+  } else if (lehreTab === "sitzungen") {
+    el.innerHTML = `
+      ${EINHEITEN.map(e=>`
+        <div class="card" onclick="showEinheitSheet(${e.nr})" style="cursor:pointer;">
+          <div class="label" style="margin-bottom:4px;">Einheit ${e.nr} · ${esc(e.datum)}</div>
+          <div class="card-title">${esc(e.titel)}</div>
+          <div class="small muted">${e.punkte.length} Schwerpunkte</div>
+        </div>
+      `).join('')}
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-title">Theravāda-Rezitation</div>
+        <div class="verse">${esc(REZITATION)}</div>
+        <div class="small muted">Diese vier Zeilen können vor jeder formellen Sitzung rezitiert werden.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">25 Verse von Longchenpa</div>
+        <div class="small muted" style="margin-bottom:12px;">Aus „Ruhe finden in der Natur des Geistes"</div>
+        ${VERSE.map(v=>`
+          <details>
+            <summary>Vers ${v.n}</summary>
+            <div class="verse">${esc(v.text)}</div>
+          </details>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+function showQSheet(id) {
+  const q = getQ(id);
+  openSheet(`
+    <h2><span class="pill ${q.farbe}">${q.name}</span> <span class="small muted">${q.sanskrit}</span></h2>
+    <div><strong>Bild:</strong> ${esc(q.bild)}</div>
+    <div style="margin-top:8px;"><strong>In der Wiese:</strong> ${esc(q.metapher)}</div>
+    <div style="margin-top:8px;"><strong>Fokus:</strong> ${esc(q.fokus)}</div>
+    <div style="margin-top:8px;"><strong>Wunsch:</strong> <em>${esc(q.wunsch)}</em></div>
+    <div style="margin-top:8px;"><strong>Gegengift für:</strong> ${esc(q.gegengift)}</div>
+    <div style="margin-top:8px;"><strong>Nicht zu verwechseln mit:</strong> ${esc(q.verwechslung)}</div>
+    <blockquote style="margin-top:12px;">${esc(q.kernpunkt)}</blockquote>
+    <div style="margin-top:12px;"><strong>Zeichen des Fortschritts:</strong><br><em>${esc(q.zeichen)}</em></div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>showKontemplationListe('${id}'),80);">Kontemplieren</button>
+      <button class="btn-secondary" onclick="_closeSheet()">Schließen</button>
+    </div>
+  `);
+}
+
+function showModulSheet(nr) {
+  const m = MODULE.find(x=>x.nr===nr);
+  const verseHtml = m.verse.map(n=>{
+    const v = VERSE.find(x=>x.n===n);
+    return v ? `<details><summary>Vers ${v.n}</summary><div class="verse">${esc(v.text)}</div></details>` : '';
+  }).join('');
+  openSheet(`
+    <div class="label">Modul ${m.nr}</div>
+    <h2 style="margin-bottom:14px;">${esc(m.titel)}</h2>
+
+    <details open><summary><strong>Studium</strong></summary>
+      <div style="margin-top:10px;">
+        <div class="small muted" style="margin-bottom:6px;">Kernfragen</div>
+        <ul style="padding-left:18px;line-height:1.8;">${m.kernfragen.map(f=>`<li class="small">${esc(f)}</li>`).join('')}</ul>
+        <div class="small muted" style="margin-top:10px;margin-bottom:6px;">Begriffe</div>
+        ${m.begriffe.map(b=>`<div style="margin-bottom:8px;"><strong class="small">${esc(b.t)}</strong><div class="small muted">${esc(b.d)}</div></div>`).join('')}
+      </div>
+    </details>
+    <hr class="divider">
+
+    <details><summary><strong>Verse</strong></summary>
+      <div style="margin-top:10px;">${verseHtml}</div>
+    </details>
+    <hr class="divider">
+
+    <details><summary><strong>Kontemplation</strong></summary>
+      <div style="margin-top:10px;white-space:pre-line;font-size:.9rem;color:var(--ink-soft);">${esc(m.kontemplation)}</div>
+    </details>
+    <hr class="divider">
+
+    <details><summary><strong>Formelle Meditation</strong></summary>
+      <div style="margin-top:10px;white-space:pre-line;font-size:.9rem;color:var(--ink-soft);">${esc(m.meditation)}</div>
+    </details>
+    <hr class="divider">
+
+    <details><summary><strong>Alltag</strong></summary>
+      <ul style="margin-top:10px;padding-left:18px;">
+        ${m.alltag.map(a=>`<li class="small" style="margin-bottom:8px;color:var(--ink-soft);">${esc(a)}</li>`).join('')}
+      </ul>
+    </details>
+
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="_closeSheet()">Schließen</button>
+    </div>
+  `);
+}
+
+function showEinheitSheet(nr) {
+  const e = EINHEITEN.find(x=>x.nr===nr);
+  openSheet(`
+    <div class="label">Sitzung ${e.nr} · ${esc(e.datum)}</div>
+    <h2 style="margin-bottom:14px;">${esc(e.titel)}</h2>
+    <div class="small muted" style="margin-bottom:6px;">Schwerpunkte</div>
+    <ul style="padding-left:18px;line-height:1.8;margin-bottom:14px;">
+      ${e.punkte.map(p=>`<li class="small">${esc(p)}</li>`).join('')}
+    </ul>
+    ${e.zitate.map(z=>`<blockquote>${esc(z)}</blockquote>`).join('')}
+    ${e.link?`<div style="margin-top:14px;"><a href="${esc(e.link)}" target="_blank" rel="noopener" style="color:var(--accent);font-size:.88rem;">Transkript →</a></div>`:''}
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="_closeSheet()">Schließen</button>
+    </div>
+  `);
+}
+
+// ═══════════════════════════════════════════════
+//  PRAXIS
+// ═══════════════════════════════════════════════
+
+function renderPraxis() {
+  const phase = getQ(S.arc.currentPhase);
+  document.getElementById("panel-praxis").innerHTML = `
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div class="label" style="margin-bottom:4px;">Aktueller Fokus</div>
+          <span class="pill ${phase.farbe}">${phase.name}</span>
+          <span class="small muted" style="margin-left:8px;">${phase.sanskrit}</span>
+        </div>
+        <button class="btn-ghost" onclick="showFokusSheet()" style="padding:8px 0;">ändern →</button>
+      </div>
+    </div>
+    <div class="mode-grid">
+      <button class="mode-btn" onclick="startMode('rezitation')">
+        <div class="m-title">Rezitation</div>
+        <div class="m-desc">Die vier Zeilen als Ausrichtung des Geistes</div>
+      </button>
+      <button class="mode-btn" onclick="startMode('verse')">
+        <div class="m-title">Vers lesen</div>
+        <div class="m-desc">Einen Vers Longchenpas kontemplieren</div>
+      </button>
+      <button class="mode-btn" onclick="showKontemplationListe(S.arc.currentPhase)">
+        <div class="m-title">Kontemplation</div>
+        <div class="m-desc">Schritt-für-Schritt Anleitung</div>
+      </button>
+      <button class="mode-btn" onclick="startMode('stille')">
+        <div class="m-title">Stille + Timer</div>
+        <div class="m-desc">Ruhe mit Glocke am Anfang und Ende</div>
+      </button>
+    </div>
+    <div id="runner"></div>
+  `;
+}
+
+function showFokusSheet() {
+  openSheet(`
+    <h2>Fokus wählen</h2>
+    <div class="small muted" style="margin-bottom:14px;">Welche Qualität steht gerade im Vordergrund?</div>
+    ${QUALITAETEN.map(q=>`
+      <div onclick="setFokus('${q.id}')" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer;background:${q.id===S.arc.currentPhase?'var(--bg-soft)':'transparent'};">
+        <span class="pill ${q.farbe}">${q.name}</span>
+        <div class="small muted" style="flex:1;">${esc(q.kernpunkt.slice(0,60))}…</div>
+        ${q.id===S.arc.currentPhase?'<div style="color:var(--accent);font-size:1.1rem;">✓</div>':''}
+      </div>
+    `).join('')}
+    <div style="height:8px;"></div>
+  `);
+}
+
+function setFokus(id) {
+  if (S.arc.currentPhase !== id) {
+    if (S.arc.currentPhase) {
+      S.arc.phaseHistory.push({
+        phase: S.arc.currentPhase,
+        startedAt: S.arc.phaseStarted,
+        completedAt: new Date().toISOString(),
+        count: S.sessions.filter(s=>s.focus===S.arc.currentPhase).length
+      });
+    }
+    S.arc.currentPhase = id;
+    S.arc.phaseStarted = new Date().toISOString();
+    save();
+  }
+  _closeSheet();
+  renderPraxis();
+  toast("Fokus: " + getQ(id).name);
+}
+
+// ─── Runner ───────────────────────────────────
+
+let RN = { mode:null, step:0, steps:[], t0:null, timer:null, dur:0, qId:null };
+
+function startMode(mode) {
+  const el = document.getElementById("runner");
+  if (!el) { switchTab('praxis'); setTimeout(()=>startMode(mode),80); return; }
+  if (mode==="stille") { showTimerSetup(); return; }
+  if (mode==="kontemplation") { showKontemplationListe(S.arc.currentPhase); return; }
+
+  el.style.display="block";
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+
+  if (mode==="rezitation") {
+    RN = { mode, step:0, t0:Date.now(), timer:null, dur:5, qId:null, steps:[
+      {stage:"Vorbereitung", text:"Setze dich bequem hin. Ein paar Atemzüge ankommen lassen.", it:false},
+      {stage:"Rezitation", text:REZITATION, it:true},
+      {stage:"Verweilen", text:"Lass die Worte nachklingen. Ruhe einen Moment im Wunsch selbst.", it:false},
+      {stage:"Abschluss", text:"Widme die Tugend allen Wesen.", it:false},
+    ]};
+  } else if (mode==="verse") {
+    const v = VERSE[Math.floor(Math.random()*12)];
+    RN = { mode, step:0, t0:Date.now(), timer:null, dur:8, qId:null, steps:[
+      {stage:"Vers "+v.n+" · Longchenpa", text:v.text, it:true},
+      {stage:"Verweilen", text:"Welcher Satz hallt nach? Bleib bei ihm.", it:false},
+      {stage:"Abschluss", text:"Eine kurze Notiz oder einfach gehen lassen.", it:false},
+    ]};
+  }
+  renderRunner();
+}
+
+function showKontemplationListe(qId) {
+  const el = document.getElementById("runner");
+  if (!el) return;
+  el.style.display="block";
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+  const q = getQ(qId);
+  const list = KONTEMPLATIONEN[qId]||[];
+  el.innerHTML = `
+    <div style="margin-bottom:12px;">
+      <div class="label" style="margin-bottom:6px;">Kontemplation</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        ${QUALITAETEN.map(x=>`<button class="btn-${x.id===qId?'secondary':'ghost'}" onclick="showKontemplationListe('${x.id}')" style="padding:6px 12px;font-size:.82rem;">${x.name}</button>`).join('')}
+      </div>
+      ${list.map((k,i)=>`
+        <div class="list-item" onclick="startKontemplation('${qId}',${i})">
+          <div class="li-title">${esc(k.titel)}</div>
+          <div class="li-sub">${k.schritte.length} Schritte</div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn-ghost" onclick="endRunner()" style="padding:8px 0;">Schließen</button>
+  `;
+}
+
+function startKontemplation(qId, idx) {
+  const k = KONTEMPLATIONEN[qId][idx];
+  const q = getQ(qId);
+  RN = { mode:"kontemplation", step:0, t0:Date.now(), timer:null, dur:0, qId, steps:[
+    {stage:"Vorbereitung · "+q.name, text:"Setze dich bequem hin. Ein paar Atemzüge. Optional die vier Zeilen rezitieren.", it:false},
+    ...k.schritte.map(s=>({stage:esc(k.titel), text:s, it:false})),
+    {stage:"Verweilen", text:"Bleib einen Moment in dem, was sich gezeigt hat.", it:false},
+    {stage:"Abschluss", text:"Widmung. Lass die Wirkung sich entfalten.", it:false},
+  ]};
+  const el = document.getElementById("runner");
+  if (el) { el.style.display="block"; el.scrollIntoView({behavior:"smooth",block:"start"}); }
+  renderRunner();
+}
+
+function renderRunner() {
+  const el = document.getElementById("runner");
+  if (!el) return;
+  const step = RN.steps[RN.step];
+  if (!step) { endRunner(); return; }
+  el.innerHTML = `
+    <div class="runner-stage">${esc(step.stage||'')} · ${RN.step+1}/${RN.steps.length}</div>
+    <div class="runner-text${step.it?' italic':''}">${esc(step.text)}</div>
+    <div class="runner-controls">
+      ${RN.step>0?`<button class="btn-secondary" onclick="rnPrev()">← Zurück</button>`:''}
+      ${RN.step<RN.steps.length-1
+        ?`<button class="btn-primary" onclick="rnNext()">Weiter →</button>`
+        :`<button class="btn-primary" onclick="finishRunner()">Sitzung abschließen ✓</button>`}
+      <button class="btn-ghost" onclick="endRunner()">Beenden</button>
+    </div>
+  `;
+}
+
+function rnNext() { RN.step=Math.min(RN.steps.length-1,RN.step+1); renderRunner(); }
+function rnPrev() { RN.step=Math.max(0,RN.step-1); renderRunner(); }
+
+function finishRunner() {
+  const mins = Math.max(1,Math.round((Date.now()-RN.t0)/60000));
+  showLogSheet({ duration:mins, focus:RN.qId||S.arc.currentPhase, mode:RN.mode, afterSave:()=>endRunner() });
+}
+
+function endRunner() {
+  if (RN.timer) clearInterval(RN.timer);
+  const el = document.getElementById("runner");
+  if (el) { el.style.display="none"; el.innerHTML=""; }
+  RN = { mode:null, step:0, steps:[], t0:null, timer:null, dur:0, qId:null };
+}
+
+// ─── Timer ────────────────────────────────────
+
+function showTimerSetup() {
+  const el = document.getElementById("runner");
+  el.style.display="block";
+  el.innerHTML = `
+    <div style="margin-bottom:16px;"><strong>Stille mit Timer</strong></div>
+    <label class="field"><span>Dauer (Minuten)</span>
+      <input type="number" id="timer-dur" value="${S.prefs.timerDefault}" min="1" max="180" style="max-width:120px;">
+    </label>
+    <label class="field" style="display:flex;align-items:center;gap:8px;font-size:.9rem;">
+      <input type="checkbox" id="timer-bell" ${S.prefs.bell?'checked':''}>
+      Glocke am Anfang und Ende
+    </label>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="startTimer()">Starten</button>
+      <button class="btn-ghost" onclick="endRunner()">Abbrechen</button>
+    </div>
+  `;
+}
+
+function startTimer() {
+  const dur = parseInt(document.getElementById("timer-dur").value,10)||20;
+  const useBell = document.getElementById("timer-bell").checked;
+  S.prefs.timerDefault = dur; S.prefs.bell = useBell; save();
+  if (useBell) bell();
+  let rem = dur * 60;
+  RN.mode="stille"; RN.t0=Date.now(); RN.dur=dur;
+
+  const el = document.getElementById("runner");
+  const draw = () => {
+    const m=Math.floor(rem/60), s=rem%60;
+    el.innerHTML = `
+      <div class="timer-display">${m}:${pad(s)}</div>
+      <div class="small muted" style="text-align:center;margin-bottom:20px;">In Stille sitzen</div>
+      <div class="runner-controls">
+        <button class="btn-secondary" onclick="finishRunner()">Beenden & eintragen</button>
+        <button class="btn-ghost" onclick="endRunner()">Abbrechen</button>
+      </div>
+    `;
+  };
+  draw();
+  RN.timer = setInterval(()=>{
+    rem--;
+    if (rem<=0) { clearInterval(RN.timer); if(useBell)bell(); finishRunner(); return; }
+    draw();
+  },1000);
+}
+
+// ═══════════════════════════════════════════════
+//  LOG SHEET
+// ═══════════════════════════════════════════════
+
+let _logAfter = null;
+
+function showLogSheet(pre={}) {
+  _logAfter = pre.afterSave||null;
+  const focus = pre.focus||S.arc.currentPhase;
+  const dur = pre.duration||"";
+  const mode = pre.mode||"";
+  openSheet(`
+    <h2>Sitzung eintragen</h2>
+    <label class="field"><span>Datum</span>
+      <input type="text" id="log-date" value="${todayISO()}">
+    </label>
+    <label class="field"><span>Dauer (Minuten)</span>
+      <input type="number" id="log-dur" value="${dur}" placeholder="z.B. 20" min="0">
+    </label>
+    <label class="field"><span>Fokus</span>
+      <select id="log-focus">
+        ${QUALITAETEN.map(q=>`<option value="${q.id}"${q.id===focus?' selected':''}>${q.name} (${q.sanskrit})</option>`).join('')}
+        <option value="alle"${focus==='alle'?' selected':''}>Alle vier</option>
+      </select>
+    </label>
+    <label class="field"><span>Modus</span>
+      <input type="text" id="log-mode" value="${esc(mode)}" placeholder="Stille, Vers, Kontemplation …">
+    </label>
+    <label class="field"><span>Erfahrung (optional)</span>
+      <textarea id="log-notes" placeholder="Was hat sich gezeigt? Welche Klarheit, welche Schwierigkeit?"></textarea>
+    </label>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="saveLog()">Eintragen</button>
+      <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>
+    </div>
+  `);
+}
+
+function saveLog() {
+  const date  = document.getElementById("log-date").value.trim()||todayISO();
+  const dur   = parseInt(document.getElementById("log-dur").value,10)||0;
+  const focus = document.getElementById("log-focus").value;
+  const mode  = document.getElementById("log-mode").value.trim();
+  const notes = document.getElementById("log-notes").value.trim();
+  S.sessions.unshift({id:uid(),date,duration:dur,focus,mode,notes});
+  save(); _closeSheet(); toast("Eingetragen ✓");
+  if (_logAfter) { _logAfter(); _logAfter=null; }
+  renderPanel(activeTab);
+}
+
+// ═══════════════════════════════════════════════
+//  TAGEBUCH
+// ═══════════════════════════════════════════════
+
+function renderTagebuch() {
+  document.getElementById("panel-tagebuch").innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="card-title" style="margin:0;">Tagebuch</div>
+        <button class="btn-primary" onclick="showLogSheet()" style="padding:8px 14px;font-size:.85rem;">+ Neu</button>
+      </div>
+      <div class="search-wrap">
+        <div class="search-icon">⌕</div>
+        <input type="text" id="j-search" placeholder="Suchen …" oninput="filterJournal()">
+      </div>
+    </div>
+    <div class="card" id="j-list">
+      ${S.sessions.length===0?`<div class="muted small">Noch keine Einträge.</div>`:
+        S.sessions.map(s=>{
+          const q=getQ(s.focus);
+          return `<div class="j-entry" data-s="${esc((s.notes||'')+(s.mode||'')+(q?.name||''))}">
+            <div class="j-date">
+              ${fmtDateLong(s.date)}
+              ${s.duration?'· '+s.duration+' min':''}
+              ${q?`· <span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'· <span class="pill neutral">alle vier</span>':'')}
+              ${s.mode?'· '+esc(s.mode):''}
+              <button onclick="delSession('${s.id}')" style="float:right;background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 4px;">×</button>
+            </div>
+            ${s.notes?`<div class="j-text">${esc(s.notes)}</div>`:`<div class="small muted">– keine Notizen –</div>`}
+          </div>`;
+        }).join('')
+      }
+    </div>
+  `;
+}
+
+function filterJournal() {
+  const q = document.getElementById("j-search")?.value.toLowerCase()||"";
+  document.querySelectorAll("#j-list .j-entry").forEach(el=>{
+    const hay = ((el.dataset.s||"")+el.textContent).toLowerCase();
+    el.style.display = hay.includes(q)?"":"none";
+  });
+}
+
+function delSession(id) {
+  if (!confirm("Eintrag löschen?")) return;
+  S.sessions = S.sessions.filter(s=>s.id!==id);
+  save(); renderTagebuch(); toast("Gelöscht");
+}
+
+// ═══════════════════════════════════════════════
+//  BOGEN
+// ═══════════════════════════════════════════════
+
+function renderBogen() {
+  const phase = S.arc.currentPhase;
+  const pd = getQ(phase);
+  const ps = S.arc.phaseStarted;
+  const phSess = S.sessions.filter(s=>s.focus===phase&&(!ps||s.date>=ps.slice(0,10)));
+  const total = S.sessions.length;
+  const totalMin = S.sessions.reduce((s,x)=>s+(x.duration||0),0);
+
+  const byQ = {}; QUALITAETEN.forEach(q=>byQ[q.id]={c:0,m:0}); byQ.alle={c:0,m:0};
+  S.sessions.forEach(s=>{ if(byQ[s.focus]){byQ[s.focus].c++;byQ[s.focus].m+=s.duration||0;} });
+
+  const allDates = new Set(S.sessions.map(s=>s.date));
+
+  document.getElementById("panel-bogen").innerHTML = `
+    <div class="card">
+      <div class="card-title">Praxis-Bogen</div>
+      <div class="small muted" style="margin-bottom:12px;">Empfohlen: erst Gleichmut, dann Liebe, Mitgefühl, Freude.</div>
+      ${["gleichmut","liebe","mitgefuehl","freude"].map((id,i,arr)=>{
+        const q=getQ(id), cur=id===phase, done=S.arc.phaseHistory.some(h=>h.phase===id);
+        return `
+          <div class="arc-row">
+            <div class="arc-dot${cur?' active':done?' done':''}"></div>
+            <div style="flex:1;display:flex;align-items:center;gap:8px;">
+              <span class="pill ${q.farbe}">${q.name}</span>
+              <span class="small muted">${q.sanskrit}</span>
+              ${cur?'<span class="small" style="color:var(--accent);">aktuell</span>':''}
+            </div>
+            <button class="btn-ghost" onclick="setFokus('${id}')" style="font-size:.8rem;padding:6px 10px;">setzen</button>
+          </div>
+          ${i<arr.length-1?'<div class="arc-line"></div>':''}
+        `;
+      }).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-title">Aktuelle Phase: ${pd.name}</div>
+      ${ps?`<div class="small muted" style="margin-bottom:6px;">seit ${ps.slice(0,10)}</div>`:''}
+      <div class="small">${phSess.length} Sitzungen · ${phSess.reduce((s,x)=>s+(x.duration||0),0)} Minuten</div>
+      <div class="small muted" style="margin-top:8px;font-style:italic;">${esc(pd.zeichen)}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Letzte 12 Wochen</div>
+      <div class="cal-head"><div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div></div>
+      <div class="cal-wrap">${renderCalendar(allDates)}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Verteilung</div>
+      <div class="small muted" style="margin-bottom:10px;">Gesamt: ${total} Sitzungen · ${totalMin} Minuten</div>
+      ${QUALITAETEN.map(q=>{
+        const d=byQ[q.id], pct=total?Math.round(d.c/total*100):0;
+        return `<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="pill ${q.farbe}">${q.name}</span>
+            <span class="small muted">${d.c} · ${d.m} min</span>
+          </div>
+          <div class="stat-bar-bg" style="margin-top:4px;"><div class="stat-bar" style="width:${pct}%"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${S.arc.phaseHistory.length?`
+    <div class="card">
+      <div class="card-title">Phasen-Verlauf</div>
+      ${S.arc.phaseHistory.map(h=>{
+        const q=getQ(h.phase);
+        return `<div class="j-entry">
+          <div class="j-date">${h.startedAt?.slice(0,10)||'?'} – ${h.completedAt?.slice(0,10)||'?'}</div>
+          <div><span class="pill ${q.farbe}">${q.name}</span> · ${h.count||0} Sitzungen</div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">Einstellungen</div>
+      <label class="field"><span>Standard-Timer (Minuten)</span>
+        <input type="number" id="pref-timer" value="${S.prefs.timerDefault}" min="1" max="180" style="max-width:120px;" onchange="S.prefs.timerDefault=parseInt(this.value,10)||20;save();">
+      </label>
+      <label class="field" style="display:flex;align-items:center;gap:8px;font-size:.9rem;">
+        <input type="checkbox" id="pref-bell" ${S.prefs.bell?'checked':''} onchange="S.prefs.bell=this.checked;save();">
+        Glocke aktivieren
+      </label>
+      <hr class="divider">
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="exportData()">Exportieren (JSON)</button>
+        <button class="btn-secondary" onclick="document.getElementById('imp').click()">Importieren</button>
+        <input type="file" id="imp" accept=".json,application/json" style="display:none;" onchange="importData(this)">
+      </div>
+      <button class="btn-ghost" onclick="if(confirm('Wirklich alle Daten löschen?'))resetAll()" style="margin-top:8px;color:var(--ink-muted);">Alles zurücksetzen</button>
+    </div>
+    <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.6;">
+      Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
+      Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.
+    </div>
+  `;
+}
+
+function renderCalendar(datesSet) {
+  const today = new Date();
+  const start = new Date(today);
+  start.setDate(today.getDate()-83);
+  while (start.getDay()!==1) start.setDate(start.getDate()-1);
+  const cells=[]; const dt=new Date(start);
+  while (dt<=today) {
+    const iso=dateISO(dt);
+    cells.push(`<div class="cal-day${datesSet.has(iso)?' done':''}${iso===todayISO()?' today':''}" title="${iso}">${dt.getDate()}</div>`);
+    dt.setDate(dt.getDate()+1);
+  }
+  return cells.join('');
+}
+
+// ═══════════════════════════════════════════════
+//  DATA EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "vier-unermesslichkeiten-"+todayISO()+".json";
+  a.click();
+}
+
+function importData(input) {
+  const file = input.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.sessions && d.arc) { S = Object.assign(defaultState(), d); save(); renderPanel(activeTab); toast("Importiert ✓"); }
+      else toast("Ungültige Datei");
+    } catch(e) { toast("Fehler beim Importieren"); }
+  };
+  r.readAsText(file);
+}
+
+function resetAll() {
+  S = defaultState(); save(); renderPanel(activeTab); toast("Zurückgesetzt");
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+
+renderHeute();
+</script>
+</body>
+</html>
