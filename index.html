@@ -34,7 +34,9 @@ body { height: 100%; background: var(--bg); color: var(--ink);
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { display: flex; flex-direction: column;
   position: fixed; inset: 0;
-  padding-top: env(safe-area-inset-top, 0px); }
+  padding-top: env(safe-area-inset-top, 0px);
+  background: #fff; }
+#content { background: var(--bg); }
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
