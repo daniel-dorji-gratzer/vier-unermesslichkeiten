@@ -254,6 +254,45 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 
 /* ── Scroll restoration ── */
 #content { scroll-behavior: auto; }
+
+/* ── Lernpfad grid ── */
+.path-header { display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.path-hcell { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--ink-muted); text-align: center; }
+.path-row { display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; align-items: center; }
+.path-q { padding-right: 4px; }
+.path-cell { border-radius: 10px; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; cursor: pointer; touch-action: manipulation; font-size: .62rem;
+  font-weight: 600; gap: 3px; padding: 8px 4px; text-align: center; min-height: 58px;
+  border: 1.5px solid var(--line); background: var(--bg-soft); color: var(--ink-muted);
+  transition: transform .1s; }
+.path-cell:active { transform: scale(.94); }
+.path-cell.done { color: #fff; border-color: transparent; }
+.path-cell.soft-locked { opacity: .38; }
+.path-cell-icon { font-size: 1.1rem; line-height: 1; }
+
+/* ── Quiz ── */
+.quiz-opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+  border-radius: 10px; border: 1.5px solid var(--line); margin-bottom: 8px; cursor: pointer;
+  touch-action: manipulation; transition: border-color .1s, background .1s; }
+.quiz-opt.selected { border-color: var(--accent); background: var(--accent-bg); }
+.quiz-opt.correct { border-color: #5BBB8A; background: #c5ecda; }
+.quiz-opt.wrong { border-color: #a23e48; background: #faf0f1; }
+.quiz-opt-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line);
+  flex-shrink: 0; margin-top: 1px; background: transparent; transition: all .1s; }
+.quiz-opt.selected .quiz-opt-dot { border-color: var(--accent); background: var(--accent); }
+.quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
+.quiz-opt.wrong .quiz-opt-dot { border-color: #a23e48; background: #a23e48; }
+
+/* ── Assessment ── */
+.assess-btn { display: block; width: 100%; text-align: left; padding: 12px 14px;
+  border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg-soft);
+  font-family: inherit; cursor: pointer; margin-bottom: 8px; touch-action: manipulation;
+  transition: border-color .1s, background .1s; }
+.assess-btn:active { border-color: var(--accent); background: var(--accent-bg); }
+.assess-score { font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--ink-muted); margin-bottom: 2px; }
+.assess-label { font-size: .9rem; font-weight: 600; color: var(--ink); }
 </style>
 </head>
 <body>
@@ -566,6 +605,9 @@ const defaultState = () => ({
   arc: { currentPhase:"gleichmut", phaseStarted:null, phaseHistory:[] },
   prefs: { timerDefault:20, bell:true },
   goals: { dailyMin:20, weeklyDays:5 },
+  path: {},
+  assessments: {},
+  lastAssessmentPrompt: null,
   version: 1
 });
 let S = loadState();
@@ -596,6 +638,21 @@ function esc(s) {
 function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function getQ(id) { return QUALITAETEN.find(q=>q.id===id); }
 
+// ── Lernpfad helpers ──
+function pathKey(qid, aspect) { return qid + '_' + aspect; }
+function isPathDone(qid, aspect) { return !!(S.path && S.path[pathKey(qid, aspect)]); }
+function allRowDone(qid) { return ['studium','kontemplation','meditation'].every(a => isPathDone(qid, a)); }
+function isQualitySoftLocked(qid) {
+  const idx = QUALITAETEN.findIndex(q => q.id === qid);
+  if (idx <= 0) return false;
+  return !allRowDone(QUALITAETEN[idx - 1].id);
+}
+function needsAssessmentPrompt() {
+  if (!S.lastAssessmentPrompt) return true;
+  const last = new Date(S.lastAssessmentPrompt + 'T12:00:00');
+  return (Date.now() - last.getTime()) / 86400000 >= 14;
+}
+
 function toast(msg, ms=2200) {
   const el = document.getElementById("toast");
   el.textContent = msg; el.classList.add("show");
@@ -608,6 +665,79 @@ const Q_COLOR = {
   mitgefuehl: '#B882D4',
   freude:     '#5BBB8A',
 };
+
+const QUIZ = {
+  gleichmut: [
+    { frage: "Womit wird Gleichmut verwechselt?",
+      optionen: ["Mit Gleichg\xFCltigkeit.","Mit Mitgef\xFChl.","Mit liebender G\xFCte.","Mit Konzentration."],
+      richtig: 0 },
+    { frage: "Warum empfiehlt das Lehrgedicht, mit Gleichmut zu beginnen?",
+      optionen: ["Erst wenn die Gleichheit naher und ferner Wesen erkannt ist, werden die anderen drei wirklich grenzenlos.",
+                 "Gleichmut ist die einfachste der vier Qualit\xE4ten.",
+                 "Ohne Gleichmut ist Meditation unm\xF6glich.",
+                 "Gleichmut f\xFChrt am schnellsten zur Erleuchtung."],
+      richtig: 0 },
+    { frage: "Was ist das Zeichen des Fortschritts in Gleichmut?",
+      optionen: ["Man sp\xFCrt keine starken Gef\xFChle mehr.",
+                 "Der Geist wird ruhig bei der Meditation.",
+                 "Selbst und Andere, Freund und Feind sind gleichgestellt.",
+                 "Man liebt alle Wesen auf dieselbe Weise."],
+      richtig: 2 }
+  ],
+  liebe: [
+    { frage: "Was ist der Fokus der liebenden G\xFCte (maitrī)?",
+      optionen: ["Diejenigen, die leiden.",
+                 "Diejenigen, die Gl\xFCck und Reichtum haben.",
+                 "Diejenigen, die nicht gl\xFCcklich sind.",
+                 "Diejenigen, die parteiisch sind."],
+      richtig: 2 },
+    { frage: "Womit wird liebende G\xFCte verwechselt?",
+      optionen: ["Mit Gleichmut.","Mit Anhaftung.","Mit Mitleid.","Mit Eifersucht."],
+      richtig: 1 },
+    { frage: "Was ist das Zeichen der Vollkommenheit in liebender G\xFCte?",
+      optionen: ["Man liebt Freunde und Familie tiefer als zuvor.",
+                 "Man meditiert t\xE4glich \xFCber W\xE4rme.",
+                 "Der Geist wird weich und ruhig.",
+                 "H\xF6chste, allumfassende Liebe – mehr als eine Mutter f\xFCr ihr einziges Kind."],
+      richtig: 3 }
+  ],
+  mitgefuehl: [
+    { frage: "Was ist das Zeichen des Fortschritts in Mitgef\xFChl?",
+      optionen: ["Die Unf\xE4higkeit, das Leiden von Wesen zu ertragen, ohne zu handeln.",
+                 "Man weint beim Anblick von Leid.",
+                 "Man hilft t\xE4glich konkreten Menschen.",
+                 "Man f\xFChlt den Schmerz anderer im eigenen K\xF6rper."],
+      richtig: 0 },
+    { frage: "Womit wird Mitgef\xFChl verwechselt?",
+      optionen: ["Mit Gleichmut.","Mit Mitfreude.","Mit liebender G\xFCte.","Mit sentimentalem Mitleid."],
+      richtig: 3 },
+    { frage: "Welche innere Haltung beschreibt echtes Mitgef\xFChl (karuṇā)?",
+      optionen: ["Bewegt und traurig, aber hilflos.",
+                 "Friedlich, bereit zu handeln – wie ein:e \xC4rzt:in.",
+                 "K\xE4mpferisch und entschlossen.",
+                 "Distanziert und analysierend."],
+      richtig: 1 }
+  ],
+  freude: [
+    { frage: "Was ist das Zeichen der Meisterschaft in Mitfreude (muditā)?",
+      optionen: ["Man ist immer fr\xF6hlich und enthusiastisch.",
+                 "Volle Freude ohne neidische Eifersucht.",
+                 "Man hat keine Sorgen mehr.",
+                 "Man freut sich \xFCber Erfolge der eigenen Gruppe."],
+      richtig: 1 },
+    { frage: "Womit wird Mitfreude verwechselt?",
+      optionen: ["Mit Aufregung.","Mit Gleichmut.","Mit liebender G\xFCte.","Mit Neid."],
+      richtig: 0 },
+    { frage: "Was ist der Fokus der Mitfreude?",
+      optionen: ["Diejenigen, die leiden.",
+                 "Diejenigen, die traurig sind.",
+                 "Alle Wesen ohne Unterschied.",
+                 "Diejenigen, die Gl\xFCck und Reichtum haben."],
+      richtig: 3 }
+  ]
+};
+
+const ZEICHEN_LABELS = ["Noch nicht erkennbar","Manchmal","H\xE4ufig","Spontan und stabil"];
 
 function streak() {
   if (!S.sessions.length) return 0;
@@ -841,6 +971,13 @@ function renderHeute() {
       + '<button class="btn-primary" onclick="switchTab(\'praxis\')">Jetzt \xFCben</button>'
       + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">Bogen</button>'
       + '</div></div>'
+      + (needsAssessmentPrompt()
+          ? '<div class="card" style="border-left:4px solid var(--accent);">'
+            + '<div class="label" style="margin-bottom:6px;">Selbsteinsch\xE4tzung</div>'
+            + '<div class="small" style="color:var(--ink-soft);margin-bottom:10px;">Wie zeigen sich die vier Unermesslichkeiten in dir? Eine kurze Reflexion alle zwei Wochen.</div>'
+            + '<button class="btn-secondary" onclick="showAssessmentSheet(\'' + phase.id + '\')" style="padding:10px 18px;">Jetzt einsch\xE4tzen →</button>'
+            + '</div>'
+          : '')
       + sessHtml;
 
     document.getElementById("panel-heute").innerHTML = html;
@@ -1296,7 +1433,21 @@ function saveLog() {
   const mode  = document.getElementById("log-mode").value.trim();
   const notes = document.getElementById("log-notes").value.trim();
   S.sessions.unshift({id:uid(),date,duration:dur,focus,mode,notes});
-  save(); _closeSheet(); toast("Eingetragen ✓");
+  save();
+  // auto-complete Lernpfad milestones
+  if (QUALITAETEN.find(q => q.id === focus)) {
+    const ml = mode.toLowerCase();
+    if (!S.path) S.path = {};
+    let changed = false;
+    if (ml === 'kontemplation' || ml.includes('kontempl')) {
+      if (!S.path[pathKey(focus,'kontemplation')]) { S.path[pathKey(focus,'kontemplation')] = true; changed = true; }
+    }
+    if (ml === 'stille' || ml.includes('medit')) {
+      if (!S.path[pathKey(focus,'meditation')]) { S.path[pathKey(focus,'meditation')] = true; changed = true; }
+    }
+    if (changed) save();
+  }
+  _closeSheet(); toast("Eingetragen ✓");
   if (_logAfter) { _logAfter(); _logAfter=null; }
   renderPanel(activeTab);
 }
@@ -1352,6 +1503,202 @@ function delSession(id) {
 }
 
 // ═══════════════════════════════════════════════
+//  LERNPFAD
+// ═══════════════════════════════════════════════
+
+function renderLernpfad() {
+  const aspects = [
+    { key:'studium',      label:'Studium',   icon:'S' },
+    { key:'kontemplation',label:'Kontempl.', icon:'K' },
+    { key:'meditation',   label:'Medit.',    icon:'M' }
+  ];
+  const rows = QUALITAETEN.map(q => {
+    const locked = isQualitySoftLocked(q.id);
+    const c = Q_COLOR[q.id];
+    const cells = aspects.map(a => {
+      const done = isPathDone(q.id, a.key);
+      const style = done ? `background:${c};border-color:${c};` : '';
+      const fn = a.key === 'studium'
+        ? `showQuizSheet('${q.id}')`
+        : `showPathInfo('${q.id}','${a.key}')`;
+      return `<div class="path-cell${done?' done':''}${locked?' soft-locked':''}" style="${style}" onclick="${fn}">
+        <div class="path-cell-icon">${done ? '✓' : a.icon}</div>
+        <div>${a.label}</div>
+      </div>`;
+    }).join('');
+    return `<div class="path-row">
+      <div class="path-q"><span class="pill ${q.farbe}" style="${locked?'opacity:.5':''}">${q.name}</span></div>
+      ${cells}
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-title" style="margin-bottom:10px;">Lernpfad</div>
+    <div class="path-header">
+      <div></div>
+      ${aspects.map(a=>`<div class="path-hcell">${a.label}</div>`).join('')}
+    </div>
+    ${rows}
+    <div class="small muted" style="margin-top:6px;line-height:1.6;">S: Quiz · K &amp; M: automatisch beim \xDCben</div>
+  </div>`;
+}
+
+function showPathInfo(qid, aspect) {
+  const q = getQ(qid);
+  const done = isPathDone(qid, aspect);
+  const name = aspect === 'kontemplation' ? 'Kontemplation' : 'Meditation';
+  const hint = aspect === 'kontemplation'
+    ? 'Schlie\xDFe eine Kontemplations-Sitzung mit diesem Fokus ab – sie wird automatisch hier eingetragen.'
+    : 'Schlie\xDFe eine Stille-Sitzung (Timer) mit diesem Fokus ab – sie wird automatisch hier eingetragen.';
+  openSheet(`
+    <h2>${name} · <span class="pill ${q.farbe}">${q.name}</span></h2>
+    ${done
+      ? '<div style="color:#1a5c3a;font-weight:600;margin-bottom:12px;">✓ Abgeschlossen</div>'
+      : `<div class="small muted" style="margin-bottom:12px;">${hint}</div>`}
+    <div class="small muted" style="margin-bottom:14px;font-style:italic;">Zeichen: ${esc(q.zeichen)}</div>
+    <div class="btn-row">
+      ${!done && aspect === 'kontemplation'
+        ? `<button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>showKontemplationListe('${qid}'),80);">Jetzt kontemplieren</button>`
+        : !done
+        ? `<button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>startMode('stille'),80);">Jetzt meditieren</button>`
+        : ''}
+      <button class="btn-secondary" onclick="_closeSheet()">Schlie\xDFen</button>
+    </div>
+  `);
+}
+
+// ── Quiz ──
+let quizState = { qid: null, answers: {}, submitted: false };
+
+function showQuizSheet(qid) {
+  const q = getQ(qid);
+  const done = isPathDone(qid, 'studium');
+  quizState = { qid, answers: {}, submitted: false };
+  if (done) {
+    openSheet(`
+      <h2>Studium · <span class="pill ${q.farbe}">${q.name}</span></h2>
+      <div style="color:#1a5c3a;font-weight:600;margin-bottom:10px;">✓ Quiz abgeschlossen</div>
+      <div class="small muted" style="margin-bottom:14px;">Das Studium f\xFCr diese Qualit\xE4t wurde bereits abgeschlossen.</div>
+      <button class="btn-ghost" onclick="showQuizContent('${qid}')">Quiz wiederholen</button>
+      <div class="btn-row" style="margin-top:8px;">
+        <button class="btn-secondary" onclick="_closeSheet()">Schlie\xDFen</button>
+      </div>
+    `);
+    return;
+  }
+  showQuizContent(qid);
+}
+
+function showQuizContent(qid) {
+  quizState = { qid, answers: {}, submitted: false };
+  _renderQuiz();
+}
+
+function _renderQuiz() {
+  const qid = quizState.qid;
+  const q = getQ(qid);
+  const questions = QUIZ[qid] || [];
+  const body = questions.map((qu, qi) => {
+    const sel = quizState.answers[qi];
+    const opts = qu.optionen.map((opt, oi) => {
+      let cls = '';
+      if (quizState.submitted) {
+        if (oi === qu.richtig) cls = ' correct';
+        else if (sel === oi) cls = ' wrong';
+      } else if (sel === oi) cls = ' selected';
+      return `<div class="quiz-opt${cls}" onclick="selectQuizOpt(${qi},${oi})">
+        <div class="quiz-opt-dot"></div>
+        <div class="small">${esc(opt)}</div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:18px;">
+      <div style="font-weight:600;margin-bottom:8px;font-size:.92rem;">${qi+1}. ${esc(qu.frage)}</div>
+      ${opts}
+    </div>`;
+  }).join('');
+
+  let resultHtml = '';
+  let btns = `<button class="btn-primary" onclick="submitQuiz()">Pr\xFCfen</button>
+    <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>`;
+
+  if (quizState.submitted) {
+    const correct = questions.filter((qu, qi) => quizState.answers[qi] === qu.richtig).length;
+    const pass = correct >= Math.ceil(questions.length * 2 / 3);
+    resultHtml = pass
+      ? `<div style="background:#c5ecda;color:#1a5c3a;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-weight:600;">✓ ${correct}/${questions.length} richtig – Studium abgeschlossen!</div>`
+      : `<div style="background:#faf0f1;color:#a23e48;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-weight:600;">✗ ${correct}/${questions.length} richtig – nochmals versuchen</div>`;
+    btns = pass
+      ? `<button class="btn-primary" onclick="_closeSheet();renderBogen();">Weiter</button>`
+      : `<button class="btn-primary" onclick="showQuizContent('${qid}')">Nochmals</button>
+         <button class="btn-secondary" onclick="_closeSheet()">Schlie\xDFen</button>`;
+  }
+
+  openSheet(`
+    <h2>Studium · <span class="pill ${q.farbe}">${q.name}</span></h2>
+    <div id="quiz-result">${resultHtml}</div>
+    <div id="quiz-body">${body}</div>
+    <div class="btn-row" id="quiz-btns">${btns}</div>
+  `);
+}
+
+function selectQuizOpt(qi, oi) {
+  if (quizState.submitted) return;
+  quizState.answers[qi] = oi;
+  _renderQuiz();
+}
+
+function submitQuiz() {
+  const questions = QUIZ[quizState.qid] || [];
+  if (Object.keys(quizState.answers).length < questions.length) {
+    toast("Bitte alle Fragen beantworten."); return;
+  }
+  quizState.submitted = true;
+  const correct = questions.filter((qu, qi) => quizState.answers[qi] === qu.richtig).length;
+  const pass = correct >= Math.ceil(questions.length * 2 / 3);
+  if (pass) {
+    if (!S.path) S.path = {};
+    S.path[pathKey(quizState.qid, 'studium')] = true;
+    save();
+  }
+  _renderQuiz();
+}
+
+// ── Selbsteinschätzung ──
+function showAssessmentSheet(qid) {
+  const q = getQ(qid);
+  const cur = S.assessments && S.assessments[qid];
+  openSheet(`
+    <h2>Selbsteinsch\xE4tzung · <span class="pill ${q.farbe}">${q.name}</span></h2>
+    <div class="small" style="margin-bottom:4px;color:var(--ink-soft);font-style:italic;">${esc(q.zeichen)}</div>
+    <div class="small muted" style="margin-bottom:16px;">Wie w\xFCrdest du deine aktuelle Erfahrung beschreiben?</div>
+    ${ZEICHEN_LABELS.map((label, score) => `
+      <button class="assess-btn" onclick="saveAssessment('${qid}',${score})">
+        <div class="assess-score">${score} – ${['Kaum','Manchmal','H\xE4ufig','Stabil'][score]}</div>
+        <div class="assess-label">${label}</div>
+      </button>
+    `).join('')}
+    ${cur ? `<div class="small muted" style="margin-top:8px;">Letzte Einsch\xE4tzung: ${cur.date} – Stufe ${cur.score}</div>` : ''}
+    <div style="height:8px;"></div>
+  `);
+}
+
+function saveAssessment(qid, score) {
+  if (!S.assessments) S.assessments = {};
+  if (!S.assessments[qid]) {
+    S.assessments[qid] = { score, date: todayISO(), history: [] };
+  } else {
+    S.assessments[qid].history = S.assessments[qid].history || [];
+    S.assessments[qid].history.push({ score: S.assessments[qid].score, date: S.assessments[qid].date });
+    S.assessments[qid].score = score;
+    S.assessments[qid].date = todayISO();
+  }
+  S.lastAssessmentPrompt = todayISO();
+  save();
+  _closeSheet();
+  toast('Einsch\xE4tzung gespeichert ✓');
+  renderPanel(activeTab);
+}
+
+// ═══════════════════════════════════════════════
 //  BOGEN
 // ═══════════════════════════════════════════════
 
@@ -1397,6 +1744,27 @@ function renderBogen() {
         </div>
         <div class="goal-bar-bg"><div class="goal-bar" style="width:${wkPct}%"></div></div>
       </div>
+    </div>
+
+    <!-- Lernpfad -->
+    ${renderLernpfad()}
+
+    <!-- Selbsteinschätzung -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">Selbsteinsch\xE4tzung</div>
+      <div class="small muted" style="margin-bottom:12px;">Zeichen des Fortschritts – alle zwei Wochen reflektieren</div>
+      ${QUALITAETEN.map(q => {
+        const a = S.assessments && S.assessments[q.id];
+        const score = a != null ? a.score : null;
+        const c = Q_COLOR[q.id];
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);">
+          <div>
+            <span class="pill ${q.farbe}">${q.name}</span>
+            <span class="small muted" style="margin-left:8px;">${score !== null ? ZEICHEN_LABELS[score] : 'Noch nicht'}</span>
+          </div>
+          <button class="btn-ghost" onclick="showAssessmentSheet('${q.id}')" style="font-size:.78rem;padding:6px 8px;">einsch\xE4tzen →</button>
+        </div>`;
+      }).join('')}
     </div>
 
     <!-- Praxis-Bogen -->
