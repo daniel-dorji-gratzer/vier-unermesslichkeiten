@@ -1390,6 +1390,19 @@ function resetAll() {
 // ═══════════════════════════════════════════════
 
 renderHeute();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/vier-unermesslichkeiten/sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const sw = reg.installing;
+      sw.addEventListener('statechange', () => {
+        if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+          window.location.reload();
+        }
+      });
+    });
+  });
+}
 </script>
 </body>
 </html>
