@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -35,12 +35,13 @@ body { height: 100%; background: var(--bg); color: var(--ink);
 #app { display: flex; flex-direction: column;
   position: fixed; inset: 0;
   padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: #fff; }
 #content { background: var(--bg); }
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 16px); }
+  padding-bottom: calc(var(--tab-h) + 16px); }
 .panel { display: none; padding: 20px 16px 0; animation: fadeIn .2s ease; }
 .panel.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -54,8 +55,7 @@ body { height: 100%; background: var(--bg); color: var(--ink);
 #tabbar { flex-shrink: 0; background: rgba(255,255,255,.94);
   backdrop-filter: saturate(200%) blur(24px); -webkit-backdrop-filter: saturate(200%) blur(24px);
   border-top: 1px solid var(--line);
-  display: flex; height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px); }
+  display: flex; height: var(--tab-h); }
 #tabbar button { flex: 1; border: none; background: transparent; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; padding: 6px 4px; color: var(--ink-muted); font-size: 10px; font-weight: 500;
