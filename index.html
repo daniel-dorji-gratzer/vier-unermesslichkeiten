@@ -399,6 +399,45 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 .radar-bar-bg { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; min-width: 0; }
 .radar-bar { height: 100%; border-radius: 3px; transition: width .4s; }
 .radar-pct { font-size: .78rem; font-weight: 700; min-width: 30px; text-align: right; flex-shrink: 0; }
+
+/* ── Onboarding ── */
+#ob { position: fixed; inset: 0; z-index: 2000;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  padding: max(env(safe-area-inset-top,44px),52px) 24px max(env(safe-area-inset-bottom,20px),20px);
+  transition: opacity .35s; }
+#ob.ob-hide { opacity: 0; pointer-events: none; }
+.ob-bg { position: absolute; inset: 0; transition: background .6s; }
+.ob-body { position: relative; z-index: 1; width: 100%; max-width: 390px;
+  display: flex; flex-direction: column; align-items: center; }
+.ob-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 28px; }
+.ob-dot { width: 8px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.35);
+  transition: all .3s; flex-shrink: 0; }
+.ob-dot.ob-active { width: 24px; background: rgba(255,255,255,.9); }
+.ob-slide { color: #fff; width: 100%; }
+.ob-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; opacity: .65; margin-bottom: 10px; }
+.ob-title { font-size: 2.1rem; font-weight: 800; line-height: 1.1;
+  letter-spacing: -.035em; margin-bottom: 12px; }
+.ob-desc { font-size: .92rem; line-height: 1.65; opacity: .8; margin-bottom: 28px; }
+.ob-qs { display: flex; flex-direction: column; gap: 9px; margin-bottom: 28px; width: 100%; }
+.ob-q { background: rgba(255,255,255,.12); border-radius: 12px;
+  padding: 11px 14px; display: flex; align-items: center; gap: 11px; }
+.ob-q-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ob-q-name { font-size: .88rem; font-weight: 700; }
+.ob-q-sk { font-size: .75rem; opacity: .6; font-style: italic; }
+.ob-steps { display: flex; flex-direction: column; gap: 9px; margin-bottom: 28px; width: 100%; }
+.ob-step { background: rgba(255,255,255,.12); border-radius: 12px;
+  padding: 12px 14px; display: flex; align-items: flex-start; gap: 12px; }
+.ob-step-n { font-size: .8rem; font-weight: 800; opacity: .5;
+  min-width: 20px; padding-top: 1px; }
+.ob-step-text { font-size: .87rem; line-height: 1.5; opacity: .9; }
+.ob-btn-main { width: 100%; padding: 15px; border-radius: 14px; border: none;
+  background: #fff; font-size: 1rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; touch-action: manipulation; transition: opacity .1s; }
+.ob-btn-main:active { opacity: .85; }
+.ob-btn-skip { background: none; border: none; color: rgba(255,255,255,.55);
+  font-size: .82rem; font-family: inherit; cursor: pointer;
+  padding: 12px 16px; touch-action: manipulation; }
 </style>
 </head>
 <body>
@@ -779,6 +818,7 @@ const defaultState = () => ({
   path: {},
   assessments: {},
   lastAssessmentPrompt: null,
+  onboarded: false,
   version: 1
 });
 let S = loadState();
@@ -2196,7 +2236,7 @@ function renderBogen() {
     <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">
       Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
       Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>
-      <span style="font-size:.7rem;opacity:.5;">v16</span>
+      <span style="font-size:.7rem;opacity:.5;">v17</span>
     </div>`;
 }
 
@@ -2229,11 +2269,96 @@ function resetAll() {
   S = defaultState(); save(); renderPanel(activeTab); toast("Zurückgesetzt");
 }
 
+
+// ═══════════════════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════════════════
+
+const OB_GRADS = [
+  'linear-gradient(155deg,#1b3a5c 0%,#2c5f8a 50%,#4a87ae 100%)',
+  'linear-gradient(155deg,#12302a 0%,#235c46 50%,#3d8a6a 100%)',
+  'linear-gradient(155deg,#2a1a0a 0%,#4a2c10 50%,#7a4820 100%)',
+];
+
+function showOnboarding() {
+  if (S.onboarded) return;
+  _renderObSlide(0);
+}
+
+function _renderObSlide(n) {
+  var el = document.getElementById('ob');
+  var bg = document.getElementById('ob-bg');
+  var slide = document.getElementById('ob-slide');
+  var dots = document.getElementById('ob-dots').children;
+  if (!el) return;
+  el.classList.remove('ob-hide');
+  bg.style.background = OB_GRADS[n] || OB_GRADS[0];
+  for (var i = 0; i < dots.length; i++) {
+    dots[i].classList.toggle('ob-active', i === n);
+  }
+  if (n === 0) {
+    slide.innerHTML = '<div class="ob-eyebrow">Herzlich willkommen</div>'
+      + '<div class="ob-title">Vier Un\xADermess\xADlich\xADkeiten</div>'
+      + '<div class="ob-desc">Dein t\xE4glicher Begleiter f\xFCr die Praxis nach Longchenpa – '
+      + 'basierend auf den Unterrichtseinheiten mit Trinley Rinpoche, Mai 2026.</div>'
+      + '<button class="ob-btn-main" onclick="_renderObSlide(1)">Weiter →</button>'
+      + '<button class="ob-btn-skip" onclick="finishOnboarding()">Direkt zur App</button>';
+  } else if (n === 1) {
+    slide.innerHTML = '<div class="ob-eyebrow">Die vier Qualit\xE4ten</div>'
+      + '<div class="ob-title">Herz\xADens\xADhaltungen</div>'
+      + '<div class="ob-qs">'
+      + '<div class="ob-q"><div class="ob-q-dot" style="background:#4a87ae;"></div><div>'
+      + '<div class="ob-q-name">Gleichmut <span class="ob-q-sk">upekṣā</span></div>'
+      + '<div style="font-size:.78rem;opacity:.65;margin-top:2px;">Weiter Raum – frei von Parteilichkeit</div>'
+      + '</div></div>'
+      + '<div class="ob-q"><div class="ob-q-dot" style="background:#c97a82;"></div><div>'
+      + '<div class="ob-q-name">Liebende G\xFCte <span class="ob-q-sk">maitrī</span></div>'
+      + '<div style="font-size:.78rem;opacity:.65;margin-top:2px;">Wunsch nach dem Gl\xFCck aller Wesen</div>'
+      + '</div></div>'
+      + '<div class="ob-q"><div class="ob-q-dot" style="background:#3d8a6a;"></div><div>'
+      + '<div class="ob-q-name">Mitgef\xFChl <span class="ob-q-sk">karuṇā</span></div>'
+      + '<div style="font-size:.78rem;opacity:.65;margin-top:2px;">Wunsch, Leid aufzuheben</div>'
+      + '</div></div>'
+      + '<div class="ob-q"><div class="ob-q-dot" style="background:#a0601a;"></div><div>'
+      + '<div class="ob-q-name">Mitfreude <span class="ob-q-sk">muditā</span></div>'
+      + '<div style="font-size:.78rem;opacity:.65;margin-top:2px;">Freude an der Freude anderer</div>'
+      + '</div></div>'
+      + '</div>'
+      + '<button class="ob-btn-main" onclick="_renderObSlide(2)">Weiter →</button>'
+      + '<button class="ob-btn-skip" onclick="finishOnboarding()">Direkt zur App</button>';
+  } else {
+    slide.innerHTML = '<div class="ob-eyebrow">So funktioniert die App</div>'
+      + '<div class="ob-title">Dein Weg</div>'
+      + '<div class="ob-steps">'
+      + '<div class="ob-step"><div class="ob-step-n">1</div><div class="ob-step-text">'
+      + '<strong>T\xE4glich \xFCben</strong> – w\xE4hle eine Praxisform (Rezitation, Vers, '
+      + 'Kontemplation oder Stille) und trage deine Sitzung ein.</div></div>'
+      + '<div class="ob-step"><div class="ob-step-n">2</div><div class="ob-step-text">'
+      + '<strong>Vertiefen</strong> – studiere die Unterrichtseinheiten und '
+      + 'Verse Longchenpas im Lehre-Tab.</div></div>'
+      + '<div class="ob-step"><div class="ob-step-n">3</div><div class="ob-step-text">'
+      + '<strong>Reflektieren</strong> – beobachte deinen Fortschritt und sch\xE4tze '
+      + 'dich alle zwei Wochen im Bogen-Tab ein.</div></div>'
+      + '</div>'
+      + '<button class="ob-btn-main" onclick="finishOnboarding()">Loslegen</button>';
+  }
+}
+
+function finishOnboarding() {
+  S.onboarded = true;
+  save();
+  var el = document.getElementById('ob');
+  if (el) {
+    el.classList.add('ob-hide');
+    setTimeout(function() { el.style.display = 'none'; }, 380);
+  }
+}
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
 
 renderHeute();
+showOnboarding();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/vier-unermesslichkeiten/sw.js').then(reg => {
@@ -2248,5 +2373,17 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<div id="ob">
+  <div class="ob-bg" id="ob-bg"></div>
+  <div class="ob-body">
+    <div class="ob-dots" id="ob-dots">
+      <div class="ob-dot ob-active"></div>
+      <div class="ob-dot"></div>
+      <div class="ob-dot"></div>
+    </div>
+    <div id="ob-slide" class="ob-slide"></div>
+  </div>
+</div>
 </body>
 </html>
