@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1b3a5c" id="meta-theme-color">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1008,37 +1007,6 @@ function heroGradient(id) {
     freude:     'linear-gradient(155deg,#3d2200 0%,#6b3a0a 50%,#a0601a 100%)',
   }[id] || 'linear-gradient(155deg,#2a2a3a 0%,#3a3a5a 100%)';
 }
-function heroTopColor(id) {
-  return { gleichmut:'#1b3a5c', liebe:'#5a1422', mitgefuehl:'#12302a', freude:'#3d2200' }[id] || '#2a2a3a';
-}
-function setThemeColor(c) {
-  var old = document.getElementById('meta-theme-color');
-  if (old) old.remove();
-  var m = document.createElement('meta');
-  m.name = 'theme-color';
-  m.content = c;
-  m.id = 'meta-theme-color';
-  document.head.appendChild(m);
-}
-function getOrCreateStatusFill() {
-  var el = document.getElementById('status-bar-fill');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'status-bar-fill';
-    el.style.cssText = 'position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,44px);z-index:9999;pointer-events:none;transition:background .3s;';
-    document.body.appendChild(el);
-  }
-  return el;
-}
-function setStatusBarColor(id) {
-  var c = heroTopColor(id);
-  setThemeColor(c);
-  getOrCreateStatusFill().style.background = c;
-}
-function resetStatusBarColor() {
-  setThemeColor('#2a2420');
-  getOrCreateStatusFill().style.background = 'transparent';
-}
 function timeGreeting() {
   const h = new Date().getHours();
   if (h >= 5  && h < 12) return { label:'Guten Morgen', svg:'<circle cx="9" cy="9" r="3.2" stroke="white" stroke-width="1.6" fill="none"/><line x1="9" y1="1" x2="9" y2="3.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="14.8" x2="9" y2="17" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="9" x2="3.2" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.8" y1="9" x2="17" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="3.6" y1="3.6" x2="5.2" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="12.8" y1="12.8" x2="14.4" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.4" y1="3.6" x2="12.8" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="5.2" y1="12.8" x2="3.6" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
@@ -1077,7 +1045,6 @@ const scrollPos = {};
 function switchTab(name) {
   if (name === activeTab) { document.getElementById("content").scrollTop=0; return; }
   scrollPos[activeTab] = document.getElementById("content").scrollTop;
-  if (name !== 'heute') resetStatusBarColor();
   activeTab = name;
   document.querySelectorAll("#tabbar button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+name));
@@ -1203,7 +1170,6 @@ function renderHeute() {
       + sessHtml;
 
     document.getElementById("panel-heute").innerHTML = html;
-    setStatusBarColor(phase.id);
   } catch(err) {
     document.getElementById("panel-heute").innerHTML = '<div class="card"><div class="card-title">Fehler beim Laden</div><div class="small muted">' + String(err) + '</div></div>';
     console.error("renderHeute:", err);
@@ -2085,7 +2051,7 @@ function renderBogen() {
     <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">
       Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
       Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>
-      <span style="font-size:.7rem;opacity:.5;">v11</span>
+      <span style="font-size:.7rem;opacity:.5;">v12</span>
     </div>`;
 }
 
