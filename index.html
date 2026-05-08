@@ -379,14 +379,24 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 .quiz-opt.wrong .quiz-opt-dot { border-color: #a23e48; background: #a23e48; }
 
 /* ── Assessment ── */
-.assess-btn { display: block; width: 100%; text-align: left; padding: 12px 14px;
-  border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg-soft);
-  font-family: inherit; cursor: pointer; margin-bottom: 8px; touch-action: manipulation;
-  transition: border-color .1s, background .1s; }
-.assess-btn:active { border-color: var(--accent); background: var(--accent-bg); }
-.assess-score { font-size: .7rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .07em; color: var(--ink-muted); margin-bottom: 2px; }
-.assess-label { font-size: .9rem; font-weight: 600; color: var(--ink); }
+.assess-q { margin-bottom: 18px; }
+.assess-q-text { font-size: .88rem; color: var(--ink-soft); margin-bottom: 8px; line-height: 1.45; }
+.assess-scale { display: flex; gap: 5px; }
+.assess-scale button { flex: 1; border: 1.5px solid var(--line); background: var(--bg);
+  border-radius: 8px; padding: 9px 2px; font-size: .8rem; color: var(--ink-muted);
+  cursor: pointer; transition: all .15s; font-family: inherit; line-height: 1.2;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; touch-action: manipulation; }
+.assess-scale button .ans-num { font-weight: 700; font-size: .95rem; }
+.assess-scale button.sel { border-color: var(--accent); background: var(--accent-bg);
+  color: var(--accent); font-weight: 600; }
+.assess-scale button.sel .ans-num { color: var(--accent); }
+.radar-wrap { display: flex; justify-content: center; padding: 4px 0 8px; }
+.radar-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.radar-score-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: var(--bg); border-radius: 10px; }
+.radar-bar-bg { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.radar-bar { height: 100%; border-radius: 3px; transition: width .4s; }
+.radar-pct { font-size: .78rem; font-weight: 700; min-width: 32px; text-align: right; }
 </style>
 </head>
 <body>
@@ -896,7 +906,33 @@ const QUIZ = {
   ]
 };
 
-const ZEICHEN_LABELS = ["Noch nicht erkennbar","Manchmal","H\xE4ufig","Spontan und stabil"];
+const ASSESSMENT_FRAGEN = {
+  gleichmut: [
+    "Ich begegne Freunden, Gleichg\xFCltigen und schwierigen Menschen mit derselben Offenheit.",
+    "Wenn jemand mir schwer\xE4llt, kann ich trotzdem sein Wohlergehen w\xFCnschen.",
+    "Ich bemerke Parteilichkeit in mir – und kann einen Schritt zur\xFCcktreten.",
+    "Ich erlebe einen stillen, weiten Raum unter Zuneigung und Ablehnung."
+  ],
+  liebe: [
+    "Ich w\xFCnsche anderen von Herzen Freude und Wohlergehen – auch ohne eigenen Nutzen.",
+    "Mein Wohlwollen schlie\xDFt auch schwierige Menschen mit ein.",
+    "Ich bin mir selbst gegen\xFCber freundlich – auch wenn ich Fehler mache.",
+    "Ich bemerke, dass meine Pr\xE4senz anderen gut tut."
+  ],
+  mitgefuehl: [
+    "Das Leiden anderer ber\xFChrt mich – ich weiche nicht aus, ohne zu zerfallen.",
+    "Ich kann mit Schmerz pr\xE4sent bleiben und tue es aus einem ruhigen Ort heraus.",
+    "Mein Mitgef\xFChl kommt aus Frieden – nicht aus \xDCberwaltigung oder Hilflosigkeit.",
+    "Ich finde Wege zu helfen, ohne mich dabei zu verlieren."
+  ],
+  freude: [
+    "Wenn andere Erfolg haben oder gl\xFCcklich sind, freue ich mich wirklich mit.",
+    "Neid oder Eifersucht tauchen seltener auf als fr\xFCher.",
+    "Ich kann die Freude anderer genie\xDFen, ohne dass sie mein eigenes Wohlgef\xFChl mindert.",
+    "Ich erlebe Zufriedenheit, wenn es Menschen gut geht – auch ohne meinen Beitrag."
+  ]
+};
+const ANS_LABELS = ["Kaum","Selten","Manchmal","Oft","Fast immer"];
 
 function streak() {
   if (!S.sessions.length) return 0;
@@ -1854,32 +1890,72 @@ function submitQuiz() {
 }
 
 // ── Selbsteinschätzung ──
+let _curAssess = {};
+
 function showAssessmentSheet(qid) {
   const q = getQ(qid);
   const cur = S.assessments && S.assessments[qid];
-  openSheet(`
-    <h2>Selbsteinsch\xE4tzung · <span class="pill ${q.farbe}">${q.name}</span></h2>
-    <div class="small" style="margin-bottom:4px;color:var(--ink-soft);font-style:italic;">${esc(q.zeichen)}</div>
-    <div class="small muted" style="margin-bottom:16px;">Wie w\xFCrdest du deine aktuelle Erfahrung beschreiben?</div>
-    ${ZEICHEN_LABELS.map((label, score) => `
-      <button class="assess-btn" onclick="saveAssessment('${qid}',${score})">
-        <div class="assess-score">${score} – ${['Kaum','Manchmal','H\xE4ufig','Stabil'][score]}</div>
-        <div class="assess-label">${label}</div>
-      </button>
-    `).join('')}
-    ${cur ? `<div class="small muted" style="margin-top:8px;">Letzte Einsch\xE4tzung: ${cur.date} – Stufe ${cur.score}</div>` : ''}
-    <div style="height:8px;"></div>
-  `);
+  const fragen = ASSESSMENT_FRAGEN[qid] || [];
+  _curAssess = { qid: qid, answers: new Array(fragen.length).fill(0) };
+  if (cur && cur.answers) { _curAssess.answers = cur.answers.slice(); }
+  openSheet(_buildAssessHtml(qid));
 }
 
-function saveAssessment(qid, score) {
+function _buildAssessHtml(qid) {
+  const q = getQ(qid);
+  const fragen = ASSESSMENT_FRAGEN[qid] || [];
+  var rows = fragen.map(function(f, fi) {
+    var scaleHtml = ANS_LABELS.map(function(lab, si) {
+      var v = si + 1;
+      var sel = _curAssess.answers[fi] === v ? ' sel' : '';
+      return '<button class="' + sel.trim() + '" onclick="_pickAns(' + fi + ',' + v + ')">'
+        + '<span class="ans-num">' + v + '</span>'
+        + '<span style="font-size:.62rem;line-height:1.1;">' + lab + '</span>'
+        + '</button>';
+    }).join('');
+    return '<div class="assess-q">'
+      + '<div class="assess-q-text">' + esc(f) + '</div>'
+      + '<div class="assess-scale">' + scaleHtml + '</div>'
+      + '</div>';
+  }).join('');
+  var cur = S.assessments && S.assessments[qid];
+  var lastHtml = cur ? '<div class="small muted" style="margin-top:4px;">Letzte Einsch\xE4tzung: '
+    + cur.date + ' – ' + cur.score + ' %</div>' : '';
+  return '<h2>Selbsteinsch\xE4tzung · <span class="pill ' + q.farbe + '">' + q.name + '</span></h2>'
+    + '<div class="small" style="margin-bottom:4px;color:var(--ink-soft);font-style:italic;">' + esc(q.zeichen) + '</div>'
+    + '<div class="small muted" style="margin-bottom:16px;">Bewerte jede Aussage von 1 (kaum) bis 5 (fast immer).</div>'
+    + rows
+    + '<button class="btn-primary" onclick="saveAssessment()" style="width:100%;margin-top:8px;">Speichern</button>'
+    + lastHtml
+    + '<div style="height:8px;"></div>';
+}
+
+function _pickAns(fi, v) {
+  _curAssess.answers[fi] = v;
+  var sheet = document.getElementById('sheet-content');
+  if (sheet) sheet.innerHTML = _buildAssessHtml(_curAssess.qid);
+}
+
+function computeAssessScore(answers) {
+  var filled = answers.filter(function(a) { return a > 0; });
+  if (!filled.length) return 0;
+  var sum = filled.reduce(function(s, a) { return s + a; }, 0);
+  return Math.round((sum - filled.length) / (filled.length * 4) * 100);
+}
+
+function saveAssessment() {
+  var qid = _curAssess.qid;
+  if (!qid) return;
+  var answers = _curAssess.answers;
+  var score = computeAssessScore(answers);
   if (!S.assessments) S.assessments = {};
   if (!S.assessments[qid]) {
-    S.assessments[qid] = { score, date: todayISO(), history: [] };
+    S.assessments[qid] = { score: score, answers: answers, date: todayISO(), history: [] };
   } else {
     S.assessments[qid].history = S.assessments[qid].history || [];
-    S.assessments[qid].history.push({ score: S.assessments[qid].score, date: S.assessments[qid].date });
+    S.assessments[qid].history.push({ score: S.assessments[qid].score, answers: S.assessments[qid].answers, date: S.assessments[qid].date });
     S.assessments[qid].score = score;
+    S.assessments[qid].answers = answers;
     S.assessments[qid].date = todayISO();
   }
   S.lastAssessmentPrompt = todayISO();
@@ -1887,6 +1963,51 @@ function saveAssessment(qid, score) {
   _closeSheet();
   toast('Einsch\xE4tzung gespeichert ✓');
   renderPanel(activeTab);
+}
+
+function renderRadarChart(scores) {
+  var cx = 110, cy = 115, R = 78;
+  function pt(ax, pct) {
+    var r = pct / 100 * R;
+    if (ax === 0) return [cx, cy - r];       // top: Gleichmut
+    if (ax === 1) return [cx + r, cy];       // right: Liebe
+    if (ax === 2) return [cx, cy + r];       // bottom: Mitgefühl
+    return [cx - r, cy];                     // left: Freude
+  }
+  function diamond(r) {
+    return 'M ' + cx + ' ' + (cy-r) + ' L ' + (cx+r) + ' ' + cy
+      + ' L ' + cx + ' ' + (cy+r) + ' L ' + (cx-r) + ' ' + cy + ' Z';
+  }
+  var grid = [25,50,75,100].map(function(p) {
+    var r = p / 100 * R;
+    return '<path d="' + diamond(r) + '" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="1"/>';
+  }).join('');
+  var axes = '<line x1="' + cx + '" y1="' + (cy-R) + '" x2="' + cx + '" y2="' + (cy+R) + '" stroke="rgba(0,0,0,.08)" stroke-width="1"/>'
+    + '<line x1="' + (cx-R) + '" y1="' + cy + '" x2="' + (cx+R) + '" y2="' + cy + '" stroke="rgba(0,0,0,.08)" stroke-width="1"/>';
+  var QC = { gleichmut:'#2c5f8a', liebe:'#8b2635', mitgefuehl:'#235c46', freude:'#6b3a0a' };
+  var ids = ['gleichmut','liebe','mitgefuehl','freude'];
+  var pcts = ids.map(function(id) { return scores[id] || 0; });
+  var pts = ids.map(function(id, i) { return pt(i, pcts[i]); });
+  var poly = 'M ' + pts.map(function(p) { return p[0] + ' ' + p[1]; }).join(' L ') + ' Z';
+  var dots = ids.map(function(id, i) {
+    if (!pcts[i]) return '';
+    return '<circle cx="' + pts[i][0] + '" cy="' + pts[i][1] + '" r="5" fill="' + QC[id] + '" stroke="#fff" stroke-width="1.5"/>';
+  }).join('');
+  var names = ['Gleichmut','Liebende G\xFCte','Mitgef\xFChl','Mitfreude'];
+  var anchors = ['middle','start','middle','end'];
+  var lx = [cx, cx+R+8, cx, cx-R-8];
+  var ly = [cy-R-10, cy+4, cy+R+14, cy+4];
+  var labels = ids.map(function(id, i) {
+    var hasPct = pcts[i] > 0;
+    var txt = names[i] + (hasPct ? ' ' + pcts[i] + '%' : '');
+    return '<text x="' + lx[i] + '" y="' + ly[i] + '" text-anchor="' + anchors[i]
+      + '" font-size="9.5" fill="' + QC[id] + '" font-weight="600" font-family="-apple-system,sans-serif">' + txt + '</text>';
+  }).join('');
+  return '<svg viewBox="0 0 220 225" style="width:100%;max-width:260px;display:block;">'
+    + grid + axes
+    + '<path d="' + poly + '" fill="rgba(162,62,72,.13)" stroke="rgba(162,62,72,.55)" stroke-width="2" stroke-linejoin="round"/>'
+    + dots + labels
+    + '</svg>';
 }
 
 // ═══════════════════════════════════════════════
@@ -1942,20 +2063,41 @@ function renderBogen() {
 
     <!-- Selbsteinschätzung -->
     <div class="card">
-      <div class="card-title" style="margin-bottom:10px;">Selbsteinsch\xE4tzung</div>
-      <div class="small muted" style="margin-bottom:12px;">Zeichen des Fortschritts – alle zwei Wochen reflektieren</div>
-      ${QUALITAETEN.map(q => {
-        const a = S.assessments && S.assessments[q.id];
-        const score = a != null ? a.score : null;
-        const c = Q_COLOR[q.id];
-        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);">
-          <div>
-            <span class="pill ${q.farbe}">${q.name}</span>
-            <span class="small muted" style="margin-left:8px;">${score !== null ? ZEICHEN_LABELS[score] : 'Noch nicht'}</span>
-          </div>
-          <button class="btn-ghost" onclick="showAssessmentSheet('${q.id}')" style="font-size:.78rem;padding:6px 8px;">einsch\xE4tzen →</button>
-        </div>`;
-      }).join('')}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div class="card-title" style="margin:0;">Selbsteinsch\xE4tzung</div>
+        <span class="small muted" style="font-size:.72rem;">alle 2 Wochen</span>
+      </div>
+      <div class="small muted" style="margin-bottom:14px;">Zeichen des Fortschritts in den vier Qualit\xE4ten</div>
+      ${(function(){
+        var sc = {};
+        QUALITAETEN.forEach(function(q) {
+          var a = S.assessments && S.assessments[q.id];
+          sc[q.id] = a ? a.score : 0;
+        });
+        var hasAny = QUALITAETEN.some(function(q){ return sc[q.id] > 0; });
+        var chartHtml = hasAny
+          ? '<div class="radar-wrap">' + renderRadarChart(sc) + '</div>'
+          : '<div class="small muted" style="text-align:center;padding:20px 0 16px;font-style:italic;">Noch keine Einsch\xE4tzung vorhanden</div>';
+        var barsHtml = '<div class="radar-scores">'
+          + QUALITAETEN.map(function(q) {
+              var a = S.assessments && S.assessments[q.id];
+              var pct = a ? a.score : 0;
+              var c = Q_COLOR[q.id];
+              return '<div class="radar-score-item">'
+                + '<span class="pill ' + q.farbe + '" style="min-width:72px;text-align:center;">' + q.name + '</span>'
+                + '<div class="radar-bar-bg"><div class="radar-bar" style="width:' + pct + '%;background:' + c + ';"></div></div>'
+                + '<span class="radar-pct" style="color:' + c + ';">' + (pct ? pct + '%' : '–') + '</span>'
+                + '</div>';
+            }).join('')
+          + '</div>';
+        var btnsHtml = '<div class="btn-row" style="flex-wrap:wrap;gap:6px;margin-top:14px;">'
+          + QUALITAETEN.map(function(q) {
+              return '<button class="btn-secondary" onclick="showAssessmentSheet(\'' + q.id + '\')" style="flex:1;min-width:120px;font-size:.78rem;padding:8px 10px;">'
+                + q.name + ' einsch\xE4tzen</button>';
+            }).join('')
+          + '</div>';
+        return chartHtml + barsHtml + btnsHtml;
+      })()}
     </div>
 
     <!-- Praxis-Bogen -->
@@ -2050,7 +2192,7 @@ function renderBogen() {
     <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">
       Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
       Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>
-      <span style="font-size:.7rem;opacity:.5;">v13</span>
+      <span style="font-size:.7rem;opacity:.5;">v14</span>
     </div>`;
 }
 
