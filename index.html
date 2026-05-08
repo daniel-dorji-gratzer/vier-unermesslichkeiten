@@ -130,17 +130,29 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 .reminder .quote { font-style: italic; color: var(--ink-soft); line-height: 1.75; font-size: .95rem; }
 
 /* ── Mode buttons ── */
-.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.mode-btn { background: var(--bg-card); border: 1.5px solid var(--line); border-radius: 14px;
-  padding: 16px 14px; cursor: pointer; text-align: left; touch-action: manipulation;
+.mode-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.mode-btn { background: var(--bg-card); border: 1.5px solid var(--line); border-radius: 16px;
+  padding: 16px 18px; cursor: pointer; text-align: left; touch-action: manipulation;
   font-family: inherit; color: var(--ink); transition: border-color .15s, background .15s;
-  box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-.mode-btn:active { border-color: var(--accent); background: var(--accent-bg); }
+  box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px; width: 100%; }
+.mode-btn:active { border-color: var(--accent); background: var(--accent-bg); transform: scale(.99); }
 .mode-btn.selected { border-color: var(--accent); background: var(--accent-bg);
-  box-shadow: 0 0 0 1px var(--accent), 0 1px 4px rgba(0,0,0,.04); }
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
 .mode-btn.selected .m-title { color: var(--accent); }
-.mode-btn .m-title { font-size: .95rem; font-weight: 700; margin-bottom: 4px; letter-spacing: -.01em; }
-.mode-btn .m-desc  { font-size: .78rem; color: var(--ink-muted); line-height: 1.45; }
+.mode-btn.selected .m-icon { color: var(--accent); }
+.mode-icon-wrap { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-soft);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mode-btn.selected .mode-icon-wrap { background: var(--accent-bg); }
+.mode-icon-wrap svg { width: 22px; height: 22px; stroke: var(--ink-soft); fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mode-btn.selected .mode-icon-wrap svg { stroke: var(--accent); }
+.mode-btn .m-title { font-size: 1rem; font-weight: 700; margin-bottom: 3px; letter-spacing: -.01em; }
+.mode-btn .m-desc  { font-size: .8rem; color: var(--ink-muted); line-height: 1.4; }
+.mode-btn .m-badge { font-size: .7rem; color: var(--ink-muted); margin-top: 4px; }
+.praxis-recent { margin-top: 4px; }
+.praxis-recent-row { display: flex; align-items: center; gap: 8px; padding: 8px 0;
+  border-bottom: 1px solid var(--line); }
+.praxis-recent-row:last-child { border-bottom: none; }
 
 /* ── Practice runner ── */
 #runner { background: var(--bg-card); border-radius: var(--r); padding: 28px 22px;
@@ -1483,30 +1495,54 @@ function selectModeBtn(el) {
 
 function renderPraxis() {
   const phase = getQ(S.arc.currentPhase);
+  const nextVerse = (S.verseIdx||0) % VERSE.length + 1;
+
+  const svgRezitation = '<svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
+  const svgVers      = '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>';
+  const svgKontempl  = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/><path d="M12 12v4"/><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/></svg>';
+  const svgStille    = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+
+  const recent = S.sessions.slice(0, 3);
+  const recentHtml = recent.length ? `
+    <div class="card praxis-recent">
+      <div class="label" style="margin-bottom:10px;">Zuletzt ge\xFCbt</div>
+      ${recent.map(s => {
+        const q = getQ(s.focus);
+        return `<div class="praxis-recent-row">
+          <span class="pill ${q ? q.farbe : 'neutral'}" style="font-size:.68rem;">${q ? q.name : s.focus}</span>
+          <span class="small muted">${fmtDateLong(s.date)}</span>
+          ${s.mode ? `<span class="small muted">\xB7 ${esc(s.mode)}</span>` : ''}
+          ${s.duration ? `<span class="small muted" style="margin-left:auto;">${s.duration}\xA0min</span>` : ''}
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   document.getElementById("panel-praxis").innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:0 2px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px;">
       <span class="pill ${phase.farbe}">${phase.name}</span>
       <span class="small muted">${phase.sanskrit}</span>
-      <button class="btn-ghost" onclick="showFokusSheet()" style="margin-left:auto;padding:4px 0;font-size:.82rem;">ändern →</button>
+      <button class="btn-ghost" onclick="showFokusSheet()" style="margin-left:auto;padding:4px 0;font-size:.82rem;">\xE4ndern →</button>
     </div>
-    <div class="mode-grid">
+    <div class="small" style="color:var(--ink-soft);margin-bottom:16px;padding:0 2px;line-height:1.5;">${esc(phase.kernpunkt)}</div>
+    <div class="mode-list">
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('rezitation')">
-        <div class="m-title">Rezitation</div>
-        <div class="m-desc">Die vier Zeilen als Ausrichtung des Geistes</div>
+        <div class="mode-icon-wrap">${svgRezitation}</div>
+        <div><div class="m-title">Rezitation</div><div class="m-desc">Die vier Zeilen als Ausrichtung des Geistes</div></div>
       </button>
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('verse')">
-        <div class="m-title">Vers lesen</div>
-        <div class="m-desc">Einen Vers Longchenpas kontemplieren</div>
+        <div class="mode-icon-wrap">${svgVers}</div>
+        <div><div class="m-title">Vers lesen</div><div class="m-desc">Einen Vers Longchenpas kontemplieren</div><div class="m-badge">n\xE4chster: Vers ${nextVerse} von ${VERSE.length}</div></div>
       </button>
       <button class="mode-btn" onclick="selectModeBtn(this);showKontemplationListe(S.arc.currentPhase)">
-        <div class="m-title">Kontemplation</div>
-        <div class="m-desc">Schritt-für-Schritt Anleitung</div>
+        <div class="mode-icon-wrap">${svgKontempl}</div>
+        <div><div class="m-title">Kontemplation</div><div class="m-desc">Schritt-f\xFCr-Schritt Anleitung</div></div>
       </button>
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('stille')">
-        <div class="m-title">Stille + Timer</div>
-        <div class="m-desc">Ruhe mit Glocke am Anfang und Ende</div>
+        <div class="mode-icon-wrap">${svgStille}</div>
+        <div><div class="m-title">Stille + Timer</div><div class="m-desc">Ruhe mit Glocke am Anfang und Ende</div><div class="m-badge">${S.prefs.timerDefault}\xA0Minuten</div></div>
       </button>
     </div>
+    ${recentHtml}
     <div id="runner"></div>
   `;
 }
