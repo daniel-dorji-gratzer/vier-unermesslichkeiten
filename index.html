@@ -1695,15 +1695,27 @@ function startTimer() {
 
 let _logAfter = null;
 
+var _editId = null;
+
+function editLog(id) {
+  const s = S.sessions.find(function(x){ return x.id === id; });
+  if (!s) return;
+  showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes });
+}
+
 function showLogSheet(pre={}) {
   _logAfter = pre.afterSave||null;
+  _editId = pre.id||null;
   const focus = pre.focus||S.arc.currentPhase;
   const dur = pre.duration||"";
   const mode = pre.mode||"";
+  const date = pre.date||todayISO();
+  const notes = pre.notes||"";
+  const isEdit = !!_editId;
   openSheet(`
-    <h2>Sitzung eintragen</h2>
+    <h2>${isEdit ? 'Sitzung bearbeiten' : 'Sitzung eintragen'}</h2>
     <label class="field"><span>Datum</span>
-      <input type="date" id="log-date" value="${todayISO()}">
+      <input type="date" id="log-date" value="${date}">
     </label>
     <label class="field"><span>Dauer (Minuten)</span>
       <input type="number" id="log-dur" value="${dur}" placeholder="z.B. 20" min="0">
@@ -1718,10 +1730,10 @@ function showLogSheet(pre={}) {
       <input type="text" id="log-mode" value="${esc(mode)}" placeholder="Stille, Vers, Kontemplation …">
     </label>
     <label class="field"><span>Erfahrung (optional)</span>
-      <textarea id="log-notes" placeholder="Was hat sich gezeigt? Welche Klarheit, welche Schwierigkeit?"></textarea>
+      <textarea id="log-notes" placeholder="Was hat sich gezeigt? Welche Klarheit, welche Schwierigkeit?">${esc(notes)}</textarea>
     </label>
     <div class="btn-row">
-      <button class="btn-primary" onclick="saveLog()">Eintragen</button>
+      <button class="btn-primary" onclick="saveLog()">${isEdit ? 'Speichern' : 'Eintragen'}</button>
       <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>
     </div>
   `);
@@ -1733,7 +1745,13 @@ function saveLog() {
   const focus = document.getElementById("log-focus").value;
   const mode  = document.getElementById("log-mode").value.trim();
   const notes = document.getElementById("log-notes").value.trim();
-  S.sessions.unshift({id:uid(),date,duration:dur,focus,mode,notes});
+  if (_editId) {
+    const idx = S.sessions.findIndex(function(s){ return s.id === _editId; });
+    if (idx !== -1) S.sessions[idx] = Object.assign(S.sessions[idx], {date,duration:dur,focus,mode,notes});
+    _editId = null;
+  } else {
+    S.sessions.unshift({id:uid(),date,duration:dur,focus,mode,notes});
+  }
   save();
   // auto-complete Lernpfad milestones
   if (QUALITAETEN.find(q => q.id === focus)) {
@@ -1779,7 +1797,10 @@ function renderTagebuch() {
               ${s.duration?'· '+s.duration+' min':''}
               ${q?`· <span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'· <span class="pill neutral">alle vier</span>':'')}
               ${s.mode?'· '+esc(s.mode):''}
-              <button onclick="delSession('${s.id}')" style="float:right;background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 4px;">×</button>
+              <span style="float:right;display:flex;gap:6px;align-items:center;">
+                <button onclick="editLog('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:.82rem;cursor:pointer;padding:0 2px;" title="Bearbeiten">✎</button>
+                <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 2px;" title="L\xF6schen">×</button>
+              </span>
             </div>
             ${s.notes?`<div class="j-text">${esc(s.notes)}</div>`:`<div class="small muted">– keine Notizen –</div>`}
           </div>`;
