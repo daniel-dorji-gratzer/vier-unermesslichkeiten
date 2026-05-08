@@ -391,7 +391,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 .quiz-opt.selected { border-color: var(--accent); background: var(--accent-bg); }
 .quiz-opt.correct { border-color: #5BBB8A; background: #c5ecda; }
 .quiz-opt.wrong { border-color: #a23e48; background: #faf0f1; }
-.quiz-opt-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line);
+.quiz-opt-dot { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--line);
   flex-shrink: 0; margin-top: 1px; background: transparent; transition: all .1s; }
 .quiz-opt.selected .quiz-opt-dot { border-color: var(--accent); background: var(--accent); }
 .quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
@@ -935,73 +935,366 @@ const Q_COLOR = {
 
 const QUIZ = {
   gleichmut: [
-    { frage: "Womit wird Gleichmut verwechselt?",
-      optionen: ["Mit Gleichg\xFCltigkeit.","Mit Mitgef\xFChl.","Mit liebender G\xFCte.","Mit Konzentration."],
-      richtig: 0 },
-    { frage: "Warum empfiehlt das Lehrgedicht, mit Gleichmut zu beginnen?",
-      optionen: ["Erst wenn die Gleichheit naher und ferner Wesen erkannt ist, werden die anderen drei wirklich grenzenlos.",
-                 "Gleichmut ist die einfachste der vier Qualit\xE4ten.",
-                 "Ohne Gleichmut ist Meditation unm\xF6glich.",
-                 "Gleichmut f\xFChrt am schnellsten zur Erleuchtung."],
-      richtig: 0 },
-    { frage: "Was ist das Zeichen des Fortschritts in Gleichmut?",
-      optionen: ["Man sp\xFCrt keine starken Gef\xFChle mehr.",
-                 "Der Geist wird ruhig bei der Meditation.",
-                 "Selbst und Andere, Freund und Feind sind gleichgestellt.",
-                 "Man liebt alle Wesen auf dieselbe Weise."],
-      richtig: 2 }
+    { frage: "Warum empfiehlt Longchenpa Anf\xE4nger:innen, mit der Praxis des Gleichmuts zu beginnen?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Ohne Gleichmut bleiben Liebe, Mitgef\xFChl und Freude leicht parteiisch und an wenige Wesen gebunden.",
+        "Erst die erkannte Gleichheit naher und ferner Wesen legt den Boden f\xFCr die universelle Form der anderen drei.",
+        "Ohne diesen Schritt ist die Universalit\xE4t von Liebe, Mitgef\xFChl und Freude nur sehr schwer zu erreichen.",
+        "Gleichmut ist die einzige der vier Qualit\xE4ten, die zur Befreiung f\xFChren kann.",
+        "Die anderen drei Qualit\xE4ten sind optional, sobald Gleichmut entwickelt ist."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D ist falsch — alle vier f\xFChren zur Befreiung, sofern mit Weisheit verbunden. E widerspricht dem komplement\xE4ren Charakter der vier Qualit\xE4ten." },
+    { frage: "Welche Aussagen zum Wesen des Gleichmuts treffen zu?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Gleichmut bedeutet, alle Wesen ohne Diskriminierung gleich zu behandeln — ohne Unterschied zwischen Selbst und Anderen.",
+        "Auch das eigene Selbst muss in diese Gleichheit einbezogen werden.",
+        "Gleichmut wird leicht mit Gleichg\xFCltigkeit verwechselt, ist aber ein freier, friedlicher, gl\xFCckseliger Geist.",
+        "Gleichmut ist der Raum, aus dem heraus echte Freundlichkeit und Mitgef\xFChl gegen\xFCber allen Wesen m\xF6glich sind.",
+        "Gleichmut bedeutet, sich aus Beziehungen zur\xFCckzuziehen, um nicht in Bev\xF6rzugung zu verfallen."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E verkennt Gleichmut als R\xFCckzug — er ist gerade die Basis f\xFCr mehr Engagement, nicht weniger." },
+    { frage: "Welche Geistesgifte werden laut Vers 21 durch Gleichmut beseitigt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Stolz",
+        "Unwissenheit",
+        "Hass",
+        "Eifersucht",
+        "Anhaftung"
+      ],
+      richtig: [0,1],
+      erklaerung: "C wird durch Liebe, D durch Freude, E (anh\xE4ftende Liebe) durch Mitgef\xFChl beseitigt (Vers 21)." },
+    { frage: "Welche Reflexionen schlägt Vers 7 als Gleichmuts-Meditation vor?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Im anf\xE4nglosen Samsara haben heutige Feinde als Vater, Mutter, Freund einst Gutes gebracht.",
+        "Die heutigen Freunde waren einst sch\xE4dliche Feinde; das Leid, das sie zuf\xFCgten, ist auch jetzt noch wirksam.",
+        "Wer dazwischensteht, war beides — Freund und Feind. Hass und Anh\xE4ftung machen daher keinen Sinn.",
+        "Da das Selbst eine Illusion ist, gibt es niemanden, der lieben oder hassen k\xF6nnte.",
+        "Da alle Wesen Buddha-Natur besitzen, kann es ohnehin keine Feinde geben."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D und E sind philosophisch verwandte, aber nicht die spezifischen Reflexionen aus Vers 7 — sie umgehen den methodischen Schritt der Praxis." },
+    { frage: "Wie wird die Gleichmut-Praxis gemäß Vers 8 aufgebaut?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Lieben in die mittlere Position der Neutralit\xE4t stellen und das Festhalten beiseitelegen.",
+        "Feinde betrachten, als w\xE4ren auch sie neutral — sich vom Hass befreien, kein „nahe und fern“ mehr.",
+        "Die Unwissenheit beseitigen, Wesen als „neither good nor bad“ zu betrachten — und unparteiisch das Leid aller zu beseitigen w\xFCnschen.",
+        "Direkt mit der Liebe gegen\xFCber Feinden beginnen, ohne den Zwischenschritt der Neutralit\xE4t.",
+        "Die Liebe zu den engsten Personen intensivieren und als Modell auf andere \xFCbertragen."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D und E \xFCberspringen den methodischen Aufbau \xFCber Neutralit\xE4t — gerade dieser Zwischenschritt ist Longchenpas Anweisung." },
+    { frage: "Welche Beispiele/Bilder werden zur Veranschaulichung von Gleichmut verwendet?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Das Theravāda-Beispiel: Wahl einer Person zur T\xF6tung — Gleichmut bedeutet, hier keine Differenzierung mehr zu w\xFCnschen.",
+        "Patrul Rinpoches Bild: ein heiterer und sch\xF6ner See.",
+        "Nach einer bestandenen Pr\xFCfung ist der Geist frei und unbeschwert — wir nutzen das aber nicht und greifen zu Ablenkung.",
+        "Eine Mutter ohne Arme, die ihr Kind ertrinken sieht.",
+        "Ein Kamel, das sein verlorenes Kalb wiederfindet."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D = Patruls Bild f\xFCr Mitgef\xFChl. E = Bild f\xFCr Freude." },
+    { frage: "Was kennzeichnet die Gleichmuts-Praxis ohne Referenzpunkt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Alle f\xFChlenden Wesen sind nichts als der Geist — sie k\xF6nnen nicht substantiell so existierend gefunden werden, wie sie erscheinen.",
+        "Die Natur des Geistes selbst ist dem Raum gleich.",
+        "Mit einem von Konzepten freien Geist ruht man im ultimativen Zustand, leer und ungeboren.",
+        "Diese Praxis ist erst nach jahrelanger Vorbereitung erlaubt.",
+        "Trinlay Rinpoche: die referenzlose Praxis nicht aufschieben — beide Ebenen helfen einander."
+      ],
+      richtig: [0,1,2,4],
+      erklaerung: "D widerspricht der ausdr\xFCcklichen Anweisung Rinpoches (E)." },
+    { frage: "Welche Buddha-Aspekte und Weisheiten werden durch Gleichmut offenbar (Vers 21)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Svabhāvikakāya",
+        "Weisheit der Gleichheit",
+        "Weisheit des Dharmadhatu",
+        "Sambhogakāya und spiegelgleiche Weisheit",
+        "Nirmāṇakāya und erhabene Weisheit"
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D geh\xF6rt zur Liebe, E zur Freude." }
   ],
   liebe: [
-    { frage: "Was ist der Fokus der liebenden G\xFCte (maitrī)?",
-      optionen: ["Diejenigen, die leiden.",
-                 "Diejenigen, die Gl\xFCck und Reichtum haben.",
-                 "Diejenigen, die nicht gl\xFCcklich sind.",
-                 "Diejenigen, die parteiisch sind."],
-      richtig: 2 },
-    { frage: "Womit wird liebende G\xFCte verwechselt?",
-      optionen: ["Mit Gleichmut.","Mit Anhaftung.","Mit Mitleid.","Mit Eifersucht."],
-      richtig: 1 },
-    { frage: "Was ist das Zeichen der Vollkommenheit in liebender G\xFCte?",
-      optionen: ["Man liebt Freunde und Familie tiefer als zuvor.",
-                 "Man meditiert t\xE4glich \xFCber W\xE4rme.",
-                 "Der Geist wird weich und ruhig.",
-                 "H\xF6chste, allumfassende Liebe – mehr als eine Mutter f\xFCr ihr einziges Kind."],
-      richtig: 3 }
+    { frage: "Welche Übersetzungen und Bestimmungen sind für maitrī korrekt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Sanskrit: Freundlichkeit, freundschaftliche Haltung.",
+        "Tibetisch: byams pa — Wohlwollen.",
+        "Im Englischen h\xE4ufig analog zu elterlicher Liebe beschrieben — Sorge um das Gl\xFCck anderer.",
+        "Definition: der Wunsch, dass andere Gl\xFCck erlangen.",
+        "Definition: das Erbarmen mit denen, die leiden."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist die Bestimmung von Mitgef\xFChl (karuṇā), nicht von maitrī." },
+    { frage: "Welche Verwechslungen mit liebender Güte werden kritisch besprochen?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Anh\xE4ftung — z. B. „Ich mag Fleisch“: selbstbezogene Vorliebe, schädlich f\xFCr die Kuh, Gegenteil von maitrī.",
+        "Selbstaufopferung — die irrige Vorstellung, man m\xFCsse sich selbst klein machen.",
+        "Eine emotional aufgeladene „Liebe“, die im Kern auf Anh\xE4ftung basiert.",
+        "Eine Haltung, in der man andere mag, weil und solange sie einem etwas bringen.",
+        "Mitf\xFChlende Freude \xFCber das Gl\xFCck anderer."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist eine eigene Unermesslichkeit (muditā), keine Verwechslung mit maitrī." },
+    { frage: "Was sagt Vers 11 über die Form der Liebende-Güte-Praxis?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "So, wie man w\xFCnscht, dass die eigene Mutter Gl\xFCck erlangt — denselben Wunsch f\xFCr alle Wesen.",
+        "Im unmittelbaren Sinne: dass die Wesen das Gl\xFCck der G\xF6tter und Menschen erlangen.",
+        "Letztendlich: dass sie die Gl\xFCckseligkeit der Buddhaschaft erreichen.",
+        "Beginnen mit einem einzigen Wesen und \xFCben, bis alle bis zu den \xE4u\xDFersten Grenzen der zehn Richtungen einbezogen sind.",
+        "Mit Tieren beginnen, da diese reineres Mitgef\xFChl wecken als Menschen."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist nicht Longchenpas Anweisung — er nennt die eigene Mutter und das einzelne Wesen als Ausgangspunkt." },
+    { frage: "Welche Zeichen der Vollkommenheit der Liebe nennt Vers 12?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "H\xF6chste, allumfassende Liebe — gr\xF6\xDFer als die Liebe einer Mutter zu ihrem einzigen Kind.",
+        "Eine gro\xDFe Liebe jenseits aller Anh\xE4ftung — im Zustand, in dem alle als gleich gesehen werden.",
+        "Das Zeichen der Vereinigung von Liebe und Leerheit.",
+        "Schon der Anblick des Praktizierenden bereitet anderen Wesen Freude.",
+        "Ein bevorzugter Schutz f\xFCr den engsten Familien- und Freundeskreis."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E widerspricht der Allumfassendheit — gerade die Aufhebung von Bev\xF6rzugung ist das Zeichen." },
+    { frage: "Welche Aussagen zur Praxis-Anleitung für maitrī sind korrekt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Zun\xE4chst auf eine Person fokussieren, die diese Qualit\xE4t inspiriert — aber so, dass keine Anh\xE4ftung entsteht.",
+        "Sukzessive Erweiterung: ein:e, zwei, drei Wesen → Region → Kontinent → Erde → Universum → Multiversum.",
+        "Wenn Liebes-Meditation zu Festhalten f\xFChrt, ist Mitgef\xFChl (Fokus auf Leid) das Gegenmittel.",
+        "Solange auch nur ein einziges Hassobjekt existiert, ist der Geist nicht frei von Hass.",
+        "Die Praxis sollte sich auf den engsten Kreis beschr\xE4nken, da nur dort echte Liebe m\xF6glich ist."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E widerspricht der Lehre, dass alle Wesen ohne Ausnahme einbezogen werden m\xFCssen." },
+    { frage: "Welche Position hat Liebe in Longchenpas Wiesen-Metapher (Vers 1)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Liebe ist der Boden / die Grundlage der Wiese.",
+        "Mitgef\xFChl sind die Blumen auf diesem Boden.",
+        "Freude ist der k\xFChlende Schatten.",
+        "Unvoreingenommenheit ist das reine Wasser, das die Blumen benetzte.",
+        "Bodhicitta ist die Sonne, die die Wiese beleuchtet."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist nicht Teil der Metapher in Vers 1 — sie nennt nur die vier Elemente Boden, Blumen, Schatten, Wasser." },
+    { frage: "Welche Buddha-Aspekte und Weisheit werden durch Liebe erlangt (Vers 21)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Sambhogakāya — gez\xFCckt mit allen Zeichen der Buddhaschaft.",
+        "Spiegelgleiche Weisheit.",
+        "Dharmakāya.",
+        "Allumfassende Weisheit.",
+        "Erhabene Weisheit des Allerfolgreichen."
+      ],
+      richtig: [0,1],
+      erklaerung: "C und D geh\xF6ren zum Mitgef\xFChl, E zur Freude." },
+    { frage: "Welches Bild verwendet Patrul Rinpoche für maitrī?",
+      hinweis: "Eine Antwort richtig.",
+      optionen: [
+        "Eine Mutter, die ihr Baby pflegt — reine G\xFCte, ohne Erwartungen.",
+        "Eine Mutter ohne Arme, die ihr Kind ertrinken sieht.",
+        "Ein Kamel, das sein Kalb wiederfindet.",
+        "Ein heiterer, ruhiger See.",
+        "Ein heller Vollmond am dunklen Himmel."
+      ],
+      richtig: [0],
+      erklaerung: "B = Mitgef\xFChl, C = Freude, D = Gleichmut, E nicht im Material." }
   ],
   mitgefuehl: [
-    { frage: "Was ist das Zeichen des Fortschritts in Mitgef\xFChl?",
-      optionen: ["Die Unf\xE4higkeit, das Leiden von Wesen zu ertragen, ohne zu handeln.",
-                 "Man weint beim Anblick von Leid.",
-                 "Man hilft t\xE4glich konkreten Menschen.",
-                 "Man f\xFChlt den Schmerz anderer im eigenen K\xF6rper."],
-      richtig: 0 },
-    { frage: "Womit wird Mitgef\xFChl verwechselt?",
-      optionen: ["Mit Gleichmut.","Mit Mitfreude.","Mit liebender G\xFCte.","Mit sentimentalem Mitleid."],
-      richtig: 3 },
-    { frage: "Welche innere Haltung beschreibt echtes Mitgef\xFChl (karuṇā)?",
-      optionen: ["Bewegt und traurig, aber hilflos.",
-                 "Friedlich, bereit zu handeln – wie ein:e \xC4rzt:in.",
-                 "K\xE4mpferisch und entschlossen.",
-                 "Distanziert und analysierend."],
-      richtig: 1 }
+    { frage: "Welche Aussagen kennzeichnen Mitgefühl (karuṇā)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Man sieht das Leid f\xFChlender Wesen und kann es nicht ertragen, nichts zu tun.",
+        "Wunsch, dass Leid und seine Ursachen von anderen entfernt werden.",
+        "Mitgef\xFChl meditiert auf Leid in seiner Ursache und Frucht.",
+        "Mitgef\xFChl wird leicht damit verwechselt, von Kummer und Trauer \xFCberw\xE4ltigt zu sein.",
+        "Mitgef\xFChl bedeutet, das eigene Wohl vollst\xE4ndig dem der Anderen zu opfern."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist die problematische Verwechslung mit Selbstaufopferung, die im Material klar zur\xFCckgewiesen wird." },
+    { frage: "Welches Patrul-Rinpoche-Bild gehört zum Mitgefühl?",
+      hinweis: "Eine Antwort richtig.",
+      optionen: [
+        "Eine Mutter ohne Arme, die ihr Kind ertrinken sieht.",
+        "Eine Mutter, die ihr Baby pflegt.",
+        "Ein Kamel, das sein Kalb wiederfindet.",
+        "Ein klarer, ruhiger See.",
+        "Ein:e Bauer:in, der/die nach D\xFCrre Regen erf\xE4hrt."
+      ],
+      richtig: [0],
+      erklaerung: "B = Liebe, C = Freude, D = Gleichmut, E nicht im Material." },
+    { frage: "Welche Aussagen zum Zeichen des Erfolgs und zur Frucht der Mitgefühlspraxis treffen zu?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Zeichen: die Unf\xE4higkeit zu ertragen, dass Wesen leiden.",
+        "Anschlie\xDFend gleichm\xE4\xDFig in einem Mitgef\xFChl ruhen, das frei von begrifflichem Bezug ist.",
+        "Das Zeichen daf\xFCr ist Leerheit — Leerheit vereint mit Mitgef\xFChl.",
+        "Frucht: ein Geist frei von Bosheit, der die urspr\xFCngliche Reinheit selbst verwirklichen wird.",
+        "Frucht: Wiedergeburt im G\xF6tterbereich von Brahmā."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist gerade die Frucht der Brahma-Vihāras OHNE Befreiungspfad — die vier Unermesslichkeiten gehen dar\xFCber hinaus (Vers 4)." },
+    { frage: "Welche Reflexionen gehören zur Mitgefühlspraxis (Vers 13–14)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Die liebenden Eltern in fr\xFCheren Leben haben f\xFCr einen b\xF6se Taten begangen, f\xFCr die sie nun leiden.",
+        "Die wandernden Wesen gehen unter in den tosenden Fluten von Geburt, Alter, Krankheit, Tod.",
+        "Sie sind ohne gezahmte Geister, die sich nach Freiheit sehnen, und ohne tugendhafte Freunde.",
+        "Aus der Tiefe des Herzens: M\xF6ge alles, was ich besitze, in diesem Augenblick alle Schmerzen der Wesen vertreiben.",
+        "Da Leid letztlich eine Illusion ist, ist es nicht n\xF6tig, etwas dagegen zu unternehmen."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E widerspricht der Lehre — die Leerheit von Leid hebt die mitf\xFChlende Antwort nicht auf." },
+    { frage: "Welches Geistesgift wird durch Mitgefühl verbannt (Vers 21)?",
+      hinweis: "Eine Antwort richtig.",
+      optionen: [
+        "Anh\xE4ftende Liebe",
+        "Hass",
+        "Eifersucht",
+        "Stolz",
+        "Unwissenheit"
+      ],
+      richtig: [0],
+      erklaerung: "B durch Liebe, C durch Freude, D und E durch Gleichmut." },
+    { frage: "Welche Buddha-Aspekte und Weisheit werden durch Mitgefühl erlangt (Vers 21)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Dharmakāya — ausgestattet mit St\xE4rken und besonderen Eigenschaften.",
+        "Allumfassende Weisheit.",
+        "Sambhogakāya.",
+        "Spiegelgleiche Weisheit.",
+        "Nirmāṇakāya."
+      ],
+      richtig: [0,1],
+      erklaerung: "C und D geh\xF6ren zur Liebe, E zur Freude." },
+    { frage: "Welche Aussagen zur strukturellen Rolle des Mitgefühls im buddhistischen Pfad treffen zu?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Im kausalen wie im resultierenden Fahrzeug st\xFCtzen sich beide Wege auf den Pfad grenzenlosen Mitgef\xFChls (Vers 23).",
+        "Beim kausalen und beim resultierenden Fahrzeug ist die Praxis dieselbe: Leerheit, belebt durch Mitgef\xFChl.",
+        "Wenn Liebes-Meditation in Festhalten umschl\xE4gt, ist Mitgef\xFChl — fokussiert auf Leid in Ursache und Frucht — das Gegenmittel.",
+        "Mitgef\xFChl ist eine blo\xDFe Vorpraxis, die nach Erlangung von Stabilit\xE4t nicht mehr n\xF6tig ist.",
+        "Mitgef\xFChl meint vor allem Selbst-Mitgef\xFChl mit der eigenen Verletzbarkeit."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D und E reduzieren bzw. verkennen die zentrale Stellung von Mitgef\xFChl auf allen Stufen des Pfades." },
+    { frage: "Welche Zuordnungen sind nach Vers 5 (Praxis mit Referenzpunkt) korrekt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Diejenigen, die ungl\xFCcklich sind / von Kummer zerm\xFCrbt — Felder von Liebe und Mitgef\xFChl.",
+        "Diejenigen, die Gl\xFCck und Reichtum besitzen — Feld der mitf\xFChlenden Freude.",
+        "Diejenigen, die das Nahe lieben und das Ferne hassen — Feld der Unvoreingenommenheit.",
+        "Form: der Wunsch, dass Gl\xFCck erlangt, Kummer beseitigt, Freude nicht verloren gehe, ein heilsamer Geist m\xF6glich werde.",
+        "Mitgef\xFChl richtet sich ausschlie\xDFlich auf jene, die durch eigene Schuld in ihr Leid geraten sind."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist eine moralische Filterung, die Vers 5 nicht enth\xE4lt — Mitgef\xFChl gilt allen Leidenden." }
   ],
   freude: [
-    { frage: "Was ist das Zeichen der Meisterschaft in Mitfreude (muditā)?",
-      optionen: ["Man ist immer fr\xF6hlich und enthusiastisch.",
-                 "Volle Freude ohne neidische Eifersucht.",
-                 "Man hat keine Sorgen mehr.",
-                 "Man freut sich \xFCber Erfolge der eigenen Gruppe."],
-      richtig: 1 },
-    { frage: "Womit wird Mitfreude verwechselt?",
-      optionen: ["Mit Aufregung.","Mit Gleichmut.","Mit liebender G\xFCte.","Mit Neid."],
-      richtig: 0 },
-    { frage: "Was ist der Fokus der Mitfreude?",
-      optionen: ["Diejenigen, die leiden.",
-                 "Diejenigen, die traurig sind.",
-                 "Alle Wesen ohne Unterschied.",
-                 "Diejenigen, die Gl\xFCck und Reichtum haben."],
-      richtig: 3 }
+    { frage: "Wie wird mitfühlende Freude (muditā) im Material charakterisiert?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Freude \xFCber das Gl\xFCck anderer.",
+        "Objekt der Aufmerksamkeit: Wesen, die gl\xFCcklich sind.",
+        "In Vers 16: „Welche Freude! Diese Wesen brauchen mich nicht — sie haben es selbst gefunden!“",
+        "Wunsch: M\xF6gen sie bis zur Erleuchtung niemals ihre Freude verlieren.",
+        "Freude \xFCber die eigenen Erkenntnisse und Fortschritte auf dem spirituellen Weg."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist eine andere Form von Freude (Freude am Dharma) — muditā meint spezifisch die Freude \xFCber das Gl\xFCck anderer." },
+    { frage: "Welches Patrul-Rinpoche-Bild gehört zur Freude?",
+      hinweis: "Eine Antwort richtig.",
+      optionen: [
+        "Ein Kamel, das sein verlorenes Kalb wiederfindet und \xFCbergl\xFCcklich ist.",
+        "Eine Mutter, die ihr Baby pflegt.",
+        "Eine Mutter ohne Arme, die ihr Kind ertrinken sieht.",
+        "Ein heiterer, ruhiger See.",
+        "Eine Mutter, die ihr Kind nach langer Trennung wiedersieht."
+      ],
+      richtig: [0],
+      erklaerung: "B = Liebe, C = Mitgef\xFChl, D = Gleichmut. E ist nicht im Material." },
+    { frage: "Welches Geistesgift ist das Gegengift der Freude (Vers 21)?",
+      hinweis: "Eine Antwort richtig.",
+      optionen: [
+        "Eifersucht / Neid",
+        "Stolz",
+        "Hass",
+        "Anh\xE4ftung",
+        "Unwissenheit"
+      ],
+      richtig: [0],
+      erklaerung: "B und E durch Gleichmut, C durch Liebe, D (anh\xE4ftende Liebe) durch Mitgef\xFChl." },
+    { frage: "Welche Aussagen zum Zeichen der Meisterschaft und zur Frucht der Freude (Vers 17) sind korrekt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Zeichen: voller Freude, ohne neidische Eifersucht.",
+        "Bei sp\xE4terer Konzentration auf Freude: frei von allen begrifflichen Bez\xFCgen.",
+        "Ganz nat\xFCrlich in Frieden — mit Gl\xFCckseligkeit in K\xF6rper, Sprache und Geist.",
+        "Frucht: Freude und best\xE4ndiger Reichtum.",
+        "Frucht: Aufregung und Begeisterung, die das Leben mit Energie f\xFCllt."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E ist gerade die Verwechslung — muditā ist NICHT Aufregung, sondern ein stiller, friedvoller Zustand." },
+    { frage: "Welche Buddha-Aspekte und Weisheit werden durch Freude erlangt (Vers 21)?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Nirmāṇakāya (vielf\xE4ltig, in verschiedenen Formen).",
+        "Erhabene Weisheit des Allerfolgreichen.",
+        "Erleuchtetes Handeln, das sich spontan vollzieht.",
+        "Sambhogakāya.",
+        "Weisheit der Gleichheit."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D geh\xF6rt zur Liebe, E zum Gleichmut." },
+    { frage: "Was sagt Vers 18 zur dynamischen Wechselbeziehung der vier Qualitäten?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Wenn Mitgef\xFChl fehlt und der Geist auf ein Objekt fixiert ist, stoppt die entstehende Depression durch nicht-referentielle Freude.",
+        "Wenn der Geist durch Freude beunruhigt ist und sich an Ablenkung erfreut, ist gro\xDFe Unvoreingenommenheit das Gegenmittel.",
+        "Wenn die Liebes-Meditation in Festhalten umschl\xE4gt, stoppt Freude diese Anh\xE4ftung.",
+        "Wenn Unvoreingenommenheit zu Gleichg\xFCltigkeit wird, meditiert man wieder \xFCber Liebe und folgende Qualit\xE4ten.",
+        "Die vier Qualit\xE4ten korrigieren sich wechselseitig — so erlangt man Stabilit\xE4t und Meisterschaft."
+      ],
+      richtig: [0,1,3,4],
+      erklaerung: "C ist falsch — bei Festhalten in der Liebe ist MITGEF\xFCHL das Gegenmittel, nicht Freude." },
+    { frage: "Welche Verwechslungen werden im Material aufgezeigt?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Liebe ≠ Anh\xE4ftung",
+        "Mitgef\xFChl ≠ von Kummer verzehrt sein (subtile Unterscheidung)",
+        "Freude ≠ Aufregung / Erregung",
+        "Gleichmut ≠ Gleichg\xFCltigkeit",
+        "Bodhicitta ≠ Mitgef\xFChl"
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E thematisiert das Material in dieser Form nicht — Bodhicitta und gro\xDFes Mitgef\xFChl gelten im Mahāyāna als untrennbar." },
+    { frage: "Welche Anweisungen gibt Vers 16 zur Meditation der mitfühlenden Freude?",
+      hinweis: "Mehrere Antworten richtig.",
+      optionen: [
+        "Beginne mit einem Wesen und \xFCbe dich, bis jedes Wesen einbezogen ist.",
+        "„Erweicht durch Mitgef\xFChl, \xFCbe dich darin, Freude zu empfinden, wenn andere ihre Freude finden.“",
+        "Gegenstand der Aufmerksamkeit: Wesen, die gl\xFCcklich sind.",
+        "Der Wunsch: M\xF6gen sie bis zur Erleuchtung ihre Freude und ihren Trost niemals verlieren.",
+        "Praktiziere Freude vor Mitgef\xFChl — Freude sei f\xFCr die meisten der einfachere Einstieg."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E widerspricht der Reihenfolge — „Erweicht durch Mitgef\xFChl“ setzt Mitgef\xFChl bereits voraus; Anf\xE4nger:innen beginnen mit Gleichmut." }
   ]
+};
 };
 
 const ASSESSMENT_FRAGEN = {
@@ -1980,62 +2273,79 @@ function _renderQuiz() {
   const q = getQ(qid);
   const questions = QUIZ[qid] || [];
   const body = questions.map((qu, qi) => {
-    const sel = quizState.answers[qi];
+    const sel = quizState.answers[qi] || [];
     const opts = qu.optionen.map((opt, oi) => {
+      const letter = String.fromCharCode(65 + oi);
       let cls = '';
       if (quizState.submitted) {
-        if (oi === qu.richtig) cls = ' correct';
-        else if (sel === oi) cls = ' wrong';
-      } else if (sel === oi) cls = ' selected';
-      return `<div class="quiz-opt${cls}" onclick="selectQuizOpt(${qi},${oi})">
-        <div class="quiz-opt-dot"></div>
-        <div class="small">${esc(opt)}</div>
-      </div>`;
+        const isCorrect = qu.richtig.includes(oi);
+        const isSelected = sel.includes(oi);
+        if (isCorrect) cls = ' correct';
+        else if (isSelected) cls = ' wrong';
+      } else if (sel.includes(oi)) cls = ' selected';
+      return '<div class="quiz-opt' + cls + '" onclick="selectQuizOpt(' + qi + ',' + oi + ')">'
+        + '<div class="quiz-opt-dot"></div>'
+        + '<div class="small"><strong>' + letter + ')</strong> ' + esc(opt) + '</div>'
+        + '</div>';
     }).join('');
-    return `<div style="margin-bottom:18px;">
-      <div style="font-weight:600;margin-bottom:8px;font-size:.92rem;">${qi+1}. ${esc(qu.frage)}</div>
-      ${opts}
-    </div>`;
+    const explHtml = quizState.submitted && qu.erklaerung
+      ? '<div class="small muted" style="margin-top:6px;padding:8px 10px;background:var(--bg-soft);border-radius:8px;line-height:1.5;">' + esc(qu.erklaerung) + '</div>'
+      : '';
+    const hintHtml = '<div class="small muted" style="margin-bottom:6px;font-style:italic;">' + esc(qu.hinweis||'') + '</div>';
+    return '<div style="margin-bottom:22px;">'
+      + '<div style="font-weight:600;margin-bottom:4px;font-size:.92rem;">' + (qi+1) + '. ' + esc(qu.frage) + '</div>'
+      + hintHtml
+      + opts
+      + explHtml
+      + '</div>';
   }).join('');
 
   let resultHtml = '';
-  let btns = `<button class="btn-primary" onclick="submitQuiz()">Pr\xFCfen</button>
-    <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>`;
+  let btns = '<button class="btn-primary" onclick="submitQuiz()">Pr\xFCfen</button>'
+    + '<button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>';
 
   if (quizState.submitted) {
-    const correct = questions.filter((qu, qi) => quizState.answers[qi] === qu.richtig).length;
-    const pass = correct >= Math.ceil(questions.length * 2 / 3);
+    const correct = questions.filter((qu, qi) => {
+      const sel = (quizState.answers[qi] || []).slice().sort().join(',');
+      const exp = qu.richtig.slice().sort().join(',');
+      return sel === exp;
+    }).length;
+    const pass = correct >= Math.ceil(questions.length * 0.6);
     resultHtml = pass
-      ? `<div style="background:#c5ecda;color:#1a5c3a;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-weight:600;">✓ ${correct}/${questions.length} richtig – Studium abgeschlossen!</div>`
-      : `<div style="background:#faf0f1;color:#a23e48;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-weight:600;">✗ ${correct}/${questions.length} richtig – nochmals versuchen</div>`;
+      ? '<div style="background:#c5ecda;color:#1a5c3a;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-weight:600;">✓ ' + correct + '/' + questions.length + ' richtig – Studium abgeschlossen!</div>'
+      : '<div style="background:#faf0f1;color:#a23e48;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-weight:600;">✗ ' + correct + '/' + questions.length + ' richtig – nochmals versuchen</div>';
     btns = pass
-      ? `<button class="btn-primary" onclick="_closeSheet();renderBogen();">Weiter</button>`
-      : `<button class="btn-primary" onclick="showQuizContent('${qid}')">Nochmals</button>
-         <button class="btn-secondary" onclick="_closeSheet()">Schlie\xDFen</button>`;
+      ? '<button class="btn-primary" onclick="_closeSheet();renderBogen();">Weiter</button>'
+      : '<button class="btn-primary" onclick="showQuizContent(\'' + qid + '\')">Nochmals</button>'
+        + '<button class="btn-secondary" onclick="_closeSheet()">Schlie\xDFen</button>';
   }
 
-  openSheet(`
-    <h2>Studium · <span class="pill ${q.farbe}">${q.name}</span></h2>
-    <div id="quiz-result">${resultHtml}</div>
-    <div id="quiz-body">${body}</div>
-    <div class="btn-row" id="quiz-btns">${btns}</div>
-  `);
+  openSheet('<h2>Studium \xB7 <span class="pill ' + q.farbe + '">' + q.name + '</span></h2>'
+    + '<div id="quiz-result">' + resultHtml + '</div>'
+    + '<div id="quiz-body">' + body + '</div>'
+    + '<div class="btn-row" id="quiz-btns">' + btns + '</div>');
 }
 
 function selectQuizOpt(qi, oi) {
   if (quizState.submitted) return;
-  quizState.answers[qi] = oi;
+  if (!quizState.answers[qi]) quizState.answers[qi] = [];
+  const idx = quizState.answers[qi].indexOf(oi);
+  if (idx === -1) quizState.answers[qi].push(oi);
+  else quizState.answers[qi].splice(idx, 1);
   _renderQuiz();
 }
 
 function submitQuiz() {
   const questions = QUIZ[quizState.qid] || [];
-  if (Object.keys(quizState.answers).length < questions.length) {
-    toast("Bitte alle Fragen beantworten."); return;
-  }
+  const answered = questions.filter((_, qi) => (quizState.answers[qi]||[]).length > 0).length;
+  if (answered < questions.length) { toast('Bitte alle Fragen beantworten.'); return; }
   quizState.submitted = true;
-  const correct = questions.filter((qu, qi) => quizState.answers[qi] === qu.richtig).length;
-  const pass = correct >= Math.ceil(questions.length * 2 / 3);
+  const correct = questions.filter((qu, qi) => {
+    const sel = (quizState.answers[qi] || []).slice().sort().join(',');
+    const exp = qu.richtig.slice().sort().join(',');
+    return sel === exp;
+  }).length;
+  const pass = correct >= Math.ceil(questions.length * 0.6);
   if (pass) {
     if (!S.path) S.path = {};
     S.path[pathKey(quizState.qid, 'studium')] = true;
