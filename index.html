@@ -1968,13 +1968,15 @@ function saveAssessment() {
 }
 
 function renderRadarChart(scores) {
-  var cx = 110, cy = 115, R = 78;
+  // Diamond layout: top=Gleichmut, right=Liebe, bottom=Mitgefühl, left=Freude
+  // viewBox gives 55px padding left/right for labels
+  var W = 300, H = 230, cx = W/2, cy = H/2 - 2, R = 78;
   function pt(ax, pct) {
     var r = pct / 100 * R;
-    if (ax === 0) return [cx, cy - r];       // top: Gleichmut
-    if (ax === 1) return [cx + r, cy];       // right: Liebe
-    if (ax === 2) return [cx, cy + r];       // bottom: Mitgefühl
-    return [cx - r, cy];                     // left: Freude
+    if (ax === 0) return [cx, cy - r];
+    if (ax === 1) return [cx + r, cy];
+    if (ax === 2) return [cx, cy + r];
+    return [cx - r, cy];
   }
   function diamond(r) {
     return 'M ' + cx + ' ' + (cy-r) + ' L ' + (cx+r) + ' ' + cy
@@ -1995,17 +1997,17 @@ function renderRadarChart(scores) {
     if (!pcts[i]) return '';
     return '<circle cx="' + pts[i][0] + '" cy="' + pts[i][1] + '" r="5" fill="' + QC[id] + '" stroke="#fff" stroke-width="1.5"/>';
   }).join('');
-  var names = ['Gleichmut','Liebende G\xFCte','Mitgef\xFChl','Mitfreude'];
-  var anchors = ['middle','start','middle','end'];
-  var lx = [cx, cx+R+8, cx, cx-R-8];
-  var ly = [cy-R-10, cy+4, cy+R+14, cy+4];
-  var labels = ids.map(function(id, i) {
-    var hasPct = pcts[i] > 0;
-    var txt = names[i] + (hasPct ? ' ' + pcts[i] + '%' : '');
-    return '<text x="' + lx[i] + '" y="' + ly[i] + '" text-anchor="' + anchors[i]
-      + '" font-size="9.5" fill="' + QC[id] + '" font-weight="600" font-family="-apple-system,sans-serif">' + txt + '</text>';
-  }).join('');
-  return '<svg viewBox="0 0 220 225" style="width:100%;max-width:260px;display:block;">'
+  // Labels: names only (% already shown in bars below). Left/right anchored to edges.
+  var label = function(x, y, anchor, id, name) {
+    return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor
+      + '" font-size="10" fill="' + QC[id] + '" font-weight="600"'
+      + ' font-family="-apple-system,sans-serif">' + name + '</text>';
+  };
+  var labels = label(cx, cy-R-12, 'middle', 'gleichmut', 'Gleichmut')
+    + label(W-4, cy+4, 'end', 'liebe', 'Liebende G\xFCte')
+    + label(cx, cy+R+16, 'middle', 'mitgefuehl', 'Mitgef\xFChl')
+    + label(4, cy+4, 'start', 'freude', 'Mitfreude');
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block;">'
     + grid + axes
     + '<path d="' + poly + '" fill="rgba(162,62,72,.13)" stroke="rgba(162,62,72,.55)" stroke-width="2" stroke-linejoin="round"/>'
     + dots + labels
@@ -2194,7 +2196,7 @@ function renderBogen() {
     <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">
       Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
       Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>
-      <span style="font-size:.7rem;opacity:.5;">v15</span>
+      <span style="font-size:.7rem;opacity:.5;">v16</span>
     </div>`;
 }
 
