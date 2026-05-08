@@ -1472,15 +1472,10 @@ function selectModeBtn(el) {
 function renderPraxis() {
   const phase = getQ(S.arc.currentPhase);
   document.getElementById("panel-praxis").innerHTML = `
-    <div class="card" style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <div>
-          <div class="label" style="margin-bottom:4px;">Aktueller Fokus</div>
-          <span class="pill ${phase.farbe}">${phase.name}</span>
-          <span class="small muted" style="margin-left:8px;">${phase.sanskrit}</span>
-        </div>
-        <button class="btn-ghost" onclick="showFokusSheet()" style="padding:8px 0;">ändern →</button>
-      </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:0 2px;">
+      <span class="pill ${phase.farbe}">${phase.name}</span>
+      <span class="small muted">${phase.sanskrit}</span>
+      <button class="btn-ghost" onclick="showFokusSheet()" style="margin-left:auto;padding:4px 0;font-size:.82rem;">ändern →</button>
     </div>
     <div class="mode-grid">
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('rezitation')">
@@ -2179,14 +2174,6 @@ function renderBogen() {
   var segContent = '';
 
   if (_wegSeg === 'ueberblick') {
-    // Aktuelle Phase card
-    segContent += '<div class="card" style="border-left:4px solid '+Q_COLOR[phase]+';">'
-      + '<div class="card-title">'+esc(pd.name)+'</div>'
-      + (ps ? '<div class="small muted" style="margin-bottom:6px;">seit '+ps.slice(0,10)+'</div>' : '')
-      + '<div class="small" style="margin-bottom:6px;">'+phSess.length+' Sitzungen · '+phSess.reduce(function(s,x){return s+(x.duration||0);},0)+' Minuten in dieser Phase</div>'
-      + '<div class="small muted" style="font-style:italic;">'+esc(pd.zeichen)+'</div>'
-      + '</div>';
-
     // Streak & Ziele
     segContent += '<div class="card">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">'
