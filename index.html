@@ -1011,16 +1011,28 @@ function heroGradient(id) {
 function heroTopColor(id) {
   return { gleichmut:'#1b3a5c', liebe:'#5a1422', mitgefuehl:'#12302a', freude:'#3d2200' }[id] || '#2a2a3a';
 }
+function setThemeColor(c) {
+  var old = document.getElementById('meta-theme-color');
+  if (old) old.remove();
+  var m = document.createElement('meta');
+  m.name = 'theme-color';
+  m.content = c;
+  m.id = 'meta-theme-color';
+  document.head.appendChild(m);
+}
 function setStatusBarColor(id) {
   var c = heroTopColor(id);
+  document.documentElement.style.backgroundColor = c;
+  document.body.style.backgroundColor = c;
   document.getElementById('app').style.backgroundColor = c;
-  var m = document.getElementById('meta-theme-color');
-  if (m) m.setAttribute('content', c);
+  setThemeColor(c);
 }
 function resetStatusBarColor() {
+  var c = '#2a2420';
+  document.documentElement.style.backgroundColor = c;
+  document.body.style.backgroundColor = c;
   document.getElementById('app').style.backgroundColor = '';
-  var m = document.getElementById('meta-theme-color');
-  if (m) m.setAttribute('content', '#2a2420');
+  setThemeColor(c);
 }
 function timeGreeting() {
   const h = new Date().getHours();
@@ -2068,7 +2080,7 @@ function renderBogen() {
     <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">
       Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
       Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>
-      <span style="font-size:.7rem;opacity:.5;">v9</span>
+      <span style="font-size:.7rem;opacity:.5;">v10</span>
     </div>`;
 }
 
