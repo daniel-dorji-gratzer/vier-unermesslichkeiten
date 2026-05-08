@@ -152,9 +152,11 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 .runner-text.italic { font-style: italic; color: var(--ink-soft); }
 .runner-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .runner-progress { text-align: center; font-size: .78rem; color: var(--ink-muted); margin-top: 14px; }
-.timer-display { font-size: 4rem; font-weight: 700; color: var(--accent);
-  text-align: center; padding: 28px 0; font-variant-numeric: tabular-nums;
-  letter-spacing: -.04em; }
+.timer-ring-wrap { position: relative; width: 180px; height: 180px; margin: 16px auto 8px; }
+.timer-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.timer-display { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; font-weight: 700; color: var(--accent);
+  font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
 
 /* ── Journal ── */
 .j-entry { padding: 13px 0; border-bottom: 1px solid var(--line); }
@@ -1665,13 +1667,23 @@ function startTimer() {
   RN.mode="stille"; RN.t0=Date.now(); RN.dur=dur;
 
   const el = document.getElementById("runner");
+  const total = dur * 60;
+  const circ = 534;
   const draw = () => {
     const m=Math.floor(rem/60), s=rem%60;
+    const offset = Math.round(circ * rem / total);
     el.innerHTML = `
-      <div class="timer-display">${m}:${pad(s)}</div>
+      <div class="timer-ring-wrap">
+        <svg viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="85" fill="none" stroke="var(--line)" stroke-width="8"/>
+          <circle cx="90" cy="90" r="85" fill="none" stroke="var(--accent)" stroke-width="8"
+            stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+        </svg>
+        <div class="timer-display">${m}:${pad(s)}</div>
+      </div>
       <div class="small muted" style="text-align:center;margin-bottom:20px;">In Stille sitzen</div>
       <div class="runner-controls">
-        <button class="btn-secondary" onclick="finishRunner()">Beenden & eintragen</button>
+        <button class="btn-secondary" onclick="finishRunner()">Beenden &amp; eintragen</button>
         <button class="btn-ghost" onclick="endRunner()">Abbrechen</button>
       </div>
     `;
@@ -1839,7 +1851,7 @@ function renderLernpfad() {
         ? `showQuizSheet('${q.id}')`
         : `showPathInfo('${q.id}','${a.key}')`;
       return `<div class="path-cell${done?' done':''}${locked?' soft-locked':''}" style="${style}" onclick="${fn}">
-        <div class="path-cell-icon">${done ? '✓' : a.icon}</div>
+        <div class="path-cell-icon">${done ? '✓' : '○'}</div>
         <div>${a.label}</div>
       </div>`;
     }).join('');
@@ -1858,7 +1870,7 @@ function renderLernpfad() {
       ${aspects.map(a=>`<div class="path-hcell">${a.label}</div>`).join('')}
     </div>
     ${rows}
-    <div class="small muted" style="margin-top:6px;line-height:1.6;">S: Quiz · K &amp; M: automatisch beim \xDCben</div>
+    <div class="small muted" style="margin-top:6px;line-height:1.6;">Studium: Quiz · Kontemplation &amp; Meditation: werden beim \xDCben automatisch abgehakt</div>
   </div>`;
 }
 
@@ -1997,6 +2009,18 @@ function showAssessmentSheet(qid) {
 function _buildAssessHtml(qid) {
   const q = getQ(qid);
   const fragen = ASSESSMENT_FRAGEN[qid] || [];
+  const answered = _curAssess.answers.filter(function(a){ return a > 0; }).length;
+  const total = fragen.length;
+  const allDone = answered === total;
+
+  var dotsHtml = '<div style="display:flex;gap:6px;align-items:center;margin-bottom:16px;">'
+    + fragen.map(function(_, i){
+        var done = _curAssess.answers[i] > 0;
+        return '<div style="flex:1;height:4px;border-radius:2px;background:'+(done?'var(--accent)':'var(--line)')+'"></div>';
+      }).join('')
+    + '<span class="small muted" style="white-space:nowrap;margin-left:8px;">'+answered+'\xA0/\xA0'+total+'</span>'
+    + '</div>';
+
   var rows = fragen.map(function(f, fi) {
     var scaleHtml = ANS_LABELS.map(function(lab, si) {
       var v = si + 1;
@@ -2011,18 +2035,26 @@ function _buildAssessHtml(qid) {
       + '<div class="assess-scale">' + scaleHtml + '</div>'
       + '</div>';
   }).join('');
+
   var cur = S.assessments && S.assessments[qid];
-  var lastHtml = cur ? '<div class="small muted" style="margin-top:4px;">Letzte Einsch\xE4tzung: '
+  var lastHtml = cur ? '<div class="small muted" style="margin-top:8px;text-align:center;">Letzte Einsch\xE4tzung: '
     + cur.date + ' – ' + cur.score + ' %</div>' : '';
-  return '<h2>Selbsteinsch\xE4tzung · <span class="pill ' + q.farbe + '">' + q.name + '</span></h2>'
+  var disabledAttr = allDone ? '' : ' disabled';
+  var btnLabel = allDone ? 'Speichern' : 'Speichern (' + answered + '\xA0/\xA0' + total + ' beantwortet)';
+  var saveBtn = '<div style="position:sticky;bottom:0;background:var(--bg-card);padding:10px 0 2px;">'
+    + '<button class="btn-primary"' + disabledAttr + ' onclick="saveAssessment()" style="width:100%;'+(allDone?'':'opacity:.45;cursor:default;')+'">'
+    + btnLabel + '</button>'
+    + '</div>';
+
+  return '<h2>Selbsteinsch\xE4tzung \xB7 <span class="pill ' + q.farbe + '">' + q.name + '</span></h2>'
     + '<div class="small" style="margin-bottom:4px;color:var(--ink-soft);font-style:italic;">' + esc(q.zeichen) + '</div>'
-    + '<div class="small muted" style="margin-bottom:16px;">Bewerte jede Aussage von 1 (kaum) bis 5 (fast immer).</div>'
+    + '<div class="small muted" style="margin-bottom:12px;">Bewerte jede Aussage von 1 (kaum) bis 5 (fast immer).</div>'
+    + dotsHtml
     + rows
-    + '<button class="btn-primary" onclick="saveAssessment()" style="width:100%;margin-top:8px;">Speichern</button>'
+    + saveBtn
     + lastHtml
     + '<div style="height:8px;"></div>';
 }
-
 function _pickAns(fi, v) {
   _curAssess.answers[fi] = v;
   var sheet = document.getElementById('sheet-content');
