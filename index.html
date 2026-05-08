@@ -1247,11 +1247,14 @@ function renderHeute() {
       + '<div class="hero-quality-sanskrit">' + esc(phase.sanskrit) + '</div>'
       + '<div class="hero-bild">' + esc(phase.bild) + '</div>'
       + '<div class="hero-stats-row">'
-      + '<div class="hero-stat"><span class="hero-stat-num">' + str + '</span><span class="hero-stat-label">Tage in Folge</span></div>'
-      + '<div class="hero-stat-sep"></div>'
-      + '<div class="hero-stat"><span class="hero-stat-num">' + wk.length + '</span><span class="hero-stat-label">Sitzungen</span></div>'
-      + '<div class="hero-stat-sep"></div>'
-      + '<div class="hero-stat"><span class="hero-stat-num">' + wkMin + '</span><span class="hero-stat-label">Min. diese Woche</span></div>'
+      + (S.sessions.length === 0
+          ? '<div class="hero-stat" style="flex:1;text-align:center;"><span class="hero-stat-num" style="font-size:1.1rem;opacity:.85;">Erste Sitzung wartet</span><span class="hero-stat-label">Auch 5 Minuten z\xE4hlen</span></div>'
+          : '<div class="hero-stat"><span class="hero-stat-num">' + str + '</span><span class="hero-stat-label">Tage in Folge</span></div>'
+            + '<div class="hero-stat-sep"></div>'
+            + '<div class="hero-stat"><span class="hero-stat-num">' + wk.length + '</span><span class="hero-stat-label">Sitzungen</span></div>'
+            + '<div class="hero-stat-sep"></div>'
+            + '<div class="hero-stat"><span class="hero-stat-num">' + wkMin + '</span><span class="hero-stat-label">Min. diese Woche</span></div>'
+        )
       + '</div>'
       + '</div>'
       + '<div class="card reminder">'
@@ -1267,7 +1270,7 @@ function renderHeute() {
       + '<div class="small" style="color:var(--ink-soft);margin-bottom:12px;">' + esc(phase.kernpunkt) + '</div>'
       + '<div class="btn-row">'
       + '<button class="btn-primary" onclick="switchTab(\'praxis\')">Jetzt \xFCben</button>'
-      + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">Bogen</button>'
+      + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">Weg</button>'
       + '</div></div>'
       + (needsAssessmentPrompt()
           ? '<div class="card" style="border-left:4px solid var(--accent);">'
@@ -1700,7 +1703,7 @@ function showLogSheet(pre={}) {
   openSheet(`
     <h2>Sitzung eintragen</h2>
     <label class="field"><span>Datum</span>
-      <input type="text" id="log-date" value="${todayISO()}">
+      <input type="date" id="log-date" value="${todayISO()}">
     </label>
     <label class="field"><span>Dauer (Minuten)</span>
       <input type="number" id="log-dur" value="${dur}" placeholder="z.B. 20" min="0">
