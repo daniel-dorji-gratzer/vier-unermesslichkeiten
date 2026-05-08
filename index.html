@@ -1113,9 +1113,9 @@ function weekSessions() {
 function heroGradient(id) {
   return {
     gleichmut:  'linear-gradient(155deg,#1b3a5c 0%,#2c5f8a 50%,#4a87ae 100%)',
-    liebe:      'linear-gradient(155deg,#5a1422 0%,#8b2635 50%,#b85060 100%)',
-    mitgefuehl: 'linear-gradient(155deg,#12302a 0%,#235c46 50%,#3d8a6a 100%)',
-    freude:     'linear-gradient(155deg,#3d2200 0%,#6b3a0a 50%,#a0601a 100%)',
+    liebe:      'linear-gradient(155deg,#3d2800 0%,#6b4800 50%,#a07010 100%)',
+    mitgefuehl: 'linear-gradient(155deg,#200a30 0%,#3d1560 50%,#6830a0 100%)',
+    freude:     'linear-gradient(155deg,#0a2e18 0%,#1a5c32 50%,#2e8a52 100%)',
   }[id] || 'linear-gradient(155deg,#2a2a3a 0%,#3a3a5a 100%)';
 }
 function timeGreeting() {
@@ -2111,7 +2111,7 @@ function renderRadarChart(scores) {
   }).join('');
   var axes = '<line x1="' + cx + '" y1="' + (cy-R) + '" x2="' + cx + '" y2="' + (cy+R) + '" stroke="rgba(0,0,0,.08)" stroke-width="1"/>'
     + '<line x1="' + (cx-R) + '" y1="' + cy + '" x2="' + (cx+R) + '" y2="' + cy + '" stroke="rgba(0,0,0,.08)" stroke-width="1"/>';
-  var QC = { gleichmut:'#2c5f8a', liebe:'#8b2635', mitgefuehl:'#235c46', freude:'#6b3a0a' };
+  var QC = { gleichmut:'#1a5878', liebe:'#6a4800', mitgefuehl:'#5a1080', freude:'#1a5c3a' };
   var ids = ['gleichmut','liebe','mitgefuehl','freude'];
   var pcts = ids.map(function(id) { return scores[id] || 0; });
   var pts = ids.map(function(id, i) { return pt(i, pcts[i]); });
