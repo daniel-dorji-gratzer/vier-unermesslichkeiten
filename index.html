@@ -1020,19 +1020,24 @@ function setThemeColor(c) {
   m.id = 'meta-theme-color';
   document.head.appendChild(m);
 }
+function getOrCreateStatusFill() {
+  var el = document.getElementById('status-bar-fill');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'status-bar-fill';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,44px);z-index:9999;pointer-events:none;transition:background .3s;';
+    document.body.appendChild(el);
+  }
+  return el;
+}
 function setStatusBarColor(id) {
   var c = heroTopColor(id);
-  document.documentElement.style.backgroundColor = c;
-  document.body.style.backgroundColor = c;
-  document.getElementById('app').style.backgroundColor = c;
   setThemeColor(c);
+  getOrCreateStatusFill().style.background = c;
 }
 function resetStatusBarColor() {
-  var c = '#2a2420';
-  document.documentElement.style.backgroundColor = c;
-  document.body.style.backgroundColor = c;
-  document.getElementById('app').style.backgroundColor = '';
-  setThemeColor(c);
+  setThemeColor('#2a2420');
+  getOrCreateStatusFill().style.background = 'transparent';
 }
 function timeGreeting() {
   const h = new Date().getHours();
@@ -2080,7 +2085,7 @@ function renderBogen() {
     <div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">
       Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>
       Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>
-      <span style="font-size:.7rem;opacity:.5;">v10</span>
+      <span style="font-size:.7rem;opacity:.5;">v11</span>
     </div>`;
 }
 
