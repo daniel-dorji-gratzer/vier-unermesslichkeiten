@@ -241,6 +241,14 @@ textarea { resize: vertical; min-height: 90px; }
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
 
 /* ── Toast ── */
+#backup-banner { position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot));
+  left: 0; right: 0; background: var(--bg-card); border-top: 1px solid var(--line);
+  padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+  transform: translateY(100%); transition: transform .3s ease; z-index: 190; }
+#backup-banner.show { transform: translateY(0); }
+#backup-banner .bb-msg { flex: 1; font-size: .84rem; color: var(--ink-muted); }
+#backup-banner .bb-msg strong { color: var(--ink); }
+
 #toast { position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot) + 20px);
   left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff;
   padding: 10px 20px; border-radius: 100px; font-size: .86rem; font-weight: 500;
@@ -532,6 +540,11 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
     <button id="sheet-close" onclick="_closeSheet()">×</button>
     <div id="sheet-content"></div>
   </div>
+</div>
+<div id="backup-banner">
+  <span class="bb-msg"><strong>Backup fällig</strong> – Daten sichern?</span>
+  <button class="btn-ghost" style="font-size:.82rem;padding:4px 10px;white-space:nowrap;" onclick="shareBackup()">Jetzt sichern</button>
+  <button onclick="dismissBackupBanner()" style="background:none;border:none;font-size:1.2rem;color:var(--ink-muted);padding:0 2px;cursor:pointer;">×</button>
 </div>
 <div id="toast"></div>
 
@@ -875,6 +888,8 @@ const defaultState = () => ({
   lastAssessmentPrompt: null,
   onboarded: false,
   verseIdx: 0,
+  lastBackupAt: null,
+  sessionsSinceBackup: 0,
   version: 1
 });
 let S = loadState();
@@ -2100,6 +2115,7 @@ function saveLog() {
     _editId = null;
   } else {
     S.sessions.unshift({id:uid(),date,duration:dur,focus,mode,notes});
+    S.sessionsSinceBackup = (S.sessionsSinceBackup || 0) + 1;
   }
   save();
   // auto-complete Lernpfad milestones
@@ -2118,6 +2134,7 @@ function saveLog() {
   _closeSheet(); toast("Eingetragen ✓");
   if (_logAfter) { _logAfter(); _logAfter=null; }
   renderPanel(activeTab);
+  checkBackupDue();
 }
 
 // ═══════════════════════════════════════════════
@@ -2723,12 +2740,59 @@ function showPhaseSwitcher() {
 //  DATA EXPORT / IMPORT
 // ═══════════════════════════════════════════════
 
+function _backupBlob() {
+  return new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+}
+function _backupFilename() {
+  return "vier-unermesslichkeiten-"+todayISO()+".json";
+}
+
 function exportData() {
-  const blob = new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  shareBackup();
+}
+
+async function shareBackup() {
+  const filename = _backupFilename();
+  const blob = _backupBlob();
+  if (navigator.share && navigator.canShare) {
+    const file = new File([blob], filename, {type:"application/json"});
+    if (navigator.canShare({files:[file]})) {
+      try {
+        await navigator.share({files:[file], title:"Vier Unermesslichkeiten Backup"});
+        S.lastBackupAt = todayISO();
+        S.sessionsSinceBackup = 0;
+        save();
+        dismissBackupBanner();
+        toast("Backup gespeichert ✓");
+        return;
+      } catch(e) { if (e.name !== 'AbortError') console.warn(e); else return; }
+    }
+  }
+  // fallback: download
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "vier-unermesslichkeiten-"+todayISO()+".json";
+  a.download = filename;
   a.click();
+  S.lastBackupAt = todayISO();
+  S.sessionsSinceBackup = 0;
+  save();
+  dismissBackupBanner();
+}
+
+function checkBackupDue() {
+  const SESSIONS_THRESHOLD = 3;
+  const DAYS_THRESHOLD = 7;
+  let due = false;
+  if (S.sessionsSinceBackup >= SESSIONS_THRESHOLD) due = true;
+  if (S.lastBackupAt) {
+    const daysSince = (Date.now() - new Date(S.lastBackupAt+'T12:00:00').getTime()) / 86400000;
+    if (daysSince >= DAYS_THRESHOLD) due = true;
+  }
+  if (due) document.getElementById('backup-banner').classList.add('show');
+}
+
+function dismissBackupBanner() {
+  document.getElementById('backup-banner').classList.remove('show');
 }
 
 function importData(input) {
@@ -2838,6 +2902,7 @@ function finishOnboarding() {
 
 renderHeute();
 showOnboarding();
+setTimeout(checkBackupDue, 1000);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/vier-unermesslichkeiten/sw.js').then(reg => {
