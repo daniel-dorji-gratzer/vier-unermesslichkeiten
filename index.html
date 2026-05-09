@@ -542,9 +542,9 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   </div>
 </div>
 <div id="backup-banner">
-  <span class="bb-msg">${t('backup_faellig')} – Daten sichern?</span>
-  <button class="btn-ghost" style="font-size:.82rem;padding:4px 10px;white-space:nowrap;" onclick="shareBackup()">${t('backup_sichern')}</button>
-  <button onclick="dismissBackupBanner()" style="background:none;border:none;font-size:1.2rem;color:var(--ink-muted);padding:0 2px;cursor:pointer;">×</button>
+  <span class="bb-msg" id="bb-msg-text"></span>
+  <button class="btn-ghost" id="bb-btn-save" style="font-size:.82rem;padding:4px 10px;white-space:nowrap;" onclick="shareBackup()"></button>
+  <button id="bb-btn-close" onclick="dismissBackupBanner()" style="background:none;border:none;font-size:1.4rem;line-height:1;color:var(--ink-muted);padding:4px 6px;cursor:pointer;">×</button>
 </div>
 <div id="toast"></div>
 
@@ -3543,7 +3543,11 @@ function checkBackupDue() {
     const daysSince = (Date.now() - new Date(S.lastBackupAt+'T12:00:00').getTime()) / 86400000;
     if (daysSince >= DAYS_THRESHOLD) due = true;
   }
-  if (due) document.getElementById('backup-banner').classList.add('show');
+  if (due) {
+    document.getElementById('bb-msg-text').textContent = t('backup_faellig') + ' – Daten sichern?';
+    document.getElementById('bb-btn-save').textContent = t('backup_sichern');
+    document.getElementById('backup-banner').classList.add('show');
+  }
 }
 
 function dismissBackupBanner() {
