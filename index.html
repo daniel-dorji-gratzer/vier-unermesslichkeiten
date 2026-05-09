@@ -551,6 +551,9 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 <script>
 "use strict";
 
+// mutable globals swapped by applyLang()
+var VERSE, QUALITAETEN, REZITATION, KONTEMPLATIONEN, QUIZ, ERINNERUNGEN;
+
 // ═══════════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════════
@@ -3652,9 +3655,7 @@ function finishOnboarding() {
 //  INIT
 // ═══════════════════════════════════════════════
 
-try { applyLang(); } catch(e) {
-  document.getElementById("panel-heute").innerHTML = '<div class="card"><div class="card-title">Fehler beim Laden</div><div class="small muted">applyLang: ' + String(e) + '</div></div>';
-}
+applyLang();
 renderHeute();
 showOnboarding();
 setTimeout(checkBackupDue, 1000);
