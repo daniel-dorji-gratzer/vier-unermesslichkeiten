@@ -1516,6 +1516,11 @@ const STRINGS = {
     ziel_titel:'Ziele anpassen', ziel_tag:'Minuten täglich', ziel_woche:'Tage pro Woche', ziel_speichern:'Speichern',
     backup_faellig:'Backup fällig', backup_sichern:'Jetzt sichern', backup_gespeichert:'Backup gespeichert ✓',
     ob_weiter:'Weiter →', ob_fertig:'Loslegen',
+    guten_morgen:'Guten Morgen', guten_tag:'Guten Tag', guten_abend:'Guten Abend', gute_nacht:'Gute Nacht',
+    weg_aktuelle_phase:'aktuelle Phase', weg_wechseln:'wechseln →',
+    weg_tage_einh:'Tage', weg_gesamt_lbl:'Gesamt',
+    selbst_einschaetzen:'einschätzen', selbst_keine:'Noch keine Einschätzung vorhanden',
+    phase_setzen:'Phase setzen', phase_setzen_hint:'Wähle die Qualität, auf die du dich aktuell konzentrierst.', phase_aktuell:'✓ aktuell',
   },
   en: {
     tab_heute:'Today', tab_lehre:'Teaching', tab_praxis:'Practice', tab_tagebuch:'Journal', tab_weg:'Path',
@@ -1600,6 +1605,11 @@ const STRINGS = {
     ziel_titel:'Adjust goals', ziel_tag:'Minutes daily', ziel_woche:'Days per week', ziel_speichern:'Save',
     backup_faellig:'Backup due', backup_sichern:'Save now', backup_gespeichert:'Backup saved ✓',
     ob_weiter:'Next →', ob_fertig:'Get started',
+    guten_morgen:'Good Morning', guten_tag:'Good Day', guten_abend:'Good Evening', gute_nacht:'Good Night',
+    weg_aktuelle_phase:'current phase', weg_wechseln:'switch →',
+    weg_tage_einh:'days', weg_gesamt_lbl:'Total',
+    selbst_einschaetzen:'assess', selbst_keine:'No assessment recorded yet',
+    phase_setzen:'Set phase', phase_setzen_hint:'Choose the quality you are currently focusing on.', phase_aktuell:'✓ current',
   }
 };
 
@@ -2204,10 +2214,10 @@ function heroGradient(id) {
 }
 function timeGreeting() {
   const h = new Date().getHours();
-  if (h >= 5  && h < 12) return { label:'Guten Morgen', svg:'<circle cx="9" cy="9" r="3.2" stroke="white" stroke-width="1.6" fill="none"/><line x1="9" y1="1" x2="9" y2="3.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="14.8" x2="9" y2="17" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="9" x2="3.2" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.8" y1="9" x2="17" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="3.6" y1="3.6" x2="5.2" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="12.8" y1="12.8" x2="14.4" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.4" y1="3.6" x2="12.8" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="5.2" y1="12.8" x2="3.6" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
-  if (h >= 12 && h < 18) return { label:'Guten Tag',    svg:'<circle cx="9" cy="9" r="4" stroke="white" stroke-width="1.6" fill="white" fill-opacity=".25"/><line x1="9" y1="0.5" x2="9" y2="3" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="15" x2="9" y2="17.5" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="0.5" y1="9" x2="3" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="15" y1="9" x2="17.5" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
-  if (h >= 18 && h < 23) return { label:'Guten Abend',  svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="white" stroke-width="1.5" fill="white" fill-opacity=".2" stroke-linejoin="round"/>' };
-  return                         { label:'Gute Nacht',   svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="white" stroke-width="1.5" fill="white" fill-opacity=".2" stroke-linejoin="round"/><circle cx="12.5" cy="4" r="1" fill="white" opacity=".7"/><circle cx="15" cy="7" r=".6" fill="white" opacity=".5"/>' };
+  if (h >= 5  && h < 12) return { label:t('guten_morgen'), svg:'<circle cx="9" cy="9" r="3.2" stroke="white" stroke-width="1.6" fill="none"/><line x1="9" y1="1" x2="9" y2="3.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="14.8" x2="9" y2="17" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="9" x2="3.2" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.8" y1="9" x2="17" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="3.6" y1="3.6" x2="5.2" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="12.8" y1="12.8" x2="14.4" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.4" y1="3.6" x2="12.8" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="5.2" y1="12.8" x2="3.6" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
+  if (h >= 12 && h < 18) return { label:t('guten_tag'),    svg:'<circle cx="9" cy="9" r="4" stroke="white" stroke-width="1.6" fill="white" fill-opacity=".25"/><line x1="9" y1="0.5" x2="9" y2="3" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="15" x2="9" y2="17.5" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="0.5" y1="9" x2="3" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="15" y1="9" x2="17.5" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
+  if (h >= 18 && h < 23) return { label:t('guten_abend'),  svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="white" stroke-width="1.5" fill="white" fill-opacity=".2" stroke-linejoin="round"/>' };
+  return                         { label:t('gute_nacht'),   svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="white" stroke-width="1.5" fill="white" fill-opacity=".2" stroke-linejoin="round"/><circle cx="12.5" cy="4" r="1" fill="white" opacity=".7"/><circle cx="15" cy="7" r=".6" fill="white" opacity=".5"/>' };
 }
 
 function todayReminder() {
@@ -2413,7 +2423,7 @@ function renderLehreBody() {
   if (lehreTab === "module") {
     el.innerHTML = `
       <div class="card">
-        <div class="card-title">Vier Qualitäten</div>
+        <div class="card-title">${t('lehre_qualitaeten')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
           ${QUALITAETEN.map(q=>`
             <div onclick="showQSheet('${q.id}')" style="background:var(--bg-soft);border-radius:10px;padding:12px;cursor:pointer;">
@@ -2428,7 +2438,7 @@ function renderLehreBody() {
         <div class="card" onclick="showModulSheet(${m.nr})" style="cursor:pointer;">
           <div class="label" style="margin-bottom:4px;">${t('lehre_module_lbl')} ${m.nr}</div>
           <div class="card-title">${esc(m.titel)}</div>
-          <div class="small muted">${m.verse.length} ${m.verse.length}${t('lehre_vers_e')} · ${t('lehre_studium')}</div>
+          <div class="small muted">${m.verse.length}${t('lehre_vers_e')} · ${t('lehre_studium')}</div>
         </div>
       `).join('')}
     `;
@@ -3320,8 +3330,8 @@ function renderBogen() {
     }
   });
   stepperHTML += '</div>'
-    + '<div class="weg-arc-sub"><span>' + pd.name + ' – aktuelle Phase</span>'
-    + '<button class="btn-ghost" onclick="showPhaseSwitcher()" style="font-size:.75rem;padding:0;">wechseln →</button></div>'
+    + '<div class="weg-arc-sub"><span>' + pd.name + ' – '+t('weg_aktuelle_phase')+'</span>'
+    + '<button class="btn-ghost" onclick="showPhaseSwitcher()" style="font-size:.75rem;padding:0;">'+t('weg_wechseln')+'</button></div>'
     + '</div>';
 
   // ── Segment bar ──────────────────────────────────
@@ -3340,34 +3350,34 @@ function renderBogen() {
     // Streak & Ziele
     segContent += '<div class="card">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">'
-      + '<div class="card-title" style="margin:0;">Streak &amp; Ziele</div>'
-      + '<button class="btn-ghost" onclick="showGoalSheet()" style="padding:4px 0;font-size:.82rem;">bearbeiten →</button>'
+      + '<div class="card-title" style="margin:0;">'+t('weg_streak')+'</div>'
+      + '<button class="btn-ghost" onclick="showGoalSheet()" style="padding:4px 0;font-size:.82rem;">'+t('weg_bearbeiten')+'</button>'
       + '</div>'
       + '<div style="display:flex;gap:24px;margin-bottom:16px;">'
-      + '<div><div class="streak-num">'+str+'</div><div class="small muted">Tage in Folge</div></div>'
+      + '<div><div class="streak-num">'+str+'</div><div class="small muted">'+t('weg_tage')+'</div></div>'
       + '<div style="width:1px;background:var(--line);"></div>'
-      + '<div><div class="streak-num" style="font-size:2rem;">'+best+'</div><div class="small muted">L\xE4ngste Serie</div></div>'
+      + '<div><div class="streak-num" style="font-size:2rem;">'+best+'</div><div class="small muted">'+t('weg_beste')+'</div></div>'
       + '<div style="width:1px;background:var(--line);"></div>'
-      + '<div><div class="streak-num" style="font-size:2rem;">'+total+'</div><div class="small muted">Sitzungen gesamt</div></div>'
+      + '<div><div class="streak-num" style="font-size:2rem;">'+total+'</div><div class="small muted">'+t('weg_gesamt')+'</div></div>'
       + '</div>'
       + '<div style="margin-bottom:8px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-      + '<span class="label">Diese Woche</span>'
-      + '<span class="small muted">'+wk.days+' / '+g.weeklyDays+' Tage · '+wk.min+' Min.</span>'
+      + '<span class="label">'+t('weg_woche')+'</span>'
+      + '<span class="small muted">'+wk.days+' / '+g.weeklyDays+' '+t('weg_tage_einh')+' · '+wk.min+' Min.</span>'
       + '</div>'
       + '<div class="goal-bar-bg"><div class="goal-bar" style="width:'+wkPct+'%"></div></div>'
       + '</div></div>';
 
     // Kalender
     segContent += '<div class="card">'
-      + '<div class="card-title" style="margin-bottom:10px;">Kalender</div>'
+      + '<div class="card-title" style="margin-bottom:10px;">'+t('weg_kalender')+'</div>'
       + '<div id="cal-view">'+renderCalMonth(allDates)+'</div>'
       + '</div>';
 
     // Verteilung
     segContent += '<div class="card">'
-      + '<div class="card-title" style="margin-bottom:10px;">Verteilung</div>'
-      + '<div class="small muted" style="margin-bottom:12px;">Gesamt: '+total+' Sitzungen · '+totalMin+' Minuten</div>'
+      + '<div class="card-title" style="margin-bottom:10px;">'+t('weg_verteilung')+'</div>'
+      + '<div class="small muted" style="margin-bottom:12px;">'+t('weg_gesamt_lbl')+': '+total+' '+t('weg_sitzungen_ges')+' · '+totalMin+' '+t('weg_minuten')+'</div>'
       + QUALITAETEN.map(function(q){
           var d=byQ[q.id], pct=total?Math.round(d.c/total*100):0, c=Q_COLOR[q.id];
           return '<div style="margin-bottom:12px;">'
@@ -3382,13 +3392,13 @@ function renderBogen() {
     // Phasen-Verlauf
     if (S.arc.phaseHistory.length) {
       segContent += '<div class="card">'
-        + '<div class="card-title" style="margin-bottom:10px;">Phasen-Verlauf</div>'
+        + '<div class="card-title" style="margin-bottom:10px;">'+t('weg_phasen')+'</div>'
         + S.arc.phaseHistory.map(function(h){
             var q=getQ(h.phase);
             return '<div class="j-entry">'
               +'<div class="j-date">'+(h.startedAt?h.startedAt.slice(0,10):'?')+' – '+(h.completedAt?h.completedAt.slice(0,10):'?')+'</div>'
               +'<div style="margin-top:2px;"><span class="pill '+q.farbe+'">'+q.name+'</span>'
-              +'<span class="small muted" style="margin-left:8px;">'+(h.count||0)+' Sitzungen</span></div>'
+              +'<span class="small muted" style="margin-left:8px;">'+(h.count||0)+' '+t('weg_sitzungen_ges')+'</span></div>'
               +'</div>';
           }).join('')
         + '</div>';
@@ -3435,24 +3445,25 @@ function renderBogen() {
     var hasAny = QUALITAETEN.some(function(q){ return sc[q.id] > 0; });
     segContent += '<div class="card">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">'
-      + '<div class="card-title" style="margin:0;">Selbsteinsch\xE4tzung</div>'
+      + '<div class="card-title" style="margin:0;">'+t('selbst_titel')+'</div>'
       + '</div>'
       + (function(){
           var last = S.lastAssessmentPrompt;
-          if (!last) return '<div class="small muted" style="margin-bottom:14px;">Noch keine Einsch\xE4tzung – starte jetzt.</div>';
+          if (!last) return '<div class="small muted" style="margin-bottom:14px;">'+t('selbst_start')+'</div>';
           var nextDate = new Date(new Date(last+'T12:00:00').getTime() + 14*86400000);
           var nextISO = nextDate.toISOString().slice(0,10);
           var overdue = needsAssessmentPrompt();
-          var nextFmt = nextDate.toLocaleDateString('de-AT',{day:'numeric',month:'long'});
-          var lastFmt = new Date(last+'T12:00:00').toLocaleDateString('de-AT',{day:'numeric',month:'long'});
+          var _loc = (S.prefs && S.prefs.lang==='en') ? 'en-US' : 'de-AT';
+          var nextFmt = nextDate.toLocaleDateString(_loc,{day:'numeric',month:'long'});
+          var lastFmt = new Date(last+'T12:00:00').toLocaleDateString(_loc,{day:'numeric',month:'long'});
           return '<div class="small muted" style="margin-bottom:14px;">'
-            + 'Letzte Einsch\xE4tzung: <strong>'+lastFmt+'</strong> · '
+            + t('selbst_letzte')+': <strong>'+lastFmt+'</strong> · '
             + (overdue
-                ? '<span style="color:var(--accent);font-weight:600;">jetzt f\xE4llig</span>'
-                : 'n\xE4chste: '+nextFmt)
+                ? '<span style="color:var(--accent);font-weight:600;">'+t('selbst_jetzt_faellig')+'</span>'
+                : t('selbst_naechste')+': '+nextFmt)
             + '</div>';
         })()
-      + (hasAny ? '<div class="radar-wrap">'+renderRadarChart(sc)+'</div>' : '<div class="small muted" style="text-align:center;padding:20px 0 16px;font-style:italic;">Noch keine Einsch\xE4tzung vorhanden</div>')
+      + (hasAny ? '<div class="radar-wrap">'+renderRadarChart(sc)+'</div>' : '<div class="small muted" style="text-align:center;padding:20px 0 16px;font-style:italic;">'+t('selbst_keine')+'</div>')
       + '<div class="radar-scores">'
       + QUALITAETEN.map(function(q){
           var a = S.assessments && S.assessments[q.id];
@@ -3467,7 +3478,7 @@ function renderBogen() {
       + '</div>'
       + '<div class="btn-row" style="flex-wrap:wrap;gap:6px;margin-top:14px;">'
       + QUALITAETEN.map(function(q){
-          return '<button class="btn-secondary" onclick="showAssessmentSheet(\''+q.id+'\')" style="flex:1;min-width:120px;font-size:.78rem;padding:8px 10px;">'+q.name+' einsch\xE4tzen</button>';
+          return '<button class="btn-secondary" onclick="showAssessmentSheet(\''+q.id+'\')" style="flex:1;min-width:120px;font-size:.78rem;padding:8px 10px;">'+q.name+' '+t('selbst_einschaetzen')+'</button>';
         }).join('')
       + '</div></div>';
   }
@@ -3483,15 +3494,15 @@ function renderBogen() {
 
 function showPhaseSwitcher() {
   var phase = S.arc.currentPhase;
-  var html = '<div class="sheet-title">Phase setzen</div>'
-    + '<div class="small muted" style="margin-bottom:16px;">W\xE4hle die Qualit\xE4t, auf die du dich aktuell konzentrierst.</div>';
+  var html = '<div class="sheet-title">'+t('phase_setzen')+'</div>'
+    + '<div class="small muted" style="margin-bottom:16px;">'+t('phase_setzen_hint')+'</div>';
   html += QUALITAETEN.map(function(q){
     var isCur = q.id === phase;
     return '<button class="btn-secondary" onclick="setFokus(\''+q.id+'\');_closeSheet();renderBogen();" '
       +'style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:8px;'+(isCur?'border:2px solid var(--accent);':'')+'">'
       +'<span class="pill '+q.farbe+'">'+q.name+'</span>'
       +'<span class="small muted">'+q.sanskrit+'</span>'
-      +(isCur?'<span class="small" style="margin-left:auto;color:var(--accent);">✓ aktuell</span>':'')
+      +(isCur?'<span class="small" style="margin-left:auto;color:var(--accent);">'+t('phase_aktuell')+'</span>':'')
       +'</button>';
   }).join('');
   openSheet(html);
