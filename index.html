@@ -552,7 +552,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 "use strict";
 
 // mutable globals swapped by applyLang()
-var VERSE, QUALITAETEN, REZITATION, KONTEMPLATIONEN, QUIZ, ERINNERUNGEN;
+var VERSE, QUALITAETEN, REZITATION, KONTEMPLATIONEN, QUIZ, ERINNERUNGEN, ASSESSMENT_FRAGEN;
 
 // ═══════════════════════════════════════════════
 //  DATA
@@ -1513,6 +1513,9 @@ const STRINGS = {
     selbst_sheet_hint:'Wie stark zeigt sich diese Qualität in deiner täglichen Erfahrung und Praxis?',
     selbst_speichern:'Einschätzung speichern', selbst_gespeichert:'Einschätzung gespeichert ✓',
     selbst_alle_beantw:'Bitte alle Fragen beantworten.',
+    selbst_skala:'Bewerte jede Aussage von 1 (kaum) bis 5 (fast immer).',
+    selbst_beantwortet:'beantwortet',
+    ans_1:'Kaum', ans_2:'Selten', ans_3:'Manchmal', ans_4:'Oft', ans_5:'Fast immer',
     ziel_titel:'Ziele anpassen', ziel_tag:'Minuten täglich', ziel_woche:'Tage pro Woche', ziel_speichern:'Speichern',
     backup_faellig:'Backup fällig', backup_sichern:'Jetzt sichern', backup_gespeichert:'Backup gespeichert ✓',
     ob_weiter:'Weiter →', ob_fertig:'Loslegen',
@@ -1602,6 +1605,9 @@ const STRINGS = {
     selbst_sheet_hint:'How strongly does this quality show in your daily experience and practice?',
     selbst_speichern:'Save assessment', selbst_gespeichert:'Assessment saved ✓',
     selbst_alle_beantw:'Please answer all questions.',
+    selbst_skala:'Rate each statement from 1 (rarely) to 5 (almost always).',
+    selbst_beantwortet:'answered',
+    ans_1:'Rarely', ans_2:'Seldom', ans_3:'Sometimes', ans_4:'Often', ans_5:'Almost always',
     ziel_titel:'Adjust goals', ziel_tag:'Minutes daily', ziel_woche:'Days per week', ziel_speichern:'Save',
     backup_faellig:'Backup due', backup_sichern:'Save now', backup_gespeichert:'Backup saved ✓',
     ob_weiter:'Next →', ob_fertig:'Get started',
@@ -1626,6 +1632,7 @@ function applyLang() {
   KONTEMPLATIONEN = (l === 'en') ? KONTEMPLATIONEN_EN : KONTEMPLATIONEN_DE;
   QUIZ = (l === 'en') ? QUIZ_EN : QUIZ_DE;
   ERINNERUNGEN = (l === 'en') ? ERINNERUNGEN_EN : ERINNERUNGEN_DE;
+  ASSESSMENT_FRAGEN = (l === 'en') ? ASSESSMENT_FRAGEN_EN : ASSESSMENT_FRAGEN_DE;
   // update tab labels
   var tabs = [{tab:'heute',key:'tab_heute'},{tab:'lehre',key:'tab_lehre'},{tab:'praxis',key:'tab_praxis'},{tab:'tagebuch',key:'tab_tagebuch'},{tab:'bogen',key:'tab_weg'}];
   tabs.forEach(function(x){
@@ -2076,7 +2083,7 @@ const QUIZ_DE = {
   ]
 };
 
-const ASSESSMENT_FRAGEN = {
+const ASSESSMENT_FRAGEN_DE = {
   gleichmut: [
     "Ich begegne Freunden, Gleichg\xFCltigen und schwierigen Menschen mit derselben Offenheit.",
     "Wenn jemand mir schwer\xE4llt, kann ich trotzdem sein Wohlergehen w\xFCnschen.",
@@ -2100,6 +2107,32 @@ const ASSESSMENT_FRAGEN = {
     "Neid oder Eifersucht tauchen seltener auf als fr\xFCher.",
     "Ich kann die Freude anderer genie\xDFen, ohne dass sie mein eigenes Wohlgef\xFChl mindert.",
     "Ich erlebe Zufriedenheit, wenn es Menschen gut geht – auch ohne meinen Beitrag."
+  ]
+};
+const ASSESSMENT_FRAGEN_EN = {
+  gleichmut: [
+    "I meet friends, neutral people, and difficult people with the same openness.",
+    "When someone is hard for me, I can still wish them well.",
+    "I notice partiality in myself – and can take a step back.",
+    "I experience a still, wide space beneath affection and rejection."
+  ],
+  liebe: [
+    "I genuinely wish others joy and well-being – even without personal gain.",
+    "My goodwill includes difficult people too.",
+    "I am kind to myself – even when I make mistakes.",
+    "I notice that my presence does others good."
+  ],
+  mitgefuehl: [
+    "The suffering of others touches me – I don't turn away, without falling apart.",
+    "I can stay present with pain and do so from a calm place.",
+    "My compassion comes from peace – not from being overwhelmed or helpless.",
+    "I find ways to help without losing myself."
+  ],
+  freude: [
+    "When others succeed or are happy, I genuinely rejoice with them.",
+    "Envy or jealousy arise less often than before.",
+    "I can enjoy the happiness of others without diminishing my own well-being.",
+    "I experience contentment when others are doing well – even without my contribution."
   ]
 };
 const ANS_LABELS = ["Kaum","Selten","Manchmal","Oft","Fast immer"];
@@ -3163,7 +3196,7 @@ function _buildAssessHtml(qid) {
     + '</div>';
 
   var rows = fragen.map(function(f, fi) {
-    var scaleHtml = ANS_LABELS.map(function(lab, si) {
+    var scaleHtml = [t('ans_1'),t('ans_2'),t('ans_3'),t('ans_4'),t('ans_5')].map(function(lab, si) {
       var v = si + 1;
       var sel = _curAssess.answers[fi] === v ? ' sel' : '';
       return '<button class="' + sel.trim() + '" onclick="_pickAns(' + fi + ',' + v + ')">'
@@ -3178,18 +3211,18 @@ function _buildAssessHtml(qid) {
   }).join('');
 
   var cur = S.assessments && S.assessments[qid];
-  var lastHtml = cur ? '<div class="small muted" style="margin-top:8px;text-align:center;">Letzte Einsch\xE4tzung: '
+  var lastHtml = cur ? '<div class="small muted" style="margin-top:8px;text-align:center;">'+t('selbst_letzte')+': '
     + cur.date + ' – ' + cur.score + ' %</div>' : '';
   var disabledAttr = allDone ? '' : ' disabled';
-  var btnLabel = allDone ? 'Speichern' : 'Speichern (' + answered + '\xA0/\xA0' + total + ' beantwortet)';
+  var btnLabel = allDone ? t('selbst_speichern') : t('selbst_speichern') + ' (' + answered + '\xA0/\xA0' + total + ' ' + t('selbst_beantwortet') + ')';
   var saveBtn = '<div style="position:sticky;bottom:0;background:var(--bg-card);padding:10px 0 2px;">'
     + '<button class="btn-primary"' + disabledAttr + ' onclick="saveAssessment()" style="width:100%;'+(allDone?'':'opacity:.45;cursor:default;')+'">'
     + btnLabel + '</button>'
     + '</div>';
 
-  return '<h2>Selbsteinsch\xE4tzung \xB7 <span class="pill ' + q.farbe + '">' + q.name + '</span></h2>'
+  return '<h2>'+t('selbst_titel')+' \xB7 <span class="pill ' + q.farbe + '">' + q.name + '</span></h2>'
     + '<div class="small" style="margin-bottom:4px;color:var(--ink-soft);font-style:italic;">' + esc(q.zeichen) + '</div>'
-    + '<div class="small muted" style="margin-bottom:12px;">Bewerte jede Aussage von 1 (kaum) bis 5 (fast immer).</div>'
+    + '<div class="small muted" style="margin-bottom:12px;">'+t('selbst_skala')+'</div>'
     + dotsHtml
     + rows
     + saveBtn
@@ -3310,7 +3343,7 @@ function renderBogen() {
   var stepperHTML = '<div class="weg-arc">'
     + '<div class="weg-arc-row">';
   var phases = ['gleichmut','liebe','mitgefuehl','freude'];
-  var phaseLabels = ['Gleichmut','Liebe','Mitgef\xFChl','Freude'];
+  var phaseLabels = QUALITAETEN.map(function(q){ return q.name; });
   phases.forEach(function(id, i) {
     var isCur = id === phase;
     var isDone = S.arc.phaseHistory.some(function(h){ return h.phase===id; });
