@@ -241,11 +241,11 @@ textarea { resize: vertical; min-height: 90px; }
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
 
 /* ── Toast ── */
-#backup-banner { position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot));
-  left: 0; right: 0; background: var(--bg-card); border-top: 1px solid var(--line);
-  padding: 10px 16px; display: flex; align-items: center; gap: 10px;
-  transform: translateY(100%); transition: transform .3s ease; z-index: 190; }
-#backup-banner.show { transform: translateY(0); }
+#backup-banner { position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot) + 8px);
+  left: 8px; right: 8px; background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,.10);
+  padding: 10px 14px; display: none; align-items: center; gap: 10px; z-index: 190; }
+#backup-banner.show { display: flex; }
 #backup-banner .bb-msg { flex: 1; font-size: .84rem; color: var(--ink-muted); }
 #backup-banner .bb-msg strong { color: var(--ink); }
 
