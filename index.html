@@ -542,8 +542,8 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   </div>
 </div>
 <div id="backup-banner">
-  <span class="bb-msg"><strong>Backup fällig</strong> – Daten sichern?</span>
-  <button class="btn-ghost" style="font-size:.82rem;padding:4px 10px;white-space:nowrap;" onclick="shareBackup()">Jetzt sichern</button>
+  <span class="bb-msg">${t('backup_faellig')} – Daten sichern?</span>
+  <button class="btn-ghost" style="font-size:.82rem;padding:4px 10px;white-space:nowrap;" onclick="shareBackup()">${t('backup_sichern')}</button>
   <button onclick="dismissBackupBanner()" style="background:none;border:none;font-size:1.2rem;color:var(--ink-muted);padding:0 2px;cursor:pointer;">×</button>
 </div>
 <div id="toast"></div>
@@ -555,7 +555,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 //  DATA
 // ═══════════════════════════════════════════════
 
-const VERSE = [
+const VERSE_DE = [
   { n:1,  text:"Diejenigen, die so Zuflucht genommen haben\nVerteilen auf dem Boden der Liebe\nDie Blumen des Mitgefühls,\nDie im kühlen Schatten der Freude\nMit dem reinen Wasser der Unvoreingenommenheit benetzt werden.\nSie schulen ihren Geist, damit sie durch ihn\nden wandernden Wesen von Nutzen sein können." },
   { n:2,  text:"Wenn Liebe, Mitgefühl, Freude und Unvoreingenommenheit\nnicht mit dem Pfad zur Befreiung verbunden sind,\nsind sie die vier göttlichen Verweilzustände, Ursachen von Samsara.\nSind sie jedoch mit dem Pfad verbunden, der zum Frieden führt,\nführen sie über den Ozean der Existenz hinaus.\nSo sind sie die vier grenzenlosen Haltungen." },
   { n:3,  text:"Sie richten sich auf die ganze Unendlichkeit der Wesen\nsowie auf den letztendlichen Zustand der Phänomene.\nSo haben sie eine zweifache, allumfassende Form:\nSie sind sowohl referenziell als auch nicht-referenziell." },
@@ -583,9 +583,9 @@ const VERSE = [
   { n:25, text:"Mögen diese guten Worte, die zum Frieden führen,\nalle Unruhe in den Köpfen der wandernden Wesen stillen.\nErschöpft vom Verfolgen falscher, irriger und minderwertiger Pfade,\nmöge ihr Geist heute Ruhe finden." },
 ];
 
-const REZITATION = "Mögen alle Wesen Glück und dessen Ursachen haben.\nMögen sie frei sein von Leid und dessen Ursachen.\nMögen sie niemals vom vollkommenen, leidfreien Glück getrennt sein.\nMögen sie ohne ein Nahes festzuhalten und Fernes abzulehnen,\nin grenzenlosem Gleichmut verweilen.";
+const REZITATION_DE = "Mögen alle Wesen Glück und dessen Ursachen haben.\nMögen sie frei sein von Leid und dessen Ursachen.\nMögen sie niemals vom vollkommenen, leidfreien Glück getrennt sein.\nMögen sie ohne ein Nahes festzuhalten und Fernes abzulehnen,\nin grenzenlosem Gleichmut verweilen.";
 
-const QUALITAETEN = [
+const QUALITAETEN_DE = [
   { id:"gleichmut",  name:"Gleichmut",      sanskrit:"upekṣā",  farbe:"gleichmut",
     bild:"Ein ruhiger, klarer See – tief und unbewegt.",
     metapher:"Das reine Wasser, das die Wiese benetzt.",
@@ -624,7 +624,7 @@ const QUALITAETEN = [
     zeichen:"Volle Freude ohne neidische Eifersucht." },
 ];
 
-const KONTEMPLATIONEN = {
+const KONTEMPLATIONEN_DE = {
   gleichmut: [
     { titel:"Reflexion auf Diskriminierung", schritte:[
       "Werde dir bewusst, wie du gerade zwischen Wesen unterscheidest – Freunde, Familie, Gleichgültige, Feinde.",
@@ -847,7 +847,7 @@ const EINHEITEN = [
     link:"https://notes.granola.ai/t/851ace9d-9975-48a0-8cf0-0a68ad3d602c-008umkv4" },
 ];
 
-const ERINNERUNGEN = [
+const ERINNERUNGEN_DE = [
   { q:"gleichmut",  t:"Ist da gerade ein Naher und ein Ferner in dir? Bemerke die Trennlinie – ohne sie zu erzwingen." },
   { q:"gleichmut",  t:"Wenn Ärger aufsteigt: Wer wird verletzt? Mein eigener Geist ist das erste Opfer." },
   { q:"gleichmut",  t:"Die Diskriminierung in mir ist mein Fehler – nicht das Verhalten der anderen. Ich entscheide sie, und ich kann etwas tun." },
@@ -875,7 +875,760 @@ const ERINNERUNGEN = [
 
 // ═══════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════
+const VERSE_EN = [
+  { n:1,  text:"Those who thus have taken refuge\nSpread upon the ground of love\nThe flowers of compassion,\nWhich in the cooling shade of joy\nAre moistened with pure waters of impartiality\nThey train their minds that through them they may be\nOf benefit to wandering beings." },
+  { n:2,  text:"If love, compassion, joy, impartiality\nAre not connected with the path to liberation,\nThey are the four divine abidings, causes of samsara.\nBut if they are connected with the path that leads to peace,\nThey lead beyond the ocean of existence.\nThus they are the four unbounded attitudes." },
+  { n:3,  text:"They focus on the whole infinity of beings\nAs well as on the ultimate condition of phenomena.\nThus they have a twofold all-embracing form:\nThey are both referential and nonreferential." },
+  { n:4,  text:"The four divine abidings are limited in scope.\nThe beings they envisage are but few.\nIn their focus and their form they are impure\nAnd, being partial, are the cause\nOf the celestial world of Brahma.\nBut the four unbounded attitudes are free of partiality.\nThey are directed at the state of liberation.\nLet those who have compassion train in them." },
+  { n:5,  text:"Those who are not happy, those worn down by sorrow,\nThose who have both happiness and wealth\nAnd those who love the close and hate the far—\nSuch are the respective fields\nOf love and of compassion,\nOf sympathetic joy, and of impartiality.\nThe forms of these four attitudes are thus the wish\nThat happiness be gained, that sorrow be removed,\nThat joy should not be lost,\nThat one should be of wholesome and impartial mind." },
+  { n:6,  text:"In the meditation on them there is no fixed order.\nBeginners on the other hand\nShould start with training in impartiality.\nOnce they realize the equality of beings who are close and far,\nThey should proceed to meditate upon the other three." },
+  { n:7,  text:"With all beings as its focus, the meditation's form\nConsists of this consideration:\n“O mind, you are attached to father, mother, friends.\nYour enemies you hate, and in this way you are defective.\nWandering in endless and beginningless samsāra,\nAs father, mother, friend, these enemies of yours\nOnce brought you benefit.\nWill you now return their kindness with malevolence?\nAnd these, your present friends, were once your harmful foes.\nThe suffering they brought to you is with you even now.\nHow does it then make sense to do them good in recompense?\nAnd all the others in between\nHave been both friend and enemy.\nThey may have helped, they may have harmed:\nNo point is there in hatred or attachment.”" },
+  { n:8,  text:"Therefore, at the outset,\nPlace your loved ones in the midposition of neutrality\nAnd set aside attachment.\nAnd for your enemies, as though they too were neutral,\nRid yourself of hatred.\nHave no “near and far.”\nThen eliminate your ignorance\nOf regarding beings neutrally as neither good nor bad.\nTrain yourself in what will free you from samsāra:\nThe intention to remove impartially\nThe afflictions that torment all wandering beings." },
+  { n:9,  text:"In wanting to be happy and to flee their pains,\nAll beings are the same.\nAnd yet in their confusion they contrive\nThe causes of their suffering.\nAlas! May all afflictions of unhappy beings\nAnd all their evil tendencies subside.\nMay they have an evenness of mind.\nMay all embodied beings,\nTormented by strong craving and aversion,\nBe freed from hatred and desire\nAnd have minds for which\nThe near and far are equalized.\n\nThinking thus, first meditate upon a single being,\nThen on two, then three.\nBeginning with the beings of one region,\nProceed then to one continent and then all four.\nThen meditate on the entire universe." },
+  { n:10, text:"The sign of your success will be that self and other,\nFriend and foe are equalized.\nIn conclusion, think that all the objects\nOf this impartial attitude devoid of clinging—\nAll are but the mind,\nAnd that the nature of the mind is similar to space.\nThen with a mind completely free of concepts,\nRest within the ultimate condition, empty and unborn." },
+  { n:11, text:"When thus your mind is even with regard to all,\nThen just as you would wish\nThat your own mother meet with happiness,\nThink the same for all embodied beings.\nAll living beings thus become the object of your love,\nThe form of which consists\nIn wanting, in the immediate term,\nThat beings have the happiness of gods and humankind\nAnd ultimately that they reach the bliss of buddhahood.\nBeginning with a single being\nTrain yourself to embrace all\nUntil the very confines of the ten directions." },
+  { n:12, text:"As a sign of your proficiency,\nYou will have supreme and all-embracing love,\nMore than any mother for her only child.\nFinally, great love that is beyond all clinging\nIs to rest within the state\nWhere all are seen as equal.\nIt is the sign of love and emptiness united.\nAnd just the sight of you will bring delight to beings." },
+  { n:13, text:"When you have embraced all beings with love,\nThen just as in your mind you cannot bear\nTo contemplate the sorrows of your father or your mother,\nBe likewise with the sufferings of wandering beings\nAnd generate compassion.\nThey founder in the great, tumultuous floods\nOf birth, age, sickness, death—\nWorn out by all their different sorrows." },
+  { n:14, text:"They are destitute of tamed and peaceful minds\nThat yearn for freedom.\nThey have no virtuous friends to show them the true path.\nAnd so—alas for them—\nThey wander in samsāra endlessly.\nAre you able to forsake them, you who see them thus?\nInstead, think rather from the center of your heart\nAnd from the marrow of your bones:\n“My body, all that I possess,\nAll the virtue gathered in the triple time—\nMay it, in this very instant,\nBanish all the pains that beings have!”" },
+  { n:15, text:"The sign of your success is said to be\nThe inability to bear that beings suffer.\nSubsequently you should evenly remain\nIn a compassion free of all conceptual reference.\nOf this the sign is emptiness—\nEmptiness united with compassion.\nThe fruit of such a training is a mind that’s free of malice." },
+  { n:16, text:"Softened by compassion, train yourself to take delight\nWhen others find their own respective joys.\nThe object of your focus will be beings who are happy,\nThe form your attitude will take will be to think,\n“What joy! These beings have no need of me\nTo bring them to the state of happiness!\nFor best of all, they found it for themselves!\nFrom this day till they gain enlightenment,\nMay they never lose their joy and comfort!”" },
+  { n:17, text:"The sign of your proficiency will be\nThat, being joyful, you will have no envious jealousy.\nLater, when you concentrate on joy,\nYou will be free of all conceptual reference.\nNaturally you will be at peace\nWith bliss in body, speech, and mind.\nAs fruit you will have joy and steady wealth." },
+  { n:18, text:"Once you have grown used to them,\nBegin with love and meditate upon them turn by turn.\nIf, when you meditate on love,\nThis causes you to cleave to everyone\nAs though they were your cherished friends,\nThis is halted by compassion.\nIf compassion is deficient and fixated on an object,\nDepression will be halted by nonreferential joy.\nIf through joy the mind is troubled,\nMeditate on great impartiality.\nAnd when impartiality becomes indifference,\nMeditate on love as you have done before\nAnd on the rest successively." },
+  { n:19, text:"Those who have grown firm in such a training\nMeditate upon the attitudes\nIn direct, indirect, alternate, or in any order.\nThus their realization of the four unbounded attitudes\nWill grow and will be fresh." },
+  { n:20, text:"This practice will give rise to four results.\nThe fully ripened fruit is high birth and the final excellence.\nThe fruits resembling the cause\nAre continued practice of the same,\nAnd a happiness and freedom from adversity.\nThanks to the conditioning result,\nOne will be born in pleasant, wholesome, happy places.\nThanks to the proliferating consequence,\nThese four attitudes will grow in strength." },
+  { n:21, text:"By love is anger driven out;\nThe sambhogakāya and mirror-like wisdom are completely gained.\nBy compassion clinging love is banished;\nThe dharmakāya and the all-discerning wisdom are achieved.\nSympathetic joy removes all jealousy;\nThe nirmāṇakāya and the all-accomplishing wisdom are gained.\nImpartiality removes both pride and ignorance.\nThe svabhāvikakāya is made manifest together with\nThe wisdom of equality and the wisdom of the dharmadhatu." },
+  { n:22, text:"Therefore love, compassion, joy, impartiality\nAre of unbounded excellence.\nAny path that lacks them is mistaken.\nEmbraced by the four boundless attitudes,\nThe path leads on to spotless liberation.\nIt is the way that all the buddhas tread." },
+  { n:23, text:"In truth, with both the vehicles, the causal and resultant,\nThe practice is in harmony. It is the same.\nIt’s emptiness enlivened with compassion." },
+  { n:24, text:"Therefore, in the footsteps of the buddhas’ holy children,\nStrive with effort in the four unbounded attitudes." },
+  { n:25, text:"May these good words that lead to peace\nStill all the turbulence of wandering beings’ minds.\nExhausted by pursuing wrong, mistaken, and inferior paths,\nMay their minds today find rest." },
+];
+
+const REZITATION_EN = "May all beings have happiness and the causes of happiness.\nMay all beings be free from suffering and the causes of suffering.\nMay all beings never be separated from joy free of suffering.\nMay all beings dwell in equanimity, free from attachment and aversion.";
+
+const QUALITAETEN_EN = [
+  { id:"gleichmut",  name:"Equanimity",       sanskrit:"upekṣā",  farbe:"gleichmut",
+    bild:"A calm, clear lake – deep and undisturbed.",
+    metapher:"The pure water that moistens the meadow.",
+    fokus:"Those who love the close and hate the far.",
+    wunsch:"May they be of wholesome and impartial mind.",
+    gegengift:"Pride and ignorance, partiality",
+    verwechslung:"Indifference. Equanimity is the vast space from which genuine love becomes possible.",
+    kernpunkt:"Beginners should start with equanimity. Only when the equality of close and far beings is realized do the other three become truly unbounded.",
+    zeichen:"Self and other, friend and foe are equalized." },
+  { id:"liebe",      name:"Loving Kindness",  sanskrit:"maitrī",  farbe:"liebe",
+    bild:"A mother holding her child – pure kindness without expectation.",
+    metapher:"The ground of the meadow.",
+    fokus:"Those who are not happy.",
+    wunsch:"May they gain the happiness they seek.",
+    gegengift:"Hatred, aggression",
+    verwechslung:"Attachment. True love is not defined by what others bring to us.",
+    kernpunkt:"Love is the wish for others’ happiness – more than a mother for her only child.",
+    zeichen:"All-embracing love; the mere sight of you brings delight to beings." },
+  { id:"mitgefuehl", name:"Compassion",        sanskrit:"karuṇā",  farbe:"mitgefuehl",
+    bild:"A mother without arms watching her child drowning – the impossibility of simply looking on.",
+    metapher:"The flowers of the meadow.",
+    fokus:"Those who are unhappy, worn down by sorrow.",
+    wunsch:"May their sorrow be removed.",
+    gegengift:"Attachment, craving",
+    verwechslung:"Sentimental pity. Karuṇā is peace and readiness to act – like a physician.",
+    kernpunkt:"Compassion is peaceful. From peace, helping is possible.",
+    zeichen:"The inability to bear the suffering of beings without acting." },
+  { id:"freude",     name:"Sympathetic Joy",  sanskrit:"muditā",  farbe:"freude",
+    bild:"A camel finding its lost calf – quiet, deep joy.",
+    metapher:"The cooling shade of the meadow.",
+    fokus:"Those who have happiness and wealth.",
+    wunsch:"May they never lose their joy.",
+    gegengift:"Jealousy, envy",
+    verwechslung:"Excitement. What is meant is contentment – a peaceful dwelling.",
+    kernpunkt:"“What joy! These beings have no need of me – they found it themselves!”",
+    zeichen:"Full of joy, without envious jealousy." },
+];
+
+const KONTEMPLATIONEN_EN = {
+  gleichmut: [
+    { titel:"Reflection on Discrimination", schritte:[
+      "Become aware of how you are currently distinguishing between beings – friends, family, neutrals, enemies.",
+      "Remember: these circles are not objective facts, but habits of attachment.",
+      "Ask: who was my friend, who my enemy over time? These roles change constantly.",
+      "Recognize: if ‘friend’ and ‘enemy’ were substantial, nothing could change.",
+      "Rest in this recognition: no boundary is truly there."
+    ]},
+    { titel:"Shifting Roles (Verse 7)", schritte:[
+      "Think of someone you experience as difficult or troubling.",
+      "Imagine: in former lives they helped you – as mother, as friend.",
+      "How does your inner feeling toward them change?",
+      "Imagine: your current friends caused you pain in former lives.",
+      "How does your clinging to affection change?"
+    ]},
+    { titel:"From One to All (Verse 9)", schritte:[
+      "Hold a single being in mind. Wish them peace, free of attachment and hatred.",
+      "Expand to two. To three. To all beings of a region.",
+      "To a continent. To all continents. To all animals – in the wild, in the water.",
+      "To all beings you cannot see. To the entire universe.",
+      "Wish all: an even mind, free of hatred and desire."
+    ]},
+    { titel:"The Airplane Example", schritte:[
+      "Imagine: you, family, a friend, your teacher, your enemy are in danger. One person will be chosen.",
+      "Observe: what does your mind wish? Do you hope it will be someone else?",
+      "Also observe: do you hope it will be yourself? That too is discrimination.",
+      "Equanimity: no preference. It is equally painful whoever is chosen.",
+      "Rest a moment in this recognition."
+    ]},
+    { titel:"Without Reference (Verse 10)", schritte:[
+      "Briefly think of the beings toward whom your equanimity is directed.",
+      "Recognize: they are all nothing but appearance in mind.",
+      "The nature of mind is like space – without center, without boundary.",
+      "Release all concepts: no subject, no object, no near, no far.",
+      "Rest."
+    ]}
+  ],
+  liebe: [
+    { titel:"Like a Mother (Verse 11)", schritte:[
+      "Your mind is even with regard to all.",
+      "Remember how you would wish your own mother to gain happiness.",
+      "Wish the same for a single being.",
+      "Wish it for two. Expand slowly.",
+      "To the very confines of the ten directions."
+    ]},
+    { titel:"Expanding from One to Many", schritte:[
+      "Begin with the mother-child attitude: warmth for one person.",
+      "Expand to two persons. Then three. Then to your family.",
+      "Notice when you begin to select. Return to equanimity.",
+      "Explicitly include yourself at the end: you have the same dignity.",
+      "Rest in this all-embracing warmth."
+    ]},
+    { titel:"Love without Attachment", schritte:[
+      "Choose a being that inspires love in you – without desire.",
+      "Feel the wish for their happiness – unconditional, without expectation.",
+      "Observe whether attachment is mixing in: ‘if they are happy, I feel better’ – that is not maitrī.",
+      "Let that go. Stay with the pure wish.",
+      "Expand to all beings."
+    ]}
+  ],
+  mitgefuehl: [
+    { titel:"Seeing Suffering (Verses 13–14)", schritte:[
+      "Recall the suffering of a loved one – how you could not bear it.",
+      "Turn the same mind toward all beings exhausted by birth, age, sickness, death.",
+      "Feel, without falling into sentimentality: from the marrow of the bones, from the depth of the heart.",
+      "Wish: ‘My body, all that I possess – may it banish all the pains that beings have.’",
+      "Recognize the peace that accompanies compassion."
+    ]},
+    { titel:"The Inner Physician", schritte:[
+      "Imagine you see a being suffering. Not sentimentally – as a physician.",
+      "Inner attitude: I see the suffering. I can do something.",
+      "Feel the readiness to help – calmly, courageously, free of panic.",
+      "Cultivate the wish: may this being be free from suffering.",
+      "Expand to all suffering beings."
+    ]}
+  ],
+  freude: [
+    { titel:"What Joy! (Verse 16)", schritte:[
+      "Think of a being who is doing well.",
+      "Say inwardly: ‘What joy! They found it themselves – that is the best!’",
+      "Observe whether jealousy arises – and let it pass.",
+      "Expand: several beings who are doing well.",
+      "Wish: ‘May they never lose their joy.’ Train until every being is included."
+    ]},
+    { titel:"Joy as Contentment", schritte:[
+      "Notice: muditā is not the excitement when your team wins.",
+      "What is meant is contentment – a peaceful settledness.",
+      "Think of someone who is doing well – even a competitor.",
+      "Notice the first emotional reaction. Practice: ‘Good. That is good.’",
+      "Cultivate: deep contentment when others have happiness."
+    ]}
+  ]
+};
+
+const ERINNERUNGEN_EN = [
+  { q:"gleichmut",  t:"Is there a near and a far in you right now? Notice the dividing line – without forcing it." },
+  { q:"gleichmut",  t:"When anger arises: who is harmed? My own mind is the first victim." },
+  { q:"gleichmut",  t:"The discrimination in me is my own error – not others’ behavior. I choose it, and I can do something about it." },
+  { q:"gleichmut",  t:"Friend becomes enemy, enemy becomes friend. None of these boundaries is substantial." },
+  { q:"gleichmut",  t:"Equanimity is not indifference – it is the space from which love becomes possible." },
+  { q:"gleichmut",  t:"Place your loved ones in the middle of neutrality. Set aside attachment – for their peace and yours." },
+  { q:"gleichmut",  t:"The wrongdoer is a slave of afflictions. The afflictions come from ignorance. That is also my problem." },
+  { q:"liebe",      t:"Like a mother toward her only child – can you wish that for any being right now?" },
+  { q:"liebe",      t:"Do I like this person because they give me something? That is attachment. Loving kindness would be free of that." },
+  { q:"liebe",      t:"When your mind is free of aggression – that is loving kindness. Its natural state." },
+  { q:"liebe",      t:"If even a single being is excluded, the mind is not yet free of anger." },
+  { q:"mitgefuehl", t:"See a being in difficulty – without sinking into grief. What would the calm response be?" },
+  { q:"mitgefuehl", t:"Compassion is not: ‘how unpleasant this is for me.’ It is free from the imperative of I." },
+  { q:"mitgefuehl", t:"Compassion is courage, not sentiment. The physician who dares the difficult operation because they can help." },
+  { q:"mitgefuehl", t:"When nothing holds back – no cost, no fear – acting spontaneously. That comes close to compassion." },
+  { q:"freude",     t:"Someone is rejoicing right now. Can you share their joy, without it being about you?" },
+  { q:"freude",     t:"What joy – they don’t need me in order to be happy!" },
+  { q:"freude",     t:"Joy is contentment, not excitement. Stillness when others have happiness." },
+  { q:"alle",       t:"All beings seek happiness and shun suffering – in this they are equal, without exception." },
+  { q:"alle",       t:"Before sitting: recite the four lines. Orientation of the mind." },
+  { q:"alle",       t:"Each encounter: three seconds pause. ‘This being wants happiness. Like me.’" },
+  { q:"alle",       t:"When you feel the pause between tasks – rest in it. That is already equanimity." },
+  { q:"alle",       t:"The afflictions are not negative because the Buddha says so – but because they are unwell. From first-hand experience." },
+];
+
+const QUIZ_EN = {
+  gleichmut: [
+    { frage: "Why does Longchenpa recommend beginners start with the practice of equanimity?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Without equanimity, love, compassion and joy easily remain partial and bound to few beings.",
+        "Only the recognized equality of near and far beings lays the ground for the universal form of the other three.",
+        "Without this step, the universality of love, compassion and joy is very difficult to achieve.",
+        "Equanimity is the only one of the four qualities that can lead to liberation.",
+        "The other three qualities are optional once equanimity is developed."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D is false — all four lead to liberation when connected with wisdom. E contradicts the complementary character of the four qualities." },
+    { frage: "Which statements about the nature of equanimity are correct?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Equanimity means treating all beings without discrimination — without difference between self and other.",
+        "Even one’s own self must be included in this equality.",
+        "Equanimity is easily confused with indifference, but is a free, peaceful, blissful mind.",
+        "Equanimity is the space from which genuine kindness and compassion toward all beings becomes possible.",
+        "Equanimity means withdrawing from relationships to avoid showing preference."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E mistakes equanimity for withdrawal — it is precisely the basis for greater engagement, not less." },
+    { frage: "Which mental afflictions are eliminated by equanimity according to Verse 21?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Pride",
+        "Ignorance",
+        "Hatred",
+        "Jealousy",
+        "Attachment"
+      ],
+      richtig: [0,1],
+      erklaerung: "C is eliminated by love, D by joy, E (clinging love) by compassion (Verse 21)." },
+    { frage: "Which reflections does Verse 7 suggest as equanimity meditation?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "In beginningless samsāra, today’s enemies once brought benefit as father, mother, friend.",
+        "Today’s friends were once harmful enemies; the suffering they caused is still with you.",
+        "Those in between have been both — friend and enemy. Hatred and attachment therefore make no sense.",
+        "Since the self is an illusion, there is no one who could love or hate.",
+        "Since all beings possess buddha-nature, there can be no enemies whatsoever."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D and E are philosophically related, but not the specific reflections from Verse 7 — they bypass the methodical step of the practice." },
+    { frage: "How is equanimity practice built up according to Verse 8?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Place loved ones in the middle position of neutrality and set aside attachment.",
+        "View enemies as though they too were neutral — free oneself from hatred, no ‘near and far.’",
+        "Eliminate the ignorance of regarding beings as neither good nor bad — and wish impartially to remove all suffering.",
+        "Begin directly with love toward enemies, without the intermediate step of neutrality.",
+        "Intensify love toward the closest people and transfer it to others as a model."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D and E skip the methodical build-up through neutrality — this intermediate step is precisely Longchenpa’s instruction." },
+    { frage: "Which examples or images are used to illustrate equanimity?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "The Theravāda example: choosing one person to be killed — equanimity means no longer wishing for any differentiation.",
+        "Patrül Rinpoche’s image: a serene and beautiful lake.",
+        "After passing an exam, the mind is free and unburdened — but we reach for distraction instead.",
+        "A mother without arms who sees her child drowning.",
+        "A camel that finds its lost calf."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D = Patrül’s image for compassion. E = image for joy." },
+    { frage: "What characterizes equanimity practice without a reference point?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "All sentient beings are nothing but mind — they cannot be found to exist substantially as they appear.",
+        "The nature of mind itself is like space.",
+        "With a mind free of concepts, one rests in the ultimate condition, empty and unborn.",
+        "This practice is only permitted after years of preparation.",
+        "Trinlay Rinpoche: don’t postpone the reference-free practice — both levels help each other."
+      ],
+      richtig: [0,1,2,4],
+      erklaerung: "D contradicts Rinpoche’s explicit instruction (E)." },
+    { frage: "Which buddha aspects and wisdoms are revealed through equanimity (Verse 21)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Svabhāvikakāya",
+        "Wisdom of equality",
+        "Wisdom of the dharmadhatu",
+        "Sambhogakāya and mirror-like wisdom",
+        "Nirmāṇakāya and all-accomplishing wisdom"
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D belongs to love, E to joy." }
+  ],
+  liebe: [
+    { frage: "Which translations and definitions for maitrī are correct?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Sanskrit: friendliness, friendly attitude.",
+        "Tibetan: byams pa — benevolence.",
+        "Often described in English analogously to parental love — concern for others’ happiness.",
+        "Definition: the wish that others gain happiness.",
+        "Definition: compassion for those who suffer."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is the definition of compassion (karuṇā), not maitrī." },
+    { frage: "Which confusions with loving kindness are critically discussed?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Attachment — e.g. ‘I like meat’: self-centered preference, harmful to the cow, opposite of maitrī.",
+        "Self-sacrifice — the mistaken notion that one must diminish oneself.",
+        "An emotionally charged ‘love’ that is fundamentally based on attachment.",
+        "An attitude in which one likes others because and as long as they are useful.",
+        "Sympathetic joy over others’ happiness."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is a separate immeasurable (muditā), not a confusion with maitrī." },
+    { frage: "What does Verse 11 say about the form of loving kindness practice?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Just as one wishes one’s own mother to gain happiness — the same wish for all beings.",
+        "In the immediate sense: that beings gain the happiness of gods and humans.",
+        "Ultimately: that they reach the bliss of buddhahood.",
+        "Start with one being and train until every being is included, to the confines of the ten directions.",
+        "Skip equanimity — loving kindness can be practiced immediately toward all."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E contradicts Verse 6 — Longchenpa explicitly instructs beginners to start with equanimity." },
+    { frage: "What is the sign of proficiency in loving kindness (Verse 12)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Supreme and all-embracing love, more than any mother for her only child.",
+        "Great love beyond all clinging — resting in the state where all are seen as equal.",
+        "The sign of love and emptiness united.",
+        "Just the sight of you brings delight to beings.",
+        "All beings spontaneously seek your presence and guidance."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is not in Verse 12 — D (‘the sight of you brings delight’) is the verse’s own wording; E overstates this." },
+    { frage: "Which corrections are described in Verse 18 for loving kindness?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "If love causes clinging to everyone as cherished friends — this is halted by compassion.",
+        "If compassion becomes depression — this is halted by non-referential joy.",
+        "If joy disturbs the mind through distraction — meditate on great impartiality.",
+        "If equanimity becomes indifference — meditate on love as before.",
+        "If love fails — meditate directly on emptiness to correct the course."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is not in the text — Verse 18 gives a sequential cycle of the four qualities as mutual corrections, not a jump to emptiness." },
+    { frage: "How is Patrül Rinpoche’s image for loving kindness described?",
+      hinweis: "One answer correct.",
+      optionen: [
+        "A mother caring for her baby.",
+        "A mother without arms who sees her child drowning.",
+        "A camel finding its lost calf.",
+        "A serene, clear lake.",
+        "A mother who sees her child after a long separation."
+      ],
+      richtig: [0],
+      erklaerung: "B = compassion, C = joy, D = equanimity. E is not in the material." },
+    { frage: "Which buddha aspect and wisdom are attained through loving kindness (Verse 21)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Sambhogakāya",
+        "Mirror-like wisdom",
+        "The sambhogakāya is adorned with all the marks of buddhahood.",
+        "Dharmakāya and all-discerning wisdom",
+        "Svabhāvikakāya and wisdom of equality"
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D belongs to compassion, E to equanimity." },
+    { frage: "What role does loving kindness play in relation to the other three qualities?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Loving kindness is the ground — like the meadow that supports everything else.",
+        "Without equanimity as a foundation, loving kindness easily remains partial.",
+        "When equanimity becomes indifference, loving kindness is the antidote.",
+        "Loving kindness, once developed, makes the other three qualities unnecessary.",
+        "The four qualities are complementary — they correct and support each other."
+      ],
+      richtig: [0,1,2,4],
+      erklaerung: "D contradicts the complementary character emphasized throughout — all four are always needed." }
+  ],
+  mitgefuehl: [
+    { frage: "How is karuṇā (compassion) defined in the material?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "The wish to remove others’ suffering.",
+        "Sanskrit karuṇā — Tibetan nying-je or tuk-je.",
+        "Its field: beings who are unhappy, worn down by sorrow.",
+        "Its form: the wish that sorrow be removed.",
+        "A feeling of grief that overtakes the practitioner when encountering suffering."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is precisely the confusion to be avoided — Trinlay Rinpoche emphasizes that compassion is peaceful, not grief." },
+    { frage: "What distinguishes genuine compassion from sentimental pity?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Genuine compassion is peaceful — from peace, genuine help is possible.",
+        "The image of the physician: seeing the suffering, being ready to act — calmly, courageously.",
+        "Compassion is free from the imperative of ‘I’ — not ‘how unpleasant this is for me.’",
+        "Bodhisattvas enter the hell realms like elephants jumping into water — bearing others’ suffering is easier than watching.",
+        "Compassion requires emotional identification with the suffering of others."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is the misunderstanding — compassion is not emotional identification but peaceful readiness." },
+    { frage: "What does Verse 14 say about the situation of wandering beings?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "They are destitute of tamed and peaceful minds that yearn for freedom.",
+        "They have no virtuous friends to show them the true path.",
+        "They wander in samsāra endlessly.",
+        "The practitioner is asked: can you forsake them, you who see them thus?",
+        "Only those who have themselves suffered greatly can develop true compassion."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is not in the text and contradicts the universal accessibility of compassion practice." },
+    { frage: "What is the form of compassion practice according to Verse 14?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Think from the center of your heart and from the marrow of your bones.",
+        "‘My body, all that I possess, all the virtue gathered in the triple time — may it banish all the pains that beings have!’",
+        "First generate loving kindness, then compassion.",
+        "Practice toward wandering beings as you would toward your own father or mother.",
+        "Begin with those closest to you and expand progressively."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E: the verse emphasizes universality with full heart engagement, not starting with the closest." },
+    { frage: "What is the sign of success in compassion (Verse 15)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "The inability to bear that beings suffer.",
+        "Subsequently remaining evenly in compassion free of all conceptual reference.",
+        "The sign of reference-free compassion is emptiness united with compassion.",
+        "The fruit: a mind free of malice.",
+        "The fruit: constant emotional sorrow over the world’s suffering."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E contradicts the verse — the fruit is a mind free of malice, not a sorrowful one." },
+    { frage: "What is the etymological meaning of karuṇā according to the course?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "It takes away our joy because others’ suffering is unbearable.",
+        "From karma (to act) — the capacity to act.",
+        "Courage and readiness to help in difficult situations.",
+        "Emotional grief and sadness in the face of suffering.",
+        "Compassion is the basis for bodhicitta in the Mahāyāna."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D is the confusion — compassion is not grief. E is theologically true but not the etymological content presented." },
+    { frage: "Which buddha aspect and wisdom are attained through compassion (Verse 21)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Dharmakāya",
+        "All-discerning wisdom",
+        "Strengths and distinctive qualities of buddhahood",
+        "Sambhogakāya",
+        "Nirmāṇakāya"
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D belongs to loving kindness, E to sympathetic joy." },
+    { frage: "Which fields and forms belong to compassion (Verse 5)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Field: those who are not happy, worn down by sorrow.",
+        "Form: the wish that sorrow be removed.",
+        "Field: those who love the close and hate the far.",
+        "Form: the wish that happiness be gained.",
+        "Compassion applies exclusively to those who have brought suffering upon themselves."
+      ],
+      richtig: [0,1],
+      erklaerung: "C and D belong to equanimity and loving kindness respectively. E is a moral filtering that Verse 5 does not contain — compassion applies to all who suffer." }
+  ],
+  freude: [
+    { frage: "How is sympathetic joy (muditā) characterized in the material?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Joy at others’ happiness.",
+        "Object of attention: beings who are happy.",
+        "In Verse 16: ‘What joy! These beings have no need of me — they found it themselves!’",
+        "Wish: may they never lose their joy until enlightenment.",
+        "Joy at one’s own insights and progress on the spiritual path."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is a different form of joy (joy in the Dharma) — muditā specifically means joy at others’ happiness." },
+    { frage: "Which Patrül Rinpoche image belongs to sympathetic joy?",
+      hinweis: "One answer correct.",
+      optionen: [
+        "A camel finding its lost calf — overjoyed.",
+        "A mother caring for her baby.",
+        "A mother without arms who sees her child drowning.",
+        "A serene, quiet lake.",
+        "A mother who sees her child after a long separation."
+      ],
+      richtig: [0],
+      erklaerung: "B = love, C = compassion, D = equanimity. E is not in the material." },
+    { frage: "Which mental affliction is the antidote of joy (Verse 21)?",
+      hinweis: "One answer correct.",
+      optionen: [
+        "Jealousy / envy",
+        "Pride",
+        "Hatred",
+        "Attachment",
+        "Ignorance"
+      ],
+      richtig: [0],
+      erklaerung: "B and E by equanimity, C by love, D (clinging love) by compassion." },
+    { frage: "Which statements about the sign of mastery and fruit of joy (Verse 17) are correct?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Sign: full of joy, without envious jealousy.",
+        "With later concentration on joy: free of all conceptual reference.",
+        "Naturally at peace — with bliss in body, speech and mind.",
+        "Fruit: joy and steady wealth.",
+        "Fruit: excitement and enthusiasm that fills life with energy."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is precisely the confusion — muditā is NOT excitement, but a quiet, peaceful state." },
+    { frage: "Which buddha aspects and wisdoms are attained through sympathetic joy (Verse 21)?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Nirmāṇakāya (manifold, in various forms).",
+        "Sublime all-accomplishing wisdom.",
+        "Enlightened action spontaneously accomplished.",
+        "Sambhogakāya.",
+        "Wisdom of equality."
+      ],
+      richtig: [0,1,2],
+      erklaerung: "D belongs to love, E to equanimity." },
+    { frage: "What does Verse 18 say about the dynamic interrelationship of the four qualities?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "If compassion is deficient and fixated on an object, depression is halted by nonreferential joy.",
+        "If the mind is disturbed through joy and takes pleasure in distraction, great impartiality is the antidote.",
+        "If love-meditation turns into clinging, joy stops this attachment.",
+        "If equanimity becomes indifference, meditate again on love and the following qualities.",
+        "The four qualities mutually correct each other — this is how stability and mastery are gained."
+      ],
+      richtig: [0,1,3,4],
+      erklaerung: "C is false — when clinging arises in love, COMPASSION is the antidote, not joy." },
+    { frage: "Which confusions are pointed out in the material?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Love ≠ attachment",
+        "Compassion ≠ being consumed by grief (subtle distinction)",
+        "Joy ≠ excitement / agitation",
+        "Equanimity ≠ indifference",
+        "Bodhicitta ≠ compassion"
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E is not addressed in this form — bodhicitta and great compassion are considered inseparable in Mahāyāna." },
+    { frage: "Which instructions does Verse 16 give for the meditation on sympathetic joy?",
+      hinweis: "Multiple answers correct.",
+      optionen: [
+        "Begin with one being and train until every being is included.",
+        "‘Softened by compassion, train yourself to take delight when others find their joy.’",
+        "Object of attention: beings who are happy.",
+        "The wish: may they never lose their joy and comfort until enlightenment.",
+        "Practice joy before compassion — joy is the easier entry for most people."
+      ],
+      richtig: [0,1,2,3],
+      erklaerung: "E contradicts the order — ‘softened by compassion’ already presupposes compassion; beginners start with equanimity." }
+  ]
+};
+
+const STRINGS = {
+  de: {
+    tab_heute:'Heute', tab_lehre:'Lehre', tab_praxis:'Praxis', tab_tagebuch:'Tagebuch', tab_weg:'Weg',
+    heute_nicht_geuebt:'Noch nicht geübt', heute_fuenf_min:'Auch fünf Minuten zählen. Was darf es heute sein?',
+    heute_vers:'Vers lesen', heute_rez:'Rezitation', heute_kontempl:'Kontemplation', heute_nur_eintragen:'Nur eintragen →',
+    heute_erste_sitzung:'Erste Sitzung wartet', heute_auch_5:'Auch 5 Minuten zählen',
+    heute_tage:'Tage in Folge', heute_sitzungen:'Sitzungen', heute_min_woche:'Min. diese Woche',
+    heute_impuls:'Impuls für heute', heute_alle_vier:'alle vier',
+    heute_fokus:'Aktueller Fokus', heute_jetzt_ueben:'Jetzt üben', heute_weg:'Weg',
+    heute_selbst:'Selbsteinschätzung', heute_selbst_text:'Wie zeigen sich die vier Unermesslichkeiten in dir? Eine kurze Reflexion alle zwei Wochen.',
+    heute_jetzt_einsch:'Jetzt einschätzen →', heute_geuebt:'Heute geübt',
+    fehler_laden:'Fehler beim Laden',
+    lehre_module:'Module', lehre_sitzungen:'Sitzungen', lehre_verse:'Verse',
+    lehre_qualitaeten:'Vier Qualitäten', lehre_module_lbl:'Modul', lehre_vers_e:'e',
+    lehre_studium:'Studium · Kontemplation · Meditation · Alltag',
+    lehre_einheit:'Einheit', lehre_schwerpunkte:' Schwerpunkte',
+    lehre_rez_titel:'Theravāda-Rezitation', lehre_rez_hint:'Diese vier Zeilen können vor jeder formellen Sitzung rezitiert werden.',
+    lehre_vers_titel:'25 Verse von Longchenpa', lehre_vers_sub:'Aus „Im natürlichen Zustand des Geistes“',
+    lehre_vers_lbl:'Vers',
+    q_bild:'Bild', q_wiese:'In der Wiese', q_fokus:'Fokus', q_wunsch:'Wunsch',
+    q_gegen:'Gegengift für', q_nicht:'Nicht zu verwechseln mit', q_zeichen:'Zeichen des Fortschritts',
+    q_kontemplieren:'Kontemplieren', schliessen:'Schließen',
+    modul_lbl:'Modul', modul_studium:'Studium', modul_kernfragen:'Kernfragen', modul_begriffe:'Begriffe',
+    modul_verse:'Verse', modul_kontempl:'Kontemplation', modul_med:'Formelle Meditation', modul_alltag:'Alltag',
+    sitzung_lbl:'Sitzung', sitzung_schwerpunkte:'Schwerpunkte', transkript:'Transkript →',
+    praxis_aendern:'ändern →', praxis_zuletzt:'Zuletzt geübt',
+    rez_titel:'Rezitation', rez_desc:'Die vier Zeilen als Ausrichtung des Geistes',
+    vers_titel:'Vers lesen', vers_desc:'Einen Vers Longchenpas kontemplieren', vers_naechster:'nächster: Vers',
+    kontempl_titel:'Kontemplation', kontempl_desc:'Schritt-für-Schritt Anleitung',
+    stille_titel:'Stille + Timer', stille_desc:'Ruhe mit Glocke am Anfang und Ende',
+    fokus_waehlen:'Fokus wählen', fokus_hint:'Welche Qualität steht gerade im Vordergrund?',
+    schritte:' Schritte', runner_zurueck:'← Zurück', runner_weiter:'Weiter →',
+    runner_abschliessen:'Sitzung abschließen ✓', runner_beenden:'Beenden',
+    runner_vor:'Vorbereitung', runner_rez_text:'Setze dich bequem hin. Ein paar Atemzüge ankommen lassen.',
+    runner_verweilen:'Verweilen', runner_rez_verweilen:'Lass die Worte nachklingen. Ruhe einen Moment im Wunsch selbst.',
+    runner_abschluss:'Abschluss', runner_rez_abschluss:'Widme die Tugend allen Wesen.',
+    runner_vers_verweilen:'Welcher Satz hallt nach? Bleib bei ihm.',
+    runner_vers_abschluss:'Eine kurze Notiz oder einfach gehen lassen.',
+    runner_stille:'In Stille sitzen', runner_beenden_eintragen:'Beenden & eintragen', runner_abbrechen:'Abbrechen',
+    kontempl_vor_text:'Setze dich bequem hin. Ein paar Atemzüge. Optional die vier Zeilen rezitieren.',
+    kontempl_verweilen:'Bleib einen Moment in dem, was sich gezeigt hat.',
+    kontempl_abschluss:'Widmung. Lass die Wirkung sich entfalten.',
+    timer_titel:'Stille mit Timer', timer_dauer:'Dauer (Minuten)', timer_glocke:'Glocke am Anfang und Ende',
+    timer_start:'Starten',
+    log_bearbeiten:'Sitzung bearbeiten', log_eintragen_neu:'Sitzung eintragen',
+    log_datum:'Datum', log_dauer:'Dauer (Minuten)', log_fokus:'Fokus', log_modus:'Modus',
+    log_modus_ph:'Stille, Vers, Kontemplation …', log_alle_vier:'Alle vier',
+    log_erfahrung:'Erfahrung (optional)', log_notes_ph:'Was hat sich gezeigt? Welche Klarheit, welche Schwierigkeit?',
+    log_speichern:'Speichern', log_eintragen:'Eintragen', log_abbrechen:'Abbrechen',
+    log_eingetragen:'Eingetragen ✓',
+    tj_title:'Tagebuch', tj_neu:'+ Neu', tj_suchen:'Suchen …', tj_leer:'Noch keine Einträge.',
+    tj_keine_notizen:'– keine Notizen –', tj_loeschen:'Eintrag löschen?', tj_geloescht:'Gelöscht',
+    weg_ueberblick:'Überblick', weg_lernpfad:'Lernpfad', weg_reflexion:'Reflexion',
+    weg_streak:'Streak & Ziele', weg_bearbeiten:'bearbeiten →', weg_tage:'Tage in Folge',
+    weg_beste:'Bester Streak', weg_gesamt:'Sitzungen gesamt', weg_woche:'Diese Woche',
+    weg_kalender:'Kalender', weg_verteilung:'Verteilung', weg_sitzungen_ges:'Sitzungen',
+    weg_minuten:'Minuten', weg_phasen:'Phasen-Verlauf',
+    weg_einst:'Einstellungen', weg_timer_std:'Standard-Timer (Minuten)', weg_glocke:'Glocke aktivieren',
+    weg_export:'Export (JSON)', weg_import:'Import', weg_reset:'Alle Daten zurücksetzen',
+    weg_reset_confirm:'Wirklich alle Daten löschen?',
+    weg_footer:'Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.',
+    weg_footer2:'Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.',
+    weg_lang:'Sprache',
+    lp_titel:'Lernpfad', lp_studium:'Studium', lp_kontempl:'Kontempl.', lp_medit:'Medit.',
+    lp_hint:'Studium: Quiz · Kontemplation & Meditation: werden beim Üben automatisch abgehakt',
+    pi_abgeschlossen:'✓ Abgeschlossen', pi_zeichen:'Zeichen',
+    pi_jetzt_kontempl:'Jetzt kontemplieren', pi_jetzt_med:'Jetzt meditieren',
+    pi_kontempl_hint:'Schließe eine Kontemplations-Sitzung mit diesem Fokus ab – sie wird automatisch hier eingetragen.',
+    pi_med_hint:'Schließe eine Stille-Sitzung (Timer) mit diesem Fokus ab – sie wird automatisch hier eingetragen.',
+    quiz_abgeschlossen:'✓ Quiz abgeschlossen', quiz_abgeschl_text:'Studium für diese Qualität wurde bereits abgeschlossen.',
+    quiz_wiederholen:'Quiz wiederholen',
+    quiz_frage:'Frage', quiz_pruefen:'Prüfen', quiz_weiter_q:'Nächste Frage →', quiz_fertig:'Fertig',
+    quiz_bestanden:'Bestanden', quiz_nicht_best:'Noch nicht bestanden', quiz_von:' von ', quiz_richtig:' richtig',
+    quiz_nochmal:'Nochmal', quiz_abschluss_text:'Studium abgeschlossen! Quiz-Ergebnis gespeichert.',
+    quiz_nicht_best_text:'Mindestens 60 % nötig. Versuche es erneut.',
+    selbst_titel:'Selbsteinschätzung', selbst_letzte:'Letzte Einschätzung',
+    selbst_naechste:'nächste', selbst_jetzt_faellig:'jetzt fällig', selbst_start:'Noch keine Einschätzung – starte jetzt.',
+    selbst_starten:'Einschätzung starten →', selbst_radar:'Deine Entwicklung',
+    selbst_sheet_hint:'Wie stark zeigt sich diese Qualität in deiner täglichen Erfahrung und Praxis?',
+    selbst_speichern:'Einschätzung speichern', selbst_gespeichert:'Einschätzung gespeichert ✓',
+    selbst_alle_beantw:'Bitte alle Fragen beantworten.',
+    ziel_titel:'Ziele anpassen', ziel_tag:'Minuten täglich', ziel_woche:'Tage pro Woche', ziel_speichern:'Speichern',
+    backup_faellig:'Backup fällig', backup_sichern:'Jetzt sichern', backup_gespeichert:'Backup gespeichert ✓',
+    ob_weiter:'Weiter →', ob_fertig:'Loslegen',
+  },
+  en: {
+    tab_heute:'Today', tab_lehre:'Teaching', tab_praxis:'Practice', tab_tagebuch:'Journal', tab_weg:'Path',
+    heute_nicht_geuebt:'Not yet practiced', heute_fuenf_min:'Even five minutes count. What shall it be today?',
+    heute_vers:'Read Verse', heute_rez:'Recitation', heute_kontempl:'Contemplation', heute_nur_eintragen:'Just log →',
+    heute_erste_sitzung:'First session awaits', heute_auch_5:'Even 5 minutes count',
+    heute_tage:'Day streak', heute_sitzungen:'Sessions', heute_min_woche:'Min. this week',
+    heute_impuls:'Today\'s impulse', heute_alle_vier:'all four',
+    heute_fokus:'Current focus', heute_jetzt_ueben:'Practice now', heute_weg:'Path',
+    heute_selbst:'Self-assessment', heute_selbst_text:'How do the four immeasurables show in you? A brief reflection every two weeks.',
+    heute_jetzt_einsch:'Assess now →', heute_geuebt:'Practiced today',
+    fehler_laden:'Error loading',
+    lehre_module:'Modules', lehre_sitzungen:'Sessions', lehre_verse:'Verses',
+    lehre_qualitaeten:'Four Qualities', lehre_module_lbl:'Module', lehre_vers_e:'',
+    lehre_studium:'Study · Contemplation · Meditation · Daily life',
+    lehre_einheit:'Session', lehre_schwerpunkte:' key points',
+    lehre_rez_titel:'Theravāda Recitation', lehre_rez_hint:'These four lines can be recited before each formal session.',
+    lehre_vers_titel:'25 Verses by Longchenpa', lehre_vers_sub:'From "Finding Rest in the Nature of the Mind"',
+    lehre_vers_lbl:'Verse',
+    q_bild:'Image', q_wiese:'In the meadow', q_fokus:'Focus', q_wunsch:'Wish',
+    q_gegen:'Antidote for', q_nicht:'Not to be confused with', q_zeichen:'Sign of progress',
+    q_kontemplieren:'Contemplate', schliessen:'Close',
+    modul_lbl:'Module', modul_studium:'Study', modul_kernfragen:'Key questions', modul_begriffe:'Terms',
+    modul_verse:'Verses', modul_kontempl:'Contemplation', modul_med:'Formal Meditation', modul_alltag:'Daily life',
+    sitzung_lbl:'Session', sitzung_schwerpunkte:'Key points', transkript:'Transcript →',
+    praxis_aendern:'change →', praxis_zuletzt:'Recently practiced',
+    rez_titel:'Recitation', rez_desc:'The four lines as orientation of the mind',
+    vers_titel:'Read Verse', vers_desc:'Contemplate a verse by Longchenpa', vers_naechster:'next: Verse',
+    kontempl_titel:'Contemplation', kontempl_desc:'Step-by-step guidance',
+    stille_titel:'Silence + Timer', stille_desc:'Rest with bell at beginning and end',
+    fokus_waehlen:'Choose focus', fokus_hint:'Which quality is currently in the foreground?',
+    schritte:' steps', runner_zurueck:'← Back', runner_weiter:'Next →',
+    runner_abschliessen:'Complete session ✓', runner_beenden:'End',
+    runner_vor:'Preparation', runner_rez_text:'Sit comfortably. Let a few breaths settle you.',
+    runner_verweilen:'Resting', runner_rez_verweilen:'Let the words resonate. Rest a moment in the wish itself.',
+    runner_abschluss:'Closing', runner_rez_abschluss:'Dedicate the virtue to all beings.',
+    runner_vers_verweilen:'Which sentence echoes? Stay with it.',
+    runner_vers_abschluss:'A brief note, or simply let it go.',
+    runner_stille:'Sitting in silence', runner_beenden_eintragen:'End & log', runner_abbrechen:'Cancel',
+    kontempl_vor_text:'Sit comfortably. A few breaths. Optionally recite the four lines.',
+    kontempl_verweilen:'Stay a moment with what has shown itself.',
+    kontempl_abschluss:'Dedication. Let the effect unfold.',
+    timer_titel:'Silence with Timer', timer_dauer:'Duration (minutes)', timer_glocke:'Bell at beginning and end',
+    timer_start:'Start',
+    log_bearbeiten:'Edit session', log_eintragen_neu:'Log session',
+    log_datum:'Date', log_dauer:'Duration (minutes)', log_fokus:'Focus', log_modus:'Mode',
+    log_modus_ph:'Silence, Verse, Contemplation …', log_alle_vier:'All four',
+    log_erfahrung:'Experience (optional)', log_notes_ph:'What showed itself? What clarity, what difficulty?',
+    log_speichern:'Save', log_eintragen:'Log', log_abbrechen:'Cancel',
+    log_eingetragen:'Logged ✓',
+    tj_title:'Journal', tj_neu:'+ New', tj_suchen:'Search …', tj_leer:'No entries yet.',
+    tj_keine_notizen:'– no notes –', tj_loeschen:'Delete entry?', tj_geloescht:'Deleted',
+    weg_ueberblick:'Overview', weg_lernpfad:'Learning path', weg_reflexion:'Reflection',
+    weg_streak:'Streak & Goals', weg_bearbeiten:'edit →', weg_tage:'Day streak',
+    weg_beste:'Best streak', weg_gesamt:'Sessions total', weg_woche:'This week',
+    weg_kalender:'Calendar', weg_verteilung:'Distribution', weg_sitzungen_ges:'sessions',
+    weg_minuten:'minutes', weg_phasen:'Phase history',
+    weg_einst:'Settings', weg_timer_std:'Default timer (minutes)', weg_glocke:'Enable bell',
+    weg_export:'Export (JSON)', weg_import:'Import', weg_reset:'Reset all data',
+    weg_reset_confirm:'Really delete all data?',
+    weg_footer:'Companion for the practice of the four immeasurables according to Longchenpa.',
+    weg_footer2:'Teachings with Trinley Tulku, May 2026 · Flourishing Society.',
+    weg_lang:'Language',
+    lp_titel:'Learning path', lp_studium:'Study', lp_kontempl:'Contempl.', lp_medit:'Medit.',
+    lp_hint:'Study: Quiz · Contemplation & Meditation: automatically checked off when practiced',
+    pi_abgeschlossen:'✓ Completed', pi_zeichen:'Sign',
+    pi_jetzt_kontempl:'Contemplate now', pi_jetzt_med:'Meditate now',
+    pi_kontempl_hint:'Complete a contemplation session with this focus – it will be logged automatically.',
+    pi_med_hint:'Complete a silence session (timer) with this focus – it will be logged automatically.',
+    quiz_abgeschlossen:'✓ Quiz completed', quiz_abgeschl_text:'Study for this quality has already been completed.',
+    quiz_wiederholen:'Repeat quiz',
+    quiz_frage:'Question', quiz_pruefen:'Check', quiz_weiter_q:'Next question →', quiz_fertig:'Done',
+    quiz_bestanden:'Passed', quiz_nicht_best:'Not yet passed', quiz_von:' of ', quiz_richtig:' correct',
+    quiz_nochmal:'Try again', quiz_abschluss_text:'Study complete! Quiz result saved.',
+    quiz_nicht_best_text:'At least 60% required. Please try again.',
+    selbst_titel:'Self-assessment', selbst_letzte:'Last assessment',
+    selbst_naechste:'next', selbst_jetzt_faellig:'due now', selbst_start:'No assessment yet – start now.',
+    selbst_starten:'Start assessment →', selbst_radar:'Your development',
+    selbst_sheet_hint:'How strongly does this quality show in your daily experience and practice?',
+    selbst_speichern:'Save assessment', selbst_gespeichert:'Assessment saved ✓',
+    selbst_alle_beantw:'Please answer all questions.',
+    ziel_titel:'Adjust goals', ziel_tag:'Minutes daily', ziel_woche:'Days per week', ziel_speichern:'Save',
+    backup_faellig:'Backup due', backup_sichern:'Save now', backup_gespeichert:'Backup saved ✓',
+    ob_weiter:'Next →', ob_fertig:'Get started',
+  }
+};
+
+function t(key) {
+  var l = (S && S.prefs && S.prefs.lang) ? S.prefs.lang : 'de';
+  return (STRINGS[l] && STRINGS[l][key] !== undefined) ? STRINGS[l][key] : (STRINGS.de[key] || key);
+}
+
+function applyLang() {
+  var l = (S && S.prefs && S.prefs.lang) ? S.prefs.lang : 'de';
+  VERSE = (l === 'en') ? VERSE_EN : VERSE_DE;
+  QUALITAETEN = (l === 'en') ? QUALITAETEN_EN : QUALITAETEN_DE;
+  REZITATION = (l === 'en') ? REZITATION_EN : REZITATION_DE;
+  KONTEMPLATIONEN = (l === 'en') ? KONTEMPLATIONEN_EN : KONTEMPLATIONEN_DE;
+  QUIZ = (l === 'en') ? QUIZ_EN : QUIZ_DE;
+  ERINNERUNGEN = (l === 'en') ? ERINNERUNGEN_EN : ERINNERUNGEN_DE;
+  // update tab labels
+  var tabs = [{tab:'heute',key:'tab_heute'},{tab:'lehre',key:'tab_lehre'},{tab:'praxis',key:'tab_praxis'},{tab:'tagebuch',key:'tab_tagebuch'},{tab:'bogen',key:'tab_weg'}];
+  tabs.forEach(function(x){
+    var btn = document.querySelector('#tabbar button[data-tab="'+x.tab+'"]');
+    if (btn) { var tn = btn.lastChild; if (tn && tn.nodeType === 3) tn.textContent = '\n      '+t(x.key)+'\n    '; }
+  });
+}
+
+function setLang(l) {
+  S.prefs.lang = l;
+  save();
+  applyLang();
+  renderPanel(activeTab);
+}
+
+═════════════
 
 const SK = "vier_unermesslichkeiten_v1";
 const defaultState = () => ({
@@ -948,7 +1701,7 @@ const Q_COLOR = {
   freude:     '#5BBB8A',
 };
 
-const QUIZ = {
+const QUIZ_DE = {
   gleichmut: [
     { frage: "Warum empfiehlt Longchenpa Anf\xE4nger:innen, mit der Praxis des Gleichmuts zu beginnen?",
       hinweis: "Mehrere Antworten richtig.",
@@ -1545,17 +2298,17 @@ function renderHeute() {
           + (s.mode ? ' · ' + esc(s.mode) : '') + '</div>'
           + notesHtml + '</div>';
       });
-      sessHtml = '<div class="card"><div class="label" style="margin-bottom:8px;">Heute geübt</div>' + rows + '</div>';
+      sessHtml = '<div class="card"><div class="label" style="margin-bottom:8px;">'+t('heute_geuebt')+'</div>' + rows + '</div>';
     } else {
       sessHtml = '<div class="card">'
-        + '<div class="label" style="margin-bottom:8px;">Noch nicht geübt</div>'
-        + '<div class="small muted" style="margin-bottom:12px;">Auch f\xFCnf Minuten z\xE4hlen. Was darf es heute sein?</div>'
+        + '<div class="label" style="margin-bottom:8px;">'+t('heute_nicht_geuebt')+'</div>'
+        + '<div class="small muted" style="margin-bottom:12px;">'+t('heute_fuenf_min')+'</div>'
         + '<div class="btn-row">'
-        + '<button class="btn-primary" onclick="quickStart(\'verse\')">Vers lesen</button>'
-        + '<button class="btn-secondary" onclick="quickStart(\'rezitation\')">Rezitation</button>'
-        + '<button class="btn-secondary" onclick="quickStart(\'kontemplation\')">Kontemplation</button>'
+        + '<button class="btn-primary" onclick="quickStart(\'verse\')">'+t('heute_vers')+'</button>'
+        + '<button class="btn-secondary" onclick="quickStart(\'rezitation\')">'+t('heute_rez')+'</button>'
+        + '<button class="btn-secondary" onclick="quickStart(\'kontemplation\')">'+t('heute_kontempl')+'</button>'
         + '</div>'
-        + '<button class="btn-ghost" onclick="showLogSheet()" style="margin-top:8px;padding-left:0;">Nur eintragen →</button>'
+        + '<button class="btn-ghost" onclick="showLogSheet()" style="margin-top:8px;padding-left:0;">'+t('heute_nur_eintragen')+'</button>'
         + '</div>';
     }
 
@@ -1579,35 +2332,35 @@ function renderHeute() {
       + '<div class="hero-bild">' + esc(phase.bild) + '</div>'
       + '<div class="hero-stats-row">'
       + (S.sessions.length === 0
-          ? '<div class="hero-stat" style="flex:1;text-align:center;"><span class="hero-stat-num" style="font-size:1.1rem;opacity:.85;">Erste Sitzung wartet</span><span class="hero-stat-label">Auch 5 Minuten z\xE4hlen</span></div>'
-          : '<div class="hero-stat"><span class="hero-stat-num">' + str + '</span><span class="hero-stat-label">Tage in Folge</span></div>'
+          ? '<div class="hero-stat" style="flex:1;text-align:center;"><span class="hero-stat-num" style="font-size:1.1rem;opacity:.85;">'+t('heute_erste_sitzung')+'</span><span class="hero-stat-label">'+t('heute_auch_5')+'</span></div>'
+          : '<div class="hero-stat"><span class="hero-stat-num">' + str + '</span><span class="hero-stat-label">'+t('heute_tage')+'</span></div>'
             + '<div class="hero-stat-sep"></div>'
-            + '<div class="hero-stat"><span class="hero-stat-num">' + wk.length + '</span><span class="hero-stat-label">Sitzungen</span></div>'
+            + '<div class="hero-stat"><span class="hero-stat-num">' + wk.length + '</span><span class="hero-stat-label">'+t('heute_sitzungen')+'</span></div>'
             + '<div class="hero-stat-sep"></div>'
-            + '<div class="hero-stat"><span class="hero-stat-num">' + wkMin + '</span><span class="hero-stat-label">Min. diese Woche</span></div>'
+            + '<div class="hero-stat"><span class="hero-stat-num">' + wkMin + '</span><span class="hero-stat-label">'+t('heute_min_woche')+'</span></div>'
         )
       + '</div>'
       + '</div>'
       + '<div class="card reminder">'
-      + '<div class="label" style="margin-bottom:6px;">Impuls f\xFCr heute</div>'
+      + '<div class="label" style="margin-bottom:6px;">'+t('heute_impuls')+'</div>'
       + '<div class="quote">„' + esc(rem.t) + '“</div>'
       + '<div style="margin-top:8px;"><span class="pill ' + remPillClass + '">' + remPillText + '</span></div>'
       + '</div>'
       + '<div class="card">'
-      + '<div class="label" style="margin-bottom:8px;">Aktueller Fokus</div>'
+      + '<div class="label" style="margin-bottom:8px;">'+t('heute_fokus')+'</div>'
       + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
       + '<span class="pill ' + phase.farbe + '">' + phase.name + '</span>'
       + '<span class="small muted">' + phase.sanskrit + '</span></div>'
       + '<div class="small" style="color:var(--ink-soft);margin-bottom:12px;">' + esc(phase.kernpunkt) + '</div>'
       + '<div class="btn-row">'
-      + '<button class="btn-primary" onclick="switchTab(\'praxis\')">Jetzt \xFCben</button>'
-      + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">Weg</button>'
+      + '<button class="btn-primary" onclick="switchTab(\'praxis\')">'+t('heute_jetzt_ueben')+'</button>'
+      + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">'+t('heute_weg')+'</button>'
       + '</div></div>'
       + (needsAssessmentPrompt()
           ? '<div class="card" style="border-left:4px solid var(--accent);">'
-            + '<div class="label" style="margin-bottom:6px;">Selbsteinsch\xE4tzung</div>'
-            + '<div class="small" style="color:var(--ink-soft);margin-bottom:10px;">Wie zeigen sich die vier Unermesslichkeiten in dir? Eine kurze Reflexion alle zwei Wochen.</div>'
-            + '<button class="btn-secondary" onclick="showAssessmentSheet(\'' + phase.id + '\')" style="padding:10px 18px;">Jetzt einsch\xE4tzen →</button>'
+            + '<div class="label" style="margin-bottom:6px;">'+t('heute_selbst')+'</div>'
+            + '<div class="small" style="color:var(--ink-soft);margin-bottom:10px;">'+t('heute_selbst_text')+'</div>'
+            + '<button class="btn-secondary" onclick="showAssessmentSheet(\'' + phase.id + '\')" style="padding:10px 18px;">'+t('heute_jetzt_einsch')+'</button>'
             + '</div>'
           : '')
       + sessHtml;
@@ -1634,9 +2387,9 @@ function renderLehre() {
   document.getElementById("panel-lehre").innerHTML = `
     <div style="padding-top:6px;">
       <div class="seg">
-        <button class="${lehreTab==='module'?'active':''}" onclick="setLehreTab('module')">Module</button>
-        <button class="${lehreTab==='sitzungen'?'active':''}" onclick="setLehreTab('sitzungen')">Sitzungen</button>
-        <button class="${lehreTab==='verse'?'active':''}" onclick="setLehreTab('verse')">Verse</button>
+        <button class="${lehreTab==='module'?'active':''}" onclick="setLehreTab('module')">${t('lehre_module')}</button>
+        <button class="${lehreTab==='sitzungen'?'active':''}" onclick="setLehreTab('sitzungen')">${t('lehre_sitzungen')}</button>
+        <button class="${lehreTab==='verse'?'active':''}" onclick="setLehreTab('verse')}">${t('lehre_verse')}</button>
       </div>
       <div id="lehre-body"></div>
     </div>
@@ -1644,10 +2397,10 @@ function renderLehre() {
   renderLehreBody();
 }
 
-function setLehreTab(t) {
-  lehreTab = t;
-  document.querySelectorAll("#panel-lehre .seg button").forEach(b=>{
-    b.classList.toggle("active", b.textContent.toLowerCase()===({module:"module",sitzungen:"sitzungen",verse:"verse"}[t]));
+function setLehreTab(tab) {
+  lehreTab = tab;
+  document.querySelectorAll("#panel-lehre .seg button").forEach((b,i)=>{
+    b.classList.toggle("active", ['module','sitzungen','verse'][i] === tab);
   });
   renderLehreBody();
 }
@@ -1671,9 +2424,9 @@ function renderLehreBody() {
       </div>
       ${MODULE.map(m=>`
         <div class="card" onclick="showModulSheet(${m.nr})" style="cursor:pointer;">
-          <div class="label" style="margin-bottom:4px;">Modul ${m.nr}</div>
+          <div class="label" style="margin-bottom:4px;">${t('lehre_module_lbl')} ${m.nr}</div>
           <div class="card-title">${esc(m.titel)}</div>
-          <div class="small muted">${m.verse.length} Vers${m.verse.length===1?'':'e'} · Studium · Kontemplation · Meditation · Alltag</div>
+          <div class="small muted">${m.verse.length} ${m.verse.length}${t('lehre_vers_e')} · ${t('lehre_studium')}</div>
         </div>
       `).join('')}
     `;
@@ -1681,16 +2434,16 @@ function renderLehreBody() {
     el.innerHTML = `
       ${EINHEITEN.map(e=>`
         <div class="card" onclick="showEinheitSheet(${e.nr})" style="cursor:pointer;">
-          <div class="label" style="margin-bottom:4px;">Einheit ${e.nr} · ${esc(e.datum)}</div>
+          <div class="label" style="margin-bottom:4px;">${t('lehre_einheit')} ${e.nr} · ${esc(e.datum)}</div>
           <div class="card-title">${esc(e.titel)}</div>
-          <div class="small muted">${e.punkte.length} Schwerpunkte</div>
+          <div class="small muted">${e.punkte.length}${t('lehre_schwerpunkte')}</div>
         </div>
       `).join('')}
     `;
   } else {
     el.innerHTML = `
       <div class="card">
-        <div class="card-title">Theravāda-Rezitation</div>
+        <div class="card-title">${t('lehre_rez_titel')}</div>
         <div class="verse">${esc(REZITATION)}</div>
         <div class="small muted">Diese vier Zeilen können vor jeder formellen Sitzung rezitiert werden.</div>
       </div>
@@ -1699,7 +2452,7 @@ function renderLehreBody() {
         <div class="small muted" style="margin-bottom:12px;">Aus „Ruhe finden in der Natur des Geistes"</div>
         ${VERSE.map(v=>`
           <details>
-            <summary>Vers ${v.n}</summary>
+            <summary>${t('lehre_vers_lbl')} ${v.n}</summary>
             <div class="verse">${esc(v.text)}</div>
           </details>
         `).join('')}
@@ -1712,17 +2465,17 @@ function showQSheet(id) {
   const q = getQ(id);
   openSheet(`
     <h2><span class="pill ${q.farbe}">${q.name}</span> <span class="small muted">${q.sanskrit}</span></h2>
-    <div><strong>Bild:</strong> ${esc(q.bild)}</div>
-    <div style="margin-top:8px;"><strong>In der Wiese:</strong> ${esc(q.metapher)}</div>
-    <div style="margin-top:8px;"><strong>Fokus:</strong> ${esc(q.fokus)}</div>
-    <div style="margin-top:8px;"><strong>Wunsch:</strong> <em>${esc(q.wunsch)}</em></div>
-    <div style="margin-top:8px;"><strong>Gegengift für:</strong> ${esc(q.gegengift)}</div>
-    <div style="margin-top:8px;"><strong>Nicht zu verwechseln mit:</strong> ${esc(q.verwechslung)}</div>
+    <div><strong>${t('q_bild')}:</strong> ${esc(q.bild)}</div>
+    <div style="margin-top:8px;"><strong>${t('q_wiese')}:</strong> ${esc(q.metapher)}</div>
+    <div style="margin-top:8px;"><strong>${t('q_fokus')}:</strong> ${esc(q.fokus)}</div>
+    <div style="margin-top:8px;"><strong>${t('q_wunsch')}:</strong> <em>${esc(q.wunsch)}</em></div>
+    <div style="margin-top:8px;"><strong>${t('q_gegen')}:</strong> ${esc(q.gegengift)}</div>
+    <div style="margin-top:8px;"><strong>${t('q_nicht')}:</strong> ${esc(q.verwechslung)}</div>
     <blockquote style="margin-top:12px;">${esc(q.kernpunkt)}</blockquote>
-    <div style="margin-top:12px;"><strong>Zeichen des Fortschritts:</strong><br><em>${esc(q.zeichen)}</em></div>
+    <div style="margin-top:12px;"><strong>${t('q_zeichen')}:</strong><br><em>${esc(q.zeichen)}</em></div>
     <div class="btn-row" style="margin-top:16px;">
-      <button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>showKontemplationListe('${id}'),80);">Kontemplieren</button>
-      <button class="btn-secondary" onclick="_closeSheet()">Schließen</button>
+      <button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>showKontemplationListe('${id}'),80);">${t('q_kontemplieren')}</button>
+      <button class="btn-secondary" onclick="_closeSheet()">${t('schliessen')}</button>
     </div>
   `);
 }
@@ -1731,38 +2484,38 @@ function showModulSheet(nr) {
   const m = MODULE.find(x=>x.nr===nr);
   const verseHtml = m.verse.map(n=>{
     const v = VERSE.find(x=>x.n===n);
-    return v ? `<details><summary>Vers ${v.n}</summary><div class="verse">${esc(v.text)}</div></details>` : '';
+    return v ? `<details><summary>${t('lehre_vers_lbl')} ${v.n}</summary><div class="verse">${esc(v.text)}</div></details>` : '';
   }).join('');
   openSheet(`
-    <div class="label">Modul ${m.nr}</div>
+    <div class="label">${t('modul_lbl')} ${m.nr}</div>
     <h2 style="margin-bottom:14px;">${esc(m.titel)}</h2>
 
-    <details open><summary><strong>Studium</strong></summary>
+    <details open><summary><strong>${t('modul_studium')}</strong></summary>
       <div style="margin-top:10px;">
-        <div class="small muted" style="margin-bottom:6px;">Kernfragen</div>
+        <div class="small muted" style="margin-bottom:6px;">${t('modul_kernfragen')}</div>
         <ul style="padding-left:18px;line-height:1.8;">${m.kernfragen.map(f=>`<li class="small">${esc(f)}</li>`).join('')}</ul>
-        <div class="small muted" style="margin-top:10px;margin-bottom:6px;">Begriffe</div>
+        <div class="small muted" style="margin-top:10px;margin-bottom:6px;">${t('modul_begriffe')}</div>
         ${m.begriffe.map(b=>`<div style="margin-bottom:8px;"><strong class="small">${esc(b.t)}</strong><div class="small muted">${esc(b.d)}</div></div>`).join('')}
       </div>
     </details>
     <hr class="divider">
 
-    <details><summary><strong>Verse</strong></summary>
+    <details><summary><strong>${t('modul_verse')}</strong></summary>
       <div style="margin-top:10px;">${verseHtml}</div>
     </details>
     <hr class="divider">
 
-    <details><summary><strong>Kontemplation</strong></summary>
+    <details><summary><strong>${t('modul_kontempl')}</strong></summary>
       <div style="margin-top:10px;white-space:pre-line;font-size:.9rem;color:var(--ink-soft);">${esc(m.kontemplation)}</div>
     </details>
     <hr class="divider">
 
-    <details><summary><strong>Formelle Meditation</strong></summary>
+    <details><summary><strong>${t('modul_med')}</strong></summary>
       <div style="margin-top:10px;white-space:pre-line;font-size:.9rem;color:var(--ink-soft);">${esc(m.meditation)}</div>
     </details>
     <hr class="divider">
 
-    <details><summary><strong>Alltag</strong></summary>
+    <details><summary><strong>${t('modul_alltag')}</strong></summary>
       <ul style="margin-top:10px;padding-left:18px;">
         ${m.alltag.map(a=>`<li class="small" style="margin-bottom:8px;color:var(--ink-soft);">${esc(a)}</li>`).join('')}
       </ul>
@@ -1777,14 +2530,14 @@ function showModulSheet(nr) {
 function showEinheitSheet(nr) {
   const e = EINHEITEN.find(x=>x.nr===nr);
   openSheet(`
-    <div class="label">Sitzung ${e.nr} · ${esc(e.datum)}</div>
+    <div class="label">${t('sitzung_lbl')} ${e.nr} · ${esc(e.datum)}</div>
     <h2 style="margin-bottom:14px;">${esc(e.titel)}</h2>
-    <div class="small muted" style="margin-bottom:6px;">Schwerpunkte</div>
+    <div class="small muted" style="margin-bottom:6px;">${t('sitzung_schwerpunkte')}</div>
     <ul style="padding-left:18px;line-height:1.8;margin-bottom:14px;">
       ${e.punkte.map(p=>`<li class="small">${esc(p)}</li>`).join('')}
     </ul>
     ${e.zitate.map(z=>`<blockquote>${esc(z)}</blockquote>`).join('')}
-    ${e.link?`<div style="margin-top:14px;"><a href="${esc(e.link)}" target="_blank" rel="noopener" style="color:var(--accent);font-size:.88rem;">Transkript →</a></div>`:''}
+    ${e.link?`<div style="margin-top:14px;"><a href="${esc(e.link)}" target="_blank" rel="noopener" style="color:var(--accent);font-size:.88rem;">${t('transkript')}</a></div>`:''}
     <div class="btn-row" style="margin-top:16px;">
       <button class="btn-secondary" onclick="_closeSheet()">Schließen</button>
     </div>
@@ -1834,19 +2587,19 @@ function renderPraxis() {
     <div class="mode-list">
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('rezitation')">
         <div class="mode-icon-wrap">${svgRezitation}</div>
-        <div><div class="m-title">Rezitation</div><div class="m-desc">Die vier Zeilen als Ausrichtung des Geistes</div></div>
+        <div><div class="m-title">${t('rez_titel')}</div><div class="m-desc">${t('rez_desc')}</div></div>
       </button>
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('verse')">
         <div class="mode-icon-wrap">${svgVers}</div>
-        <div><div class="m-title">Vers lesen</div><div class="m-desc">Einen Vers Longchenpas kontemplieren</div><div class="m-badge">n\xE4chster: Vers ${nextVerse} von ${VERSE.length}</div></div>
+        <div><div class="m-title">${t('vers_titel')}</div><div class="m-desc">${t('vers_desc')}</div><div class="m-badge">n\xE4chster: Vers ${nextVerse} von ${VERSE.length}</div></div>
       </button>
       <button class="mode-btn" onclick="selectModeBtn(this);showKontemplationListe(S.arc.currentPhase)">
         <div class="mode-icon-wrap">${svgKontempl}</div>
-        <div><div class="m-title">Kontemplation</div><div class="m-desc">Schritt-f\xFCr-Schritt Anleitung</div></div>
+        <div><div class="m-title">${t('kontempl_titel')}</div><div class="m-desc">${t('kontempl_desc')}</div></div>
       </button>
       <button class="mode-btn" onclick="selectModeBtn(this);startMode('stille')">
         <div class="mode-icon-wrap">${svgStille}</div>
-        <div><div class="m-title">Stille + Timer</div><div class="m-desc">Ruhe mit Glocke am Anfang und Ende</div><div class="m-badge">${S.prefs.timerDefault}\xA0Minuten</div></div>
+        <div><div class="m-title">${t('stille_titel')}</div><div class="m-desc">${t('stille_desc')}</div><div class="m-badge">${S.prefs.timerDefault}\xA0Minuten</div></div>
       </button>
     </div>
     ${recentHtml}
@@ -1856,8 +2609,8 @@ function renderPraxis() {
 
 function showFokusSheet() {
   openSheet(`
-    <h2>Fokus wählen</h2>
-    <div class="small muted" style="margin-bottom:14px;">Welche Qualität steht gerade im Vordergrund?</div>
+    <h2>${t('fokus_waehlen')}</h2>
+    <div class="small muted" style="margin-bottom:14px;">${t('fokus_hint')}</div>
     ${QUALITAETEN.map(q=>`
       <div onclick="setFokus('${q.id}')" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer;background:${q.id===S.arc.currentPhase?'var(--bg-soft)':'transparent'};">
         <span class="pill ${q.farbe}">${q.name}</span>
@@ -1885,7 +2638,7 @@ function setFokus(id) {
   }
   _closeSheet();
   renderPraxis();
-  toast("Fokus: " + getQ(id).name);
+  toast(t('heute_fokus')+': ' + getQ(id).name);
 }
 
 // ─── Runner ───────────────────────────────────
@@ -1903,10 +2656,10 @@ function startMode(mode) {
 
   if (mode==="rezitation") {
     RN = { mode, step:0, t0:Date.now(), timer:null, dur:5, qId:null, steps:[
-      {stage:"Vorbereitung", text:"Setze dich bequem hin. Ein paar Atemzüge ankommen lassen.", it:false},
-      {stage:"Rezitation", text:REZITATION, it:true},
-      {stage:"Verweilen", text:"Lass die Worte nachklingen. Ruhe einen Moment im Wunsch selbst.", it:false},
-      {stage:"Abschluss", text:"Widme die Tugend allen Wesen.", it:false},
+      {stage:t('runner_vor'), text:t('runner_rez_text'), it:false},
+      {stage:t('rez_titel'), text:REZITATION, it:true},
+      {stage:t('runner_verweilen'), text:t('runner_rez_verweilen'), it:false},
+      {stage:t('runner_abschluss'), text:t('runner_rez_abschluss'), it:false},
     ]};
   } else if (mode==="verse") {
     if (S.verseIdx === undefined) S.verseIdx = 0;
@@ -1914,9 +2667,9 @@ function startMode(mode) {
     const v = VERSE[idx];
     S.verseIdx = idx + 1; save();
     RN = { mode, step:0, t0:Date.now(), timer:null, dur:8, qId:null, steps:[
-      {stage:"Vers "+v.n+" von "+VERSE.length+" · Longchenpa", text:v.text, it:true},
-      {stage:"Verweilen", text:"Welcher Satz hallt nach? Bleib bei ihm.", it:false},
-      {stage:"Abschluss", text:"Eine kurze Notiz oder einfach gehen lassen.", it:false},
+      {stage:t('lehre_vers_lbl')+' '+v.n+' / '+VERSE.length+' · Longchenpa', text:v.text, it:true},
+      {stage:t('runner_verweilen'), text:t('runner_vers_verweilen'), it:false},
+      {stage:t('runner_abschluss'), text:t('runner_vers_abschluss'), it:false},
     ]};
   }
   renderRunner();
@@ -1931,18 +2684,18 @@ function showKontemplationListe(qId) {
   const list = KONTEMPLATIONEN[qId]||[];
   el.innerHTML = `
     <div style="margin-bottom:12px;">
-      <div class="label" style="margin-bottom:6px;">Kontemplation</div>
+      <div class="label" style="margin-bottom:6px;">${t('kontempl_titel')}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
         ${QUALITAETEN.map(x=>`<button class="btn-${x.id===qId?'secondary':'ghost'}" onclick="showKontemplationListe('${x.id}')" style="padding:6px 12px;font-size:.82rem;">${x.name}</button>`).join('')}
       </div>
       ${list.map((k,i)=>`
         <div class="list-item" onclick="startKontemplation('${qId}',${i})">
           <div class="li-title">${esc(k.titel)}</div>
-          <div class="li-sub">${k.schritte.length} Schritte</div>
+          <div class="li-sub">${k.schritte.length}${t('schritte')}</div>
         </div>
       `).join('')}
     </div>
-    <button class="btn-ghost" onclick="endRunner()" style="padding:8px 0;">Schließen</button>
+    <button class="btn-ghost" onclick="endRunner()" style="padding:8px 0;">${t('schliessen')}</button>
   `;
 }
 
@@ -1950,10 +2703,10 @@ function startKontemplation(qId, idx) {
   const k = KONTEMPLATIONEN[qId][idx];
   const q = getQ(qId);
   RN = { mode:"kontemplation", step:0, t0:Date.now(), timer:null, dur:0, qId, steps:[
-    {stage:"Vorbereitung · "+q.name, text:"Setze dich bequem hin. Ein paar Atemzüge. Optional die vier Zeilen rezitieren.", it:false},
+    {stage:t('runner_vor')+' · '+q.name, text:t('kontempl_vor_text'), it:false},
     ...k.schritte.map(s=>({stage:esc(k.titel), text:s, it:false})),
-    {stage:"Verweilen", text:"Bleib einen Moment in dem, was sich gezeigt hat.", it:false},
-    {stage:"Abschluss", text:"Widmung. Lass die Wirkung sich entfalten.", it:false},
+    {stage:t('runner_verweilen'), text:t('kontempl_verweilen'), it:false},
+    {stage:t('runner_abschluss'), text:t('kontempl_abschluss'), it:false},
   ]};
   const el = document.getElementById("runner");
   if (el) { el.style.display="block"; el.scrollIntoView({behavior:"smooth",block:"start"}); }
@@ -1969,11 +2722,11 @@ function renderRunner() {
     <div class="runner-stage">${esc(step.stage||'')} · ${RN.step+1}/${RN.steps.length}</div>
     <div class="runner-text${step.it?' italic':''}">${esc(step.text)}</div>
     <div class="runner-controls">
-      ${RN.step>0?`<button class="btn-secondary" onclick="rnPrev()">← Zurück</button>`:''}
+      ${RN.step>0?`<button class="btn-secondary" onclick="rnPrev()">${t('runner_zurueck')}</button>`:''}
       ${RN.step<RN.steps.length-1
-        ?`<button class="btn-primary" onclick="rnNext()">Weiter →</button>`
-        :`<button class="btn-primary" onclick="finishRunner()">Sitzung abschließen ✓</button>`}
-      <button class="btn-ghost" onclick="endRunner()">Beenden</button>
+        ?`<button class="btn-primary" onclick="rnNext()">${t('runner_weiter')}</button>`
+        :`<button class="btn-primary" onclick="finishRunner()">${t('runner_abschliessen')}</button>`}
+      <button class="btn-ghost" onclick="endRunner()">${t('runner_beenden')}</button>
     </div>
   `;
 }
@@ -2000,17 +2753,17 @@ function showTimerSetup() {
   const el = document.getElementById("runner");
   el.style.display="block";
   el.innerHTML = `
-    <div style="margin-bottom:16px;"><strong>Stille mit Timer</strong></div>
-    <label class="field"><span>Dauer (Minuten)</span>
+    <div style="margin-bottom:16px;"><strong>${t('timer_titel')}</strong></div>
+    <label class="field"><span>${t('timer_dauer')}</span>
       <input type="number" id="timer-dur" value="${S.prefs.timerDefault}" min="1" max="180" style="max-width:120px;">
     </label>
     <label class="field" style="display:flex;align-items:center;gap:8px;font-size:.9rem;">
       <input type="checkbox" id="timer-bell" ${S.prefs.bell?'checked':''}>
-      Glocke am Anfang und Ende
+      ${t('timer_glocke')}
     </label>
     <div class="btn-row">
-      <button class="btn-primary" onclick="startTimer()">Starten</button>
-      <button class="btn-ghost" onclick="endRunner()">Abbrechen</button>
+      <button class="btn-primary" onclick="startTimer()">${t('timer_start')}</button>
+      <button class="btn-ghost" onclick="endRunner()">${t('runner_abbrechen')}</button>
     </div>
   `;
 }
@@ -2038,9 +2791,9 @@ function startTimer() {
         </svg>
         <div class="timer-display">${m}:${pad(s)}</div>
       </div>
-      <div class="small muted" style="text-align:center;margin-bottom:20px;">In Stille sitzen</div>
+      <div class="small muted" style="text-align:center;margin-bottom:20px;">${t('runner_stille')}</div>
       <div class="runner-controls">
-        <button class="btn-secondary" onclick="finishRunner()">Beenden &amp; eintragen</button>
+        <button class="btn-secondary" onclick="finishRunner()">${t('runner_beenden_eintragen')}</button>
         <button class="btn-ghost" onclick="endRunner()">Abbrechen</button>
       </div>
     `;
@@ -2077,27 +2830,27 @@ function showLogSheet(pre={}) {
   const notes = pre.notes||"";
   const isEdit = !!_editId;
   openSheet(`
-    <h2>${isEdit ? 'Sitzung bearbeiten' : 'Sitzung eintragen'}</h2>
-    <label class="field"><span>Datum</span>
+    <h2>${isEdit ? t('log_bearbeiten') : t('log_eintragen_neu')}</h2>
+    <label class="field"><span>${t('log_datum')}</span>
       <input type="date" id="log-date" value="${date}">
     </label>
-    <label class="field"><span>Dauer (Minuten)</span>
+    <label class="field"><span>${t('log_dauer')}</span>
       <input type="number" id="log-dur" value="${dur}" placeholder="z.B. 20" min="0">
     </label>
-    <label class="field"><span>Fokus</span>
+    <label class="field"><span>${t('log_fokus')}</span>
       <select id="log-focus">
         ${QUALITAETEN.map(q=>`<option value="${q.id}"${q.id===focus?' selected':''}>${q.name} (${q.sanskrit})</option>`).join('')}
-        <option value="alle"${focus==='alle'?' selected':''}>Alle vier</option>
+        <option value="alle"${focus==='alle'?' selected':''}}>${t('log_alle_vier')}</option>
       </select>
     </label>
-    <label class="field"><span>Modus</span>
-      <input type="text" id="log-mode" value="${esc(mode)}" placeholder="Stille, Vers, Kontemplation …">
+    <label class="field"><span>${t('log_modus')}</span>
+      <input type="text" id="log-mode" value="${esc(mode)}" placeholder="${t('log_modus_ph')}">
     </label>
-    <label class="field"><span>Erfahrung (optional)</span>
-      <textarea id="log-notes" placeholder="Was hat sich gezeigt? Welche Klarheit, welche Schwierigkeit?">${esc(notes)}</textarea>
+    <label class="field"><span>${t('log_erfahrung')}</span>
+      <textarea id="log-notes" placeholder="${t('log_notes_ph')}">${esc(notes)}</textarea>
     </label>
     <div class="btn-row">
-      <button class="btn-primary" onclick="saveLog()">${isEdit ? 'Speichern' : 'Eintragen'}</button>
+      <button class="btn-primary" onclick="saveLog()">${isEdit ? t('log_speichern') : t('log_eintragen')}</button>
       <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>
     </div>
   `);
@@ -2131,7 +2884,7 @@ function saveLog() {
     }
     if (changed) save();
   }
-  _closeSheet(); toast("Eingetragen ✓");
+  _closeSheet(); toast(t('log_eingetragen'));
   if (_logAfter) { _logAfter(); _logAfter=null; }
   renderPanel(activeTab);
   checkBackupDue();
@@ -2145,16 +2898,16 @@ function renderTagebuch() {
   document.getElementById("panel-tagebuch").innerHTML = `
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div class="card-title" style="margin:0;">Tagebuch</div>
-        <button class="btn-primary" onclick="showLogSheet()" style="padding:8px 14px;font-size:.85rem;">+ Neu</button>
+        <div class="card-title" style="margin:0;">${t('tj_title')}</div>
+        <button class="btn-primary" onclick="showLogSheet()" style="padding:8px 14px;font-size:.85rem;">${t('tj_neu')}</button>
       </div>
       <div class="search-wrap">
         <div class="search-icon">⌕</div>
-        <input type="text" id="j-search" placeholder="Suchen …" oninput="filterJournal()">
+        <input type="text" id="j-search" placeholder="${t('tj_suchen')}" oninput="filterJournal()">
       </div>
     </div>
     <div class="card" id="j-list">
-      ${S.sessions.length===0?`<div class="muted small">Noch keine Einträge.</div>`:
+      ${S.sessions.length===0?`<div class="muted small">${t('tj_leer')}</div>`:
         S.sessions.map(s=>{
           const q=getQ(s.focus);
           return `<div class="j-entry" data-s="${esc((s.notes||'')+(s.mode||'')+(q?.name||''))}">
@@ -2168,7 +2921,7 @@ function renderTagebuch() {
                 <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 2px;" title="L\xF6schen">×</button>
               </span>
             </div>
-            ${s.notes?`<div class="j-text">${esc(s.notes)}</div>`:`<div class="small muted">– keine Notizen –</div>`}
+            ${s.notes?`<div class="j-text">${esc(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
           </div>`;
         }).join('')
       }
@@ -2185,9 +2938,9 @@ function filterJournal() {
 }
 
 function delSession(id) {
-  if (!confirm("Eintrag löschen?")) return;
+  if (!confirm(t('tj_loeschen'))) return;
   S.sessions = S.sessions.filter(s=>s.id!==id);
-  save(); renderTagebuch(); toast("Gelöscht");
+  save(); renderTagebuch(); toast(t('tj_geloescht'));
 }
 
 // ═══════════════════════════════════════════════
@@ -2196,9 +2949,9 @@ function delSession(id) {
 
 function renderLernpfad() {
   const aspects = [
-    { key:'studium',      label:'Studium',   icon:'S' },
-    { key:'kontemplation',label:'Kontempl.', icon:'K' },
-    { key:'meditation',   label:'Medit.',    icon:'M' }
+    { key:'studium',      label:t('lp_studium'),   icon:'S' },
+    { key:'kontemplation',label:t('lp_kontempl'), icon:'K' },
+    { key:'meditation',   label:t('lp_medit'),    icon:'M' }
   ];
   const rows = QUALITAETEN.map(q => {
     const locked = isQualitySoftLocked(q.id);
@@ -2223,34 +2976,34 @@ function renderLernpfad() {
     </div>`;
   }).join('');
   return `<div class="card">
-    <div class="card-title" style="margin-bottom:10px;">Lernpfad</div>
+    <div class="card-title" style="margin-bottom:10px;">${t('lp_titel')}</div>
     <div class="path-header">
       <div></div>
       ${aspects.map(a=>`<div class="path-hcell">${a.label}</div>`).join('')}
     </div>
     ${rows}
-    <div class="small muted" style="margin-top:6px;line-height:1.6;">Studium: Quiz · Kontemplation &amp; Meditation: werden beim \xDCben automatisch abgehakt</div>
+    <div class="small muted" style="margin-top:6px;line-height:1.6;">${t('lp_hint')}</div>
   </div>`;
 }
 
 function showPathInfo(qid, aspect) {
   const q = getQ(qid);
   const done = isPathDone(qid, aspect);
-  const name = aspect === 'kontemplation' ? 'Kontemplation' : 'Meditation';
+  const name = aspect === 'kontemplation' ? t('kontempl_titel') : t('modul_med');
   const hint = aspect === 'kontemplation'
-    ? 'Schlie\xDFe eine Kontemplations-Sitzung mit diesem Fokus ab – sie wird automatisch hier eingetragen.'
-    : 'Schlie\xDFe eine Stille-Sitzung (Timer) mit diesem Fokus ab – sie wird automatisch hier eingetragen.';
+    ? t('pi_kontempl_hint')
+    : t('pi_med_hint');
   openSheet(`
     <h2>${name} · <span class="pill ${q.farbe}">${q.name}</span></h2>
     ${done
-      ? '<div style="color:#1a5c3a;font-weight:600;margin-bottom:12px;">✓ Abgeschlossen</div>'
+      ? t('pi_abgeschlossen')
       : `<div class="small muted" style="margin-bottom:12px;">${hint}</div>`}
-    <div class="small muted" style="margin-bottom:14px;font-style:italic;">Zeichen: ${esc(q.zeichen)}</div>
+    <div class="small muted" style="margin-bottom:14px;font-style:italic;">${t('pi_zeichen')}: ${esc(q.zeichen)}</div>
     <div class="btn-row">
       ${!done && aspect === 'kontemplation'
-        ? `<button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>showKontemplationListe('${qid}'),80);">Jetzt kontemplieren</button>`
+        ? `<button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>showKontemplationListe('${qid}'),80);">'+t('pi_jetzt_kontempl')+'</button>`
         : !done
-        ? `<button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>startMode('stille'),80);">Jetzt meditieren</button>`
+        ? `<button class="btn-primary" onclick="_closeSheet();switchTab('praxis');setTimeout(()=>startMode('stille'),80);">'+t('pi_jetzt_med')+'</button>`
         : ''}
       <button class="btn-secondary" onclick="_closeSheet()">Schlie\xDFen</button>
     </div>
@@ -2570,7 +3323,7 @@ function renderBogen() {
     + '</div>';
 
   // ── Segment bar ──────────────────────────────────
-  var segs = [['ueberblick','\xDCberblick'],['lernpfad','Lernpfad'],['reflexion','Reflexion']];
+  var segs = [['ueberblick',t('weg_ueberblick')],['lernpfad',t('weg_lernpfad')],['reflexion',t('weg_reflexion')]];
   var segBarHTML = '<div class="seg-bar">';
   segs.forEach(function(s){
     segBarHTML += '<button class="seg-btn'+(s[0]===_wegSeg?' seg-active':'')+'" onclick="switchWegSeg(\''+s[0]+'\')">'
@@ -2618,7 +3371,7 @@ function renderBogen() {
           return '<div style="margin-bottom:12px;">'
             +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
             +'<span class="pill '+q.farbe+'">'+q.name+'</span>'
-            +'<span class="small muted">'+d.c+' Sitzungen · '+d.m+' Min.</span></div>'
+            +'<span class="small muted">'+d.c+' '+t('weg_sitzungen_ges')+' · '+d.m+' min</span></div>'
             +'<div class="stat-bar-bg"><div class="stat-bar" style="width:'+pct+'%;background:'+c+';"></div></div>'
             +'</div>';
         }).join('')
@@ -2658,8 +3411,8 @@ function renderBogen() {
       + '</div>';
 
     segContent += '<div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">'
-      + 'Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.<br>'
-      + 'Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.<br>'
+      + t('weg_footer')+'<br>'
+      + t('weg_footer2')+'<br>'
       + '<span style="font-size:.7rem;opacity:.5;">v18</span></div>';
 
   } else if (_wegSeg === 'lernpfad') {
@@ -2712,7 +3465,7 @@ function renderBogen() {
   }
 
   document.getElementById('panel-bogen').innerHTML =
-    '<div class="panel-header"><h1>Weg</h1><div class="sub">Dein Praxis-Bogen &amp; Fortschritt</div></div>'
+    "<div class=\"panel-header\"><h1>"+t('tab_weg')+"</h1><div class=\"sub\">"+t('weg_footer')+"</div></div>"
     + stepperHTML
     + segBarHTML
     + '<div id="weg-seg-content">'
@@ -2763,7 +3516,7 @@ async function shareBackup() {
         S.sessionsSinceBackup = 0;
         save();
         dismissBackupBanner();
-        toast("Backup gespeichert ✓");
+        toast(t('backup_gespeichert'));
         return;
       } catch(e) { if (e.name !== 'AbortError') console.warn(e); else return; }
     }
@@ -2901,6 +3654,7 @@ function finishOnboarding() {
 // ═══════════════════════════════════════════════
 
 renderHeute();
+applyLang();
 showOnboarding();
 setTimeout(checkBackupDue, 1000);
 
