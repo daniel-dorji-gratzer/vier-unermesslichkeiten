@@ -3652,7 +3652,9 @@ function finishOnboarding() {
 //  INIT
 // ═══════════════════════════════════════════════
 
-applyLang();
+try { applyLang(); } catch(e) {
+  document.getElementById("panel-heute").innerHTML = '<div class="card"><div class="card-title">Fehler beim Laden</div><div class="small muted">applyLang: ' + String(e) + '</div></div>';
+}
 renderHeute();
 showOnboarding();
 setTimeout(checkBackupDue, 1000);
