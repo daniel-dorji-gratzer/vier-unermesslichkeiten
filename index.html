@@ -28,10 +28,10 @@
   --safe-bot: env(safe-area-inset-bottom, 0px);
   --shadow: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.07);
   --r: 18px;
-  --kap-gleichmut-bg: #e8f3fa;
-  --kap-liebe-bg: #fef9df;
-  --kap-mitgefuehl-bg: #f3e8fb;
-  --kap-freude-bg: #e2f5eb;
+  --kap-gleichmut-border: #1a5878;
+  --kap-liebe-border: #6a4800;
+  --kap-mitgefuehl-border: #5a1080;
+  --kap-freude-border: #1a5c3a;
 }
 /* ── Dark mode variables ── */
 :root[data-theme="dark"] {
@@ -46,10 +46,10 @@
   --accent-bg: #2c181b;
   --line: #3a332d;
   --shadow: 0 1px 4px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.5);
-  --kap-gleichmut-bg: #162535;
-  --kap-liebe-bg: #2e2200;
-  --kap-mitgefuehl-bg: #210f38;
-  --kap-freude-bg: #0a2b18;
+  --kap-gleichmut-border: #6ec5f0;
+  --kap-liebe-border: #f5d070;
+  --kap-mitgefuehl-border: #d49cf0;
+  --kap-freude-border: #60d090;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
@@ -64,10 +64,10 @@
     --accent-bg: #2c181b;
     --line: #3a332d;
     --shadow: 0 1px 4px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.5);
-    --kap-gleichmut-bg: #162535;
-    --kap-liebe-bg: #2e2200;
-    --kap-mitgefuehl-bg: #210f38;
-    --kap-freude-bg: #0a2b18;
+    --kap-gleichmut-border: #6ec5f0;
+    --kap-liebe-border: #f5d070;
+    --kap-mitgefuehl-border: #d49cf0;
+    --kap-freude-border: #60d090;
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -2600,11 +2600,10 @@ function renderLehreBody() {
         ${KAPITEL.map((kap,ki)=>{
           var kapVerse = kap.verse.map(n=>VERSE.find(v=>v.n===n)).filter(Boolean);
           var nummern = kap.verse.length===1 ? t('lehre_vers_lbl')+' '+kap.verse[0] : t('lehre_vers_lbl')+' '+kap.verse[0]+'–'+kap.verse[kap.verse.length-1];
-          var bg = kap.farbe ? 'var(--kap-'+kap.farbe+'-bg)' : 'var(--bg-soft)';
-          var dot = kap.farbe ? '<span class="pill '+kap.farbe+'" style="font-size:.68rem;padding:1px 6px;vertical-align:middle;margin-right:6px;">&#x25CF;</span>' : '<span style="display:inline-block;width:20px;margin-right:6px;"></span>';
-          return `<details style="background:${bg};border-radius:12px;padding:10px 14px;margin-bottom:8px;">
+          var borderCol = kap.farbe ? 'var(--kap-'+kap.farbe+'-border)' : 'var(--line)';
+          return `<details style="background:var(--bg-soft);border-radius:12px;padding:10px 14px;margin-bottom:8px;border-left:3px solid ${borderCol};">
             <summary style="font-weight:600;display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;-webkit-appearance:none;">
-              <span style="display:flex;align-items:center;">${dot}${ki+1}. ${t(kap.key)}</span>
+              <span>${ki+1}. ${t(kap.key)}</span>
               <span class="small muted" style="font-weight:400;white-space:nowrap;margin-left:8px;">${nummern}</span>
             </summary>
             <div style="margin-top:10px;border-top:1px solid var(--line);padding-top:6px;">
