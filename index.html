@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
+<meta name="theme-color" content="#f4f1ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1714" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>Vier Unermesslichkeiten</title>
@@ -27,15 +29,44 @@
   --shadow: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.07);
   --r: 18px;
 }
+/* ── Dark mode variables ── */
+:root[data-theme="dark"] {
+  --bg: #1c1714;
+  --bg-card: #252019;
+  --bg-soft: #302924;
+  --ink: #f0ebe5;
+  --ink-soft: #c5b8b0;
+  --ink-muted: #7a6d66;
+  --accent: #c97a82;
+  --accent-soft: #e8a0a8;
+  --accent-bg: #2c181b;
+  --line: #3a332d;
+  --shadow: 0 1px 4px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.5);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --bg: #1c1714;
+    --bg-card: #252019;
+    --bg-soft: #302924;
+    --ink: #f0ebe5;
+    --ink-soft: #c5b8b0;
+    --ink-muted: #7a6d66;
+    --accent: #c97a82;
+    --accent-soft: #e8a0a8;
+    --accent-bg: #2c181b;
+    --line: #3a332d;
+    --shadow: 0 1px 4px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.5);
+  }
+}
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { height: 100%; }
-body { height: 100%; overflow: hidden; background: #fff; color: var(--ink);
+body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--ink);
   font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px;
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { display: flex; flex-direction: column;
   position: fixed; inset: 0;
   padding-top: env(safe-area-inset-top, 0px);
-  background: #fff; }
+  background: var(--bg-card); }
 #content { background: var(--bg); }
 
 /* ── Tab content ── */
@@ -51,7 +82,7 @@ body { height: 100%; overflow: hidden; background: #fff; color: var(--ink);
 .panel-header .sub { font-size: .88rem; color: var(--ink-muted); margin-top: 3px; }
 
 /* ── Bottom tab bar ── */
-#tabbar { flex-shrink: 0; background: rgba(255,255,255,.94);
+#tabbar { flex-shrink: 0; background: rgba(255,255,255,.94); --tabbar-dark-bg: rgba(28,23,20,.96);
   backdrop-filter: saturate(200%) blur(24px); -webkit-backdrop-filter: saturate(200%) blur(24px);
   border-top: 1px solid var(--line);
   display: flex; padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -75,6 +106,34 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 14px 0; }
 /* ── Accent card header strip ── */
 .card-accent { border-top: 3px solid var(--accent); }
 .card-accent .card-title { color: var(--accent); }
+
+/* ── Dark-mode element overrides ── */
+:root[data-theme="dark"] #tabbar { background: rgba(28,23,20,.96); }
+:root[data-theme="dark"] .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
+:root[data-theme="dark"] .pill.liebe      { background: #3d2d00; color: #f5d070; }
+:root[data-theme="dark"] .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
+:root[data-theme="dark"] .pill.freude     { background: #0e3520; color: #60d090; }
+:root[data-theme="dark"] .quiz-opt.correct { border-color: #5BBB8A; background: #0d3522; color: var(--ink); }
+:root[data-theme="dark"] .quiz-opt.wrong   { border-color: #c97a82; background: #2c181b; color: var(--ink); }
+:root[data-theme="dark"] .quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
+:root[data-theme="dark"] .quiz-opt.wrong   .quiz-opt-dot { border-color: #c97a82; background: #c97a82; }
+:root[data-theme="dark"] input, :root[data-theme="dark"] textarea, :root[data-theme="dark"] select {
+  background: var(--bg-soft); color: var(--ink); border-color: var(--line); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) #tabbar { background: rgba(28,23,20,.96); }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.liebe      { background: #3d2d00; color: #f5d070; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.freude     { background: #0e3520; color: #60d090; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.correct { border-color: #5BBB8A; background: #0d3522; color: var(--ink); }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.wrong   { border-color: #c97a82; background: #2c181b; color: var(--ink); }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.wrong   .quiz-opt-dot { border-color: #c97a82; background: #c97a82; }
+  :root:not([data-theme="light"]):not([data-theme="dark"]) input,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) textarea,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) select {
+    background: var(--bg-soft); color: var(--ink); border-color: var(--line); }
+}
 
 /* ── Typography ── */
 .muted { color: var(--ink-muted); }
@@ -459,7 +518,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   min-width: 20px; padding-top: 1px; }
 .ob-step-text { font-size: .87rem; line-height: 1.5; opacity: .9; }
 .ob-btn-main { width: 100%; padding: 15px; border-radius: 14px; border: none;
-  background: #fff; font-size: 1rem; font-weight: 700; font-family: inherit;
+  background: var(--bg-card); font-size: 1rem; font-weight: 700; font-family: inherit;
   cursor: pointer; touch-action: manipulation; transition: opacity .1s; }
 .ob-btn-main:active { opacity: .85; }
 .ob-btn-skip { background: none; border: none; color: rgba(255,255,255,.55);
@@ -495,7 +554,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   font-size: .78rem; font-weight: 600; color: var(--ink-muted);
   font-family: inherit; border-radius: 8px; cursor: pointer;
   transition: all .18s; touch-action: manipulation; }
-.seg-btn.seg-active { background: #fff; color: var(--ink);
+.seg-btn.seg-active { background: var(--bg-card); color: var(--ink);
   box-shadow: 0 1px 4px rgba(0,0,0,.10); }
 </style>
 </head>
@@ -1494,7 +1553,7 @@ const STRINGS = {
     weg_reset_confirm:'Wirklich alle Daten löschen?',
     weg_footer:'Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.',
     weg_footer2:'Belehrungen mit Trinley Tulku, Mai 2026 · Flourishing Society.',
-    weg_lang:'Sprache',
+    weg_lang:'Sprache', weg_erscheinungsbild:'Erscheinungsbild', weg_hell:'Hell', weg_dunkel:'Dunkel', weg_auto:'Auto',
     lp_titel:'Lernpfad', lp_studium:'Studium', lp_kontempl:'Kontempl.', lp_medit:'Medit.',
     lp_hint:'Studium: Quiz · Kontemplation & Meditation: werden beim Üben automatisch abgehakt',
     pi_abgeschlossen:'✓ Abgeschlossen', pi_zeichen:'Zeichen',
@@ -1586,7 +1645,7 @@ const STRINGS = {
     weg_reset_confirm:'Really delete all data?',
     weg_footer:'Companion for the practice of the four immeasurables according to Longchenpa.',
     weg_footer2:'Teachings with Trinley Tulku, May 2026 · Flourishing Society.',
-    weg_lang:'Language',
+    weg_lang:'Language', weg_erscheinungsbild:'Appearance', weg_hell:'Light', weg_dunkel:'Dark', weg_auto:'Auto',
     lp_titel:'Learning path', lp_studium:'Study', lp_kontempl:'Contempl.', lp_medit:'Medit.',
     lp_hint:'Study: Quiz · Contemplation & Meditation: automatically checked off when practiced',
     pi_abgeschlossen:'✓ Completed', pi_zeichen:'Sign',
@@ -1618,6 +1677,23 @@ const STRINGS = {
     phase_setzen:'Set phase', phase_setzen_hint:'Choose the quality you are currently focusing on.', phase_aktuell:'✓ current',
   }
 };
+
+function applyTheme(pref) {
+  var p = pref || (S && S.prefs && S.prefs.theme) || 'auto';
+  if (p === 'dark')  { document.documentElement.dataset.theme = 'dark'; }
+  else if (p === 'light') { document.documentElement.dataset.theme = 'light'; }
+  else               { delete document.documentElement.dataset.theme; }
+  // keep meta theme-color in sync
+  var isDark = p === 'dark' || (p !== 'light' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = isDark ? '#1c1714' : '#f4f1ee';
+}
+function setTheme(pref) {
+  S.prefs.theme = pref;
+  save();
+  applyTheme(pref);
+  renderPanel(activeTab); // re-render to update button states
+}
 
 function t(key) {
   var l = (S && S.prefs && S.prefs.lang) ? S.prefs.lang : 'de';
@@ -1653,7 +1729,7 @@ const SK = "vier_unermesslichkeiten_v1";
 const defaultState = () => ({
   sessions: [],
   arc: { currentPhase:"gleichmut", phaseStarted:null, phaseHistory:[] },
-  prefs: { timerDefault:20, bell:true },
+  prefs: { timerDefault:20, bell:true, theme:'auto' },
   goals: { dailyMin:20, weeklyDays:5 },
   path: {},
   assessments: {},
@@ -3452,6 +3528,17 @@ function renderBogen() {
       + '<button class="btn-'+((!S.prefs.lang||S.prefs.lang==='de')?'secondary':'ghost')+'" onclick="setLang(\'de\')" style="padding:6px 14px;font-size:.84rem;">DE</button>'
       + '<button class="btn-'+(S.prefs.lang==='en'?'secondary':'ghost')+'" onclick="setLang(\'en\')" style="padding:6px 14px;font-size:.84rem;">EN</button>'
       + '</div></label>'
+      + '<label class="field" style="display:flex;align-items:center;justify-content:space-between;font-size:.9rem;margin-top:4px;">'
+      + '<span>'+t('weg_erscheinungsbild')+'</span>'
+      + '<div style="display:flex;gap:4px;">'
+      + (function(th){
+          return ['light','auto','dark'].map(function(v){
+            var lbl = v==='light'?t('weg_hell'):v==='dark'?t('weg_dunkel'):t('weg_auto');
+            var active = th===v || (!th&&v==='auto');
+            return '<button class="btn-'+(active?'secondary':'ghost')+'" onclick="setTheme(\''+v+'\')" style="padding:6px 10px;font-size:.82rem;">'+lbl+'</button>';
+          }).join('');
+        })(S.prefs.theme)
+      + '</div></label>'
       + '<hr class="divider">'
       + '<div class="btn-row">'
       + '<button class="btn-secondary" onclick="exportData()">'+t('weg_export')+'</button>'
@@ -3709,10 +3796,15 @@ function finishOnboarding() {
 //  INIT
 // ═══════════════════════════════════════════════
 
+applyTheme();
 applyLang();
 renderHeute();
 showOnboarding();
 setTimeout(checkBackupDue, 1000);
+// Also re-apply theme if system preference changes (auto mode)
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function() {
+  if (!S.prefs.theme || S.prefs.theme === 'auto') applyTheme();
+});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/vier-unermesslichkeiten/sw.js').then(reg => {
