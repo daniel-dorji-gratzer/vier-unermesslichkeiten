@@ -101,12 +101,25 @@
 #reader-content {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding: 28px 22px 80px; background: var(--bg-card);
+  counter-reset: para-counter;
 }
 #reader-content p {
   font-size: 1.05rem; line-height: 1.85;
   color: var(--ink); margin-bottom: 1.25em;
   font-family: Georgia, 'Times New Roman', serif;
   max-width: 65ch;
+  counter-increment: para-counter;
+  position: relative;
+  padding-left: 36px;
+}
+#reader-content p::before {
+  content: counter(para-counter);
+  position: absolute; left: 0; top: 0.35em;
+  font-size: 0.62rem; line-height: 1;
+  color: var(--ink-muted);
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  width: 24px; text-align: right;
+  user-select: none; -webkit-user-select: none;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { height: 100%; }
