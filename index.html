@@ -2468,10 +2468,22 @@ function _closeSheet() {
 // ── Reader ────────────────────────────────────────────
 var _readerNr = null;
 var _readerSelection = '';
+var _readerParaIdx = null;
 document.addEventListener('selectionchange', function() {
   if (_readerNr !== null) {
     var s = window.getSelection();
     _readerSelection = s ? s.toString().trim() : '';
+    if (_readerSelection && s && s.anchorNode) {
+      var node = s.anchorNode;
+      while (node && node.nodeName !== 'P') node = node.parentNode;
+      if (node) {
+        var paras = document.getElementById('reader-content').querySelectorAll('p');
+        var idx = Array.prototype.indexOf.call(paras, node);
+        _readerParaIdx = idx >= 0 ? idx + 1 : null;
+      }
+    } else {
+      _readerParaIdx = null;
+    }
   }
 });
 function openReader(nr) {
@@ -2503,8 +2515,15 @@ function _closeReader() {
 }
 function readerNote() {
   var sel = _readerSelection;
-  var notes = sel ? 'Zitat:\n„' + sel + '”\n\nReflexion: ' : '';
+  var notes = '';
+  if (sel) {
+    var e = EINHEITEN.find(function(x){ return x.nr===_readerNr; });
+    var src = 'Sitzung ' + _readerNr + (e ? ' – ' + e.titel : '');
+    if (_readerParaIdx) src += ', Abschnitt ' + _readerParaIdx;
+    notes = src + '\n\n„' + sel + '”\n\nReflexion: ';
+  }
   _readerSelection = '';
+  _readerParaIdx = null;
   _closeReader();
   showLogSheet({ notes: notes, mode: 'Transkript' });
 }
