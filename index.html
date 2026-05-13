@@ -2467,6 +2467,13 @@ function _closeSheet() {
 
 // ── Reader ────────────────────────────────────────────
 var _readerNr = null;
+var _readerSelection = '';
+document.addEventListener('selectionchange', function() {
+  if (_readerNr !== null) {
+    var s = window.getSelection();
+    _readerSelection = s ? s.toString().trim() : '';
+  }
+});
 function openReader(nr) {
   var e = EINHEITEN.find(function(x){ return x.nr===nr; });
   var data = EINHEITEN_TEXTE.find(function(x){ return x.nr===nr; });
@@ -2495,8 +2502,9 @@ function _closeReader() {
   _readerNr = null;
 }
 function readerNote() {
-  var sel = window.getSelection ? window.getSelection().toString().trim() : '';
-  var notes = sel ? 'Zitat:\n„' + sel + '“\n\nReflexion: ' : '';
+  var sel = _readerSelection;
+  var notes = sel ? 'Zitat:\n„' + sel + '”\n\nReflexion: ' : '';
+  _readerSelection = '';
   _closeReader();
   showLogSheet({ notes: notes, mode: 'Transkript' });
 }
