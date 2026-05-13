@@ -28,10 +28,10 @@
   --safe-bot: env(safe-area-inset-bottom, 0px);
   --shadow: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.07);
   --r: 18px;
-  --kap-gleichmut-border: #1a5878;
-  --kap-liebe-border: #6a4800;
-  --kap-mitgefuehl-border: #5a1080;
-  --kap-freude-border: #1a5c3a;
+  --kap-gleichmut-border: #7BB3D4;
+  --kap-liebe-border: #F5C842;
+  --kap-mitgefuehl-border: #B882D4;
+  --kap-freude-border: #5BBB8A;
 }
 /* ── Dark mode variables ── */
 :root[data-theme="dark"] {
@@ -2601,7 +2601,7 @@ function renderLehreBody() {
           var kapVerse = kap.verse.map(n=>VERSE.find(v=>v.n===n)).filter(Boolean);
           var nummern = kap.verse.length===1 ? t('lehre_vers_lbl')+' '+kap.verse[0] : t('lehre_vers_lbl')+' '+kap.verse[0]+'–'+kap.verse[kap.verse.length-1];
           var borderCol = kap.farbe ? 'var(--kap-'+kap.farbe+'-border)' : 'var(--line)';
-          return `<details style="background:var(--bg-soft);border-radius:12px;padding:10px 14px;margin-bottom:8px;border-left:4px solid ${borderCol};">
+          return `<details style="background:var(--bg-soft);border-radius:12px;padding:10px 14px;margin-bottom:8px;border-left:3px solid ${borderCol};">
             <summary style="font-weight:600;display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;-webkit-appearance:none;">
               <span>${ki+1}. ${t(kap.key)}</span>
               <span class="small muted" style="font-weight:400;white-space:nowrap;margin-left:8px;">${nummern}</span>
