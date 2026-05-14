@@ -137,6 +137,14 @@
   width: 24px; text-align: right;
   user-select: none; -webkit-user-select: none;
 }
+#reader-content p.p-annotated {
+  border-left: 2px dotted var(--accent);
+  cursor: pointer;
+}
+#reader-content p.p-annotated::before {
+  color: var(--accent);
+  opacity: .7;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { height: 100%; }
 body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--ink);
@@ -1670,6 +1678,7 @@ const STRINGS = {
     log_eingetragen:'Eingetragen ✓',
     tj_title:'Tagebuch', tj_neu:'+ Neu', tj_suchen:'Suchen …', tj_leer:'Noch keine Einträge.',
     tj_keine_notizen:'– keine Notizen –', tj_loeschen:'Eintrag löschen?', tj_geloescht:'Gelöscht',
+    tj_eintrag:'Tagebucheintrag', tj_bearbeiten:'Eintrag bearbeiten',
     weg_ueberblick:'Überblick', weg_lernpfad:'Lernpfad', weg_reflexion:'Reflexion',
     weg_streak:'Streak & Ziele', weg_bearbeiten:'bearbeiten →', weg_tage:'Tage in Folge',
     weg_beste:'Bester Streak', weg_gesamt:'Sitzungen gesamt', weg_woche:'Diese Woche',
@@ -1764,6 +1773,7 @@ const STRINGS = {
     log_eingetragen:'Logged ✓',
     tj_title:'Journal', tj_neu:'+ New', tj_suchen:'Search …', tj_leer:'No entries yet.',
     tj_keine_notizen:'– no notes –', tj_loeschen:'Delete entry?', tj_geloescht:'Deleted',
+    tj_eintrag:'Journal Entry', tj_bearbeiten:'Edit entry',
     weg_ueberblick:'Overview', weg_lernpfad:'Learning path', weg_reflexion:'Reflection',
     weg_streak:'Streak & Goals', weg_bearbeiten:'edit →', weg_tage:'Day streak',
     weg_beste:'Best streak', weg_gesamt:'Sessions total', weg_woche:'This week',
@@ -2526,6 +2536,7 @@ function _closeSheet() {
 var _readerNr = null;
 var _readerSelection = '';
 var _readerParaIdx = null;
+var _readerAnnotMap = {};
 document.addEventListener('selectionchange', function() {
   if (_readerNr !== null) {
     var s = window.getSelection();
@@ -2554,6 +2565,24 @@ function openReader(nr) {
   var bg = document.getElementById('reader-bg');
   bg.style.display = 'flex';
   var content = document.getElementById('reader-content');
+
+  // Build annotation map: paraIdx (1-based) → [session, ...]
+  _readerAnnotMap = {};
+  S.sessions.forEach(function(sess) {
+    if (!sess.notes) return;
+    var m = sess.notes.match(/^Sitzung\s+(\d+)[^\n]*Abschnitt\s+(\d+)/);
+    if (m && +m[1] === nr) {
+      var idx = +m[2];
+      if (!_readerAnnotMap[idx]) _readerAnnotMap[idx] = [];
+      _readerAnnotMap[idx].push(sess);
+    }
+  });
+  // Mark annotated paragraphs
+  var paras = content.querySelectorAll('p');
+  paras.forEach(function(p, i) {
+    if (_readerAnnotMap[i + 1]) p.classList.add('p-annotated');
+  });
+
   var pos = S.prefs.readerPos && S.prefs.readerPos[nr] || 0;
   content.scrollTop = pos;
   var _saveTimer = null;
@@ -2566,10 +2595,35 @@ function openReader(nr) {
     }, 500);
   };
 }
+function _showReaderAnnotSheet(entries) {
+  var html = '';
+  entries.forEach(function(s, i) {
+    if (i > 0) html += '<hr class="divider">';
+    var dateStr = s.date ? '<div class="small muted" style="margin-bottom:6px;">' + esc(s.date) + '</div>' : '';
+    // Strip the source reference line, show the rest
+    var body = (s.notes || '').replace(/^[^\n]+\n\n?/, '').trim();
+    html += dateStr
+      + '<div style="white-space:pre-line;font-size:.93rem;line-height:1.7;color:var(--ink);">' + esc(body) + '</div>'
+      + (entries.length === 1
+          ? '<button class="btn-secondary" style="margin-top:14px;" onclick="_closeSheet();showLogSheet({id:\'' + s.id + '\'})">' + t('tj_bearbeiten') + '</button>'
+          : '');
+  });
+  openSheet('<h2 style="margin-bottom:14px;">' + t('tj_eintrag') + '</h2>' + html);
+}
 function _closeReader() {
   document.getElementById('reader-bg').style.display = 'none';
   _readerNr = null;
 }
+// Delegated click: annotated paragraph → show journal entries
+document.getElementById('reader-content').addEventListener('click', function(e) {
+  if (window.getSelection && window.getSelection().toString().trim()) return; // ignore if selecting text
+  var p = e.target.closest('p.p-annotated');
+  if (!p) return;
+  var paras = document.getElementById('reader-content').querySelectorAll('p');
+  var idx = Array.prototype.indexOf.call(paras, p) + 1;
+  var entries = _readerAnnotMap[idx];
+  if (entries && entries.length) _showReaderAnnotSheet(entries);
+});
 function readerNote() {
   var sel = _readerSelection;
   var notes = '';
