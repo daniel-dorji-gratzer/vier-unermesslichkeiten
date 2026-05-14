@@ -3769,7 +3769,7 @@ function renderBogen() {
     segContent += '<div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">'
       + t('weg_footer')+'<br>'
       + t('weg_footer2')+'<br>'
-      + '<span style="font-size:.7rem;opacity:.5;">v18</span></div>';
+      + '<span id="app-ver" style="font-size:.7rem;opacity:.5;">…</span></div>';
 
   } else if (_wegSeg === 'lernpfad') {
     segContent += renderLernpfad();
@@ -4023,6 +4023,12 @@ setTimeout(checkBackupDue, 1000);
 window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function() {
   if (!S.prefs.theme || S.prefs.theme === 'auto') applyTheme();
 });
+
+fetch('/vier-unermesslichkeiten/sw.js').then(r=>r.text()).then(txt=>{
+  var m = txt.match(/vum-v(\d+)/);
+  var el = document.getElementById('app-ver');
+  if (m && el) el.textContent = 'v' + m[1];
+}).catch(function(){});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/vier-unermesslichkeiten/sw.js').then(reg => {
