@@ -408,10 +408,13 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   transition: max-height .3s cubic-bezier(.4,0,.2,1), border-radius .3s cubic-bezier(.4,0,.2,1); }
 /* Writing mode: sheet expands full-screen when notes textarea is focused */
 #sheet-bg.writing #sheet {
-  max-height: 100vh; border-radius: 0; display: flex; flex-direction: column; overflow: hidden; }
+  position: absolute; inset: 0; max-height: none; border-radius: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
 #sheet-bg.writing #log-meta-fields { display: none; }
 #sheet-bg.writing #log-meta-summary { display: flex !important; }
 #sheet-bg.writing #log-notes-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+#sheet-bg.writing #log-notes-wrap .field { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #sheet-bg.writing #log-notes { flex: 1; min-height: 0; resize: none; }
 #log-meta-summary { display: none; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-bottom: 12px; padding: 8px 12px; background: var(--bg-soft);
