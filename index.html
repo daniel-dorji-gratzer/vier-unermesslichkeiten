@@ -392,7 +392,18 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(103%);
   border: 1px solid rgba(255,255,255,.5); border-bottom: none;
   box-shadow: 0 -8px 60px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.65);
-  position: relative; }
+  position: relative;
+  transition: max-height .3s cubic-bezier(.4,0,.2,1), border-radius .3s cubic-bezier(.4,0,.2,1); }
+/* Writing mode: sheet expands full-screen when notes textarea is focused */
+#sheet-bg.writing #sheet {
+  max-height: 100vh; border-radius: 0; display: flex; flex-direction: column; overflow: hidden; }
+#sheet-bg.writing #log-meta-fields { display: none; }
+#sheet-bg.writing #log-meta-summary { display: flex !important; }
+#sheet-bg.writing #log-notes-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+#sheet-bg.writing #log-notes { flex: 1; min-height: 0; resize: none; }
+#log-meta-summary { display: none; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 12px; padding: 8px 12px; background: var(--bg-soft);
+  border-radius: 10px; font-size: .82rem; color: var(--ink-soft); }
 #sheet::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 60px;
   background: linear-gradient(180deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,0) 100%);
   border-radius: 24px 24px 0 0; pointer-events: none; z-index: 0; }
@@ -2529,6 +2540,7 @@ function closeSheet(e) {
 function _closeSheet() {
   const bg = document.getElementById("sheet-bg");
   bg.classList.remove("show");
+  bg.classList.remove("writing");
   setTimeout(()=>{ bg.style.display="none"; }, 250);
 }
 
@@ -3221,6 +3233,23 @@ function editLog(id) {
   showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes });
 }
 
+function _updateLogSummary() {
+  var el = document.getElementById('log-meta-summary');
+  if (!el) return;
+  var date = (document.getElementById('log-date')||{}).value || '';
+  var dur  = (document.getElementById('log-dur')||{}).value  || '';
+  var focusEl = document.getElementById('log-focus');
+  var focusLabel = focusEl ? focusEl.options[focusEl.selectedIndex].text.split(' (')[0] : '';
+  var mode = (document.getElementById('log-mode')||{}).value || '';
+  var parts = [];
+  if (date) parts.push(date.split('-').reverse().join('.'));
+  if (dur)  parts.push(dur + ' min');
+  if (focusLabel) parts.push(focusLabel);
+  if (mode) parts.push(mode);
+  el.innerHTML = parts.map(function(p,i){
+    return '<span>' + esc(p) + '</span>' + (i < parts.length-1 ? '<span style="opacity:.35">·</span>' : '');
+  }).join('');
+}
 function showLogSheet(pre={}) {
   _logAfter = pre.afterSave||null;
   _editId = pre.id||null;
@@ -3232,29 +3261,41 @@ function showLogSheet(pre={}) {
   const isEdit = !!_editId;
   openSheet(`
     <h2>${isEdit ? t('log_bearbeiten') : t('log_eintragen_neu')}</h2>
-    <label class="field"><span>${t('log_datum')}</span>
-      <input type="date" id="log-date" value="${date}">
-    </label>
-    <label class="field"><span>${t('log_dauer')}</span>
-      <input type="number" id="log-dur" value="${dur}" placeholder="z.B. 20" min="0">
-    </label>
-    <label class="field"><span>${t('log_fokus')}</span>
-      <select id="log-focus">
-        ${QUALITAETEN.map(q=>`<option value="${q.id}"${q.id===focus?' selected':''}>${q.name} (${q.sanskrit})</option>`).join('')}
-        <option value="alle"${focus==='alle'?' selected':''}}>${t('log_alle_vier')}</option>
-      </select>
-    </label>
-    <label class="field"><span>${t('log_modus')}</span>
-      <input type="text" id="log-mode" value="${esc(mode)}" placeholder="${t('log_modus_ph')}">
-    </label>
-    <label class="field"><span>${t('log_erfahrung')}</span>
-      <textarea id="log-notes" placeholder="${t('log_notes_ph')}">${esc(notes)}</textarea>
-    </label>
+    <div id="log-meta-summary"></div>
+    <div id="log-meta-fields">
+      <label class="field"><span>${t('log_datum')}</span>
+        <input type="date" id="log-date" value="${date}" oninput="_updateLogSummary()">
+      </label>
+      <label class="field"><span>${t('log_dauer')}</span>
+        <input type="number" id="log-dur" value="${dur}" placeholder="z.B. 20" min="0" oninput="_updateLogSummary()">
+      </label>
+      <label class="field"><span>${t('log_fokus')}</span>
+        <select id="log-focus" onchange="_updateLogSummary()">
+          ${QUALITAETEN.map(q=>`<option value="${q.id}"${q.id===focus?' selected':''}>${q.name} (${q.sanskrit})</option>`).join('')}
+          <option value="alle"${focus==='alle'?' selected':''}>${t('log_alle_vier')}</option>
+        </select>
+      </label>
+      <label class="field"><span>${t('log_modus')}</span>
+        <input type="text" id="log-mode" value="${esc(mode)}" placeholder="${t('log_modus_ph')}" oninput="_updateLogSummary()">
+      </label>
+    </div>
+    <div id="log-notes-wrap">
+      <label class="field" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+        <span id="log-notes-label">${t('log_erfahrung')}</span>
+        <textarea id="log-notes" placeholder="${t('log_notes_ph')}" style="flex:1;">${esc(notes)}</textarea>
+      </label>
+    </div>
     <div class="btn-row">
       <button class="btn-primary" onclick="saveLog()">${isEdit ? t('log_speichern') : t('log_eintragen')}</button>
       <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>
     </div>
   `);
+  // Writing-mode expand on textarea focus
+  var ta = document.getElementById('log-notes');
+  var sbg = document.getElementById('sheet-bg');
+  _updateLogSummary();
+  ta.addEventListener('focus', function() { sbg.classList.add('writing'); });
+  ta.addEventListener('blur',  function() { sbg.classList.remove('writing'); });
 }
 
 function saveLog() {
