@@ -348,12 +348,24 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 .j-text li { margin-bottom: .2em; }
 .j-text blockquote { border-left: 3px solid var(--line); padding-left: 12px;
   color: var(--ink-soft); margin: .5em 0; }
-/* Markdown toolbar */
+/* Formatting toolbar */
 .md-toolbar { display: flex; gap: 4px; margin-bottom: 6px; }
 .md-btn { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 7px;
   padding: 5px 10px; font-size: .82rem; font-family: inherit; color: var(--ink-soft);
   cursor: pointer; touch-action: manipulation; line-height: 1; }
 .md-btn:active { background: var(--line); }
+/* Contenteditable notes field */
+.notes-editor { width: 100%; border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 11px 14px; font-family: inherit; font-size: .95rem; background: var(--bg);
+  color: var(--ink); min-height: 120px; outline: none; overflow-y: auto;
+  -webkit-user-select: text; user-select: text; }
+.notes-editor:focus { border-color: var(--accent); }
+.notes-editor:empty::before { content: attr(data-placeholder);
+  color: var(--ink-muted); pointer-events: none; }
+.notes-editor ul { padding-left: 1.3em; }
+.notes-editor blockquote { border-left: 3px solid var(--line); padding-left: 12px;
+  color: var(--ink-soft); margin: .4em 0; }
+#sheet-bg.writing .notes-editor { flex: 1; min-height: 0; border-radius: 8px; }
 
 /* ── Calendar ── */
 .cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -2640,7 +2652,7 @@ function _showReaderAnnotSheet(entries) {
     // Strip the source reference line, show the rest
     var body = (s.notes || '').replace(/^[^\n]+\n\n?/, '').trim();
     html += dateStr
-      + '<div class="j-text">' + renderMd(body) + '</div>'
+      + '<div class="j-text">' + displayNotes(body) + '</div>'
       + (entries.length === 1
           ? '<button class="btn-secondary" style="margin-top:14px;" onclick="_closeSheet();showLogSheet({id:\'' + s.id + '\'})">' + t('tj_bearbeiten') + '</button>'
           : '');
@@ -2695,7 +2707,7 @@ function renderHeute() {
         const q = getQ(s.focus);
         const pillClass = q ? q.farbe : 'neutral';
         const pillName = q ? q.name : (s.focus || '–');
-        const notesHtml = s.notes ? '<div class="j-text">' + renderMd(s.notes) + '</div>' : '';
+        const notesHtml = s.notes ? '<div class="j-text">' + displayNotes(s.notes) + '</div>' : '';
         rows += '<div class="j-entry">'
           + '<div class="j-date">' + (s.duration ? s.duration + ' min · ' : '')
           + '<span class="pill ' + pillClass + '">' + pillName + '</span>'
@@ -3258,17 +3270,20 @@ function editLog(id) {
   showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes });
 }
 
-function _updateMdPreview() {
-  var ta = document.getElementById('log-notes');
-  var pr = document.getElementById('md-preview');
-  if (!ta || !pr) return;
-  var rendered = renderMd(ta.value);
-  if (ta.value.trim()) {
-    pr.innerHTML = rendered;
-    pr.style.display = 'block';
-  } else {
-    pr.style.display = 'none';
-  }
+function _fmt(type) {
+  var el = document.getElementById('log-notes');
+  if (!el) return;
+  el.focus();
+  if (type === 'bold')   document.execCommand('bold',   false, null);
+  if (type === 'italic') document.execCommand('italic', false, null);
+  if (type === 'ul')     document.execCommand('insertUnorderedList', false, null);
+  if (type === 'quote')  document.execCommand('formatBlock', false, 'blockquote');
+}
+// Display notes: HTML (new entries) shown directly, plain/markdown text rendered via renderMd
+function displayNotes(text) {
+  if (!text) return '';
+  if (/<[a-z][\s\S]*>/i.test(text)) return text;
+  return renderMd(text);
 }
 function renderMd(text) {
   if (!text) return '';
@@ -3297,40 +3312,6 @@ function _mdInline(s) {
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,     '<em>$1</em>')
     .replace(/_(.+?)_/g,       '<em>$1</em>');
-}
-// Insert markdown syntax around selection (or at cursor) in a textarea
-function _mdFmt(type) {
-  var ta = document.getElementById('log-notes');
-  if (!ta) return;
-  var s = ta.selectionStart, e = ta.selectionEnd;
-  var sel = ta.value.slice(s, e);
-  var pre = ta.value.slice(0, s), post = ta.value.slice(e);
-  var insert, cur;
-  if (type === 'bold')   { insert = '**'+(sel||'fett')+'**';   cur = sel ? e+4 : s+2; }
-  if (type === 'italic') { insert = '*'+(sel||'kursiv')+'*';    cur = sel ? e+2 : s+1; }
-  if (type === 'ul') {
-    // Prefix each selected line or insert new bullet
-    if (sel) {
-      insert = sel.split('\n').map(function(l){ return '- '+l; }).join('\n');
-      cur = s + insert.length;
-    } else {
-      insert = (s===0||pre.endsWith('\n') ? '' : '\n') + '- ';
-      cur = s + insert.length;
-    }
-  }
-  if (type === 'quote') {
-    if (sel) {
-      insert = sel.split('\n').map(function(l){ return '> '+l; }).join('\n');
-      cur = s + insert.length;
-    } else {
-      insert = (s===0||pre.endsWith('\n') ? '' : '\n') + '> ';
-      cur = s + insert.length;
-    }
-  }
-  ta.value = pre + insert + post;
-  ta.focus();
-  ta.setSelectionRange(cur, cur);
-  _updateMdPreview();
 }
 function _updateLogSummary() {
   var el = document.getElementById('log-meta-summary');
@@ -3382,13 +3363,13 @@ function showLogSheet(pre={}) {
       <label class="field" style="flex:1;display:flex;flex-direction:column;min-height:0;">
         <span id="log-notes-label">${t('log_erfahrung')}</span>
         <div class="md-toolbar">
-          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('bold')"><strong>B</strong></button>
-          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('italic')"><em>I</em></button>
-          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('ul')">• –</button>
-          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('quote')">" "</button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_fmt('bold')"><strong>B</strong></button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_fmt('italic')"><em>I</em></button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_fmt('ul')">• –</button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_fmt('quote')">" "</button>
         </div>
-        <textarea id="log-notes" placeholder="${t('log_notes_ph')}" style="flex:1;" oninput="_updateMdPreview()">${esc(notes)}</textarea>
-        <div id="md-preview" class="j-text" style="display:none;border-top:1px solid var(--line);padding-top:10px;margin-top:6px;font-size:.88rem;"></div>
+        <div id="log-notes" class="notes-editor j-text" contenteditable="true"
+          data-placeholder="${t('log_notes_ph')}" style="flex:1;"></div>
       </label>
     </div>
     <div class="btn-row">
@@ -3396,20 +3377,23 @@ function showLogSheet(pre={}) {
       <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>
     </div>
   `);
-  // Writing-mode expand on textarea focus (debounced blur so toolbar taps don't collapse)
-  var ta = document.getElementById('log-notes');
+  // Fill contenteditable with pre-existing content
+  var el = document.getElementById('log-notes');
   var sbg = document.getElementById('sheet-bg');
-  var _blurTimer = null;
+  if (notes) {
+    // HTML content (new entries) shown directly; plain/markdown shown as text
+    if (/<[a-z][\s\S]*>/i.test(notes)) el.innerHTML = notes;
+    else el.textContent = notes;
+  }
   _updateLogSummary();
-  _updateMdPreview();
-  ta.addEventListener('focus', function() {
+  // Writing-mode expand on focus (debounced blur so toolbar taps don't collapse)
+  var _blurTimer = null;
+  el.addEventListener('focus', function() {
     clearTimeout(_blurTimer);
     sbg.classList.add('writing');
   });
-  ta.addEventListener('blur', function() {
-    _blurTimer = setTimeout(function() {
-      sbg.classList.remove('writing');
-    }, 250);
+  el.addEventListener('blur', function() {
+    _blurTimer = setTimeout(function() { sbg.classList.remove('writing'); }, 250);
   });
 }
 
@@ -3418,7 +3402,8 @@ function saveLog() {
   const dur   = parseInt(document.getElementById("log-dur").value,10)||0;
   const focus = document.getElementById("log-focus").value;
   const mode  = document.getElementById("log-mode").value.trim();
-  const notes = document.getElementById("log-notes").value.trim();
+  const notesEl = document.getElementById("log-notes");
+  const notes = notesEl ? notesEl.innerHTML.trim() : '';
   if (_editId) {
     const idx = S.sessions.findIndex(function(s){ return s.id === _editId; });
     if (idx !== -1) S.sessions[idx] = Object.assign(S.sessions[idx], {date,duration:dur,focus,mode,notes});
@@ -3478,7 +3463,7 @@ function renderTagebuch() {
                 <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 2px;" title="L\xF6schen">×</button>
               </span>
             </div>
-            ${s.notes?`<div class="j-text">${renderMd(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
+            ${s.notes?`<div class="j-text">${displayNotes(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
           </div>`;
         }).join('')
       }
