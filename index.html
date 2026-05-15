@@ -341,7 +341,19 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 .j-entry:last-child { border-bottom: none; }
 .j-date { font-size: .78rem; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;
   text-transform: uppercase; letter-spacing: .05em; }
-.j-text { font-size: .92rem; color: var(--ink); white-space: pre-wrap; line-height: 1.65; }
+.j-text { font-size: .92rem; color: var(--ink); line-height: 1.65; }
+.j-text p { margin-bottom: .7em; }
+.j-text p:last-child { margin-bottom: 0; }
+.j-text ul { padding-left: 1.2em; margin-bottom: .7em; }
+.j-text li { margin-bottom: .2em; }
+.j-text blockquote { border-left: 3px solid var(--line); padding-left: 12px;
+  color: var(--ink-soft); margin: .5em 0; }
+/* Markdown toolbar */
+.md-toolbar { display: flex; gap: 4px; margin-bottom: 6px; }
+.md-btn { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 7px;
+  padding: 5px 10px; font-size: .82rem; font-family: inherit; color: var(--ink-soft);
+  cursor: pointer; touch-action: manipulation; line-height: 1; }
+.md-btn:active { background: var(--line); }
 
 /* ── Calendar ── */
 .cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -2615,7 +2627,7 @@ function _showReaderAnnotSheet(entries) {
     // Strip the source reference line, show the rest
     var body = (s.notes || '').replace(/^[^\n]+\n\n?/, '').trim();
     html += dateStr
-      + '<div style="white-space:pre-line;font-size:.93rem;line-height:1.7;color:var(--ink);">' + esc(body) + '</div>'
+      + '<div class="j-text">' + renderMd(body) + '</div>'
       + (entries.length === 1
           ? '<button class="btn-secondary" style="margin-top:14px;" onclick="_closeSheet();showLogSheet({id:\'' + s.id + '\'})">' + t('tj_bearbeiten') + '</button>'
           : '');
@@ -2670,7 +2682,7 @@ function renderHeute() {
         const q = getQ(s.focus);
         const pillClass = q ? q.farbe : 'neutral';
         const pillName = q ? q.name : (s.focus || '–');
-        const notesHtml = s.notes ? '<div class="j-text">' + esc(s.notes) + '</div>' : '';
+        const notesHtml = s.notes ? '<div class="j-text">' + renderMd(s.notes) + '</div>' : '';
         rows += '<div class="j-entry">'
           + '<div class="j-date">' + (s.duration ? s.duration + ' min · ' : '')
           + '<span class="pill ' + pillClass + '">' + pillName + '</span>'
@@ -3233,6 +3245,67 @@ function editLog(id) {
   showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes });
 }
 
+function renderMd(text) {
+  if (!text) return '';
+  // Collect consecutive list lines into <ul> blocks
+  var lines = text.split('\n');
+  var out = []; var inList = false;
+  lines.forEach(function(line) {
+    var li = line.match(/^[-*] (.+)/);
+    if (li) {
+      if (!inList) { out.push('<ul>'); inList = true; }
+      out.push('<li>' + _mdInline(li[1]) + '</li>');
+    } else {
+      if (inList) { out.push('</ul>'); inList = false; }
+      var bq = line.match(/^> (.+)/);
+      if (bq) { out.push('<blockquote>' + _mdInline(bq[1]) + '</blockquote>'); }
+      else if (line.trim() === '') { out.push(''); }
+      else { out.push('<p>' + _mdInline(line) + '</p>'); }
+    }
+  });
+  if (inList) out.push('</ul>');
+  // Collapse adjacent empty strings (blank lines between blocks)
+  return out.filter(function(l,i){ return !(l==='' && (i===0||out[i-1]===''));}).join('');
+}
+function _mdInline(s) {
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+    .replace(/_(.+?)_/g,       '<em>$1</em>');
+}
+// Insert markdown syntax around selection (or at cursor) in a textarea
+function _mdFmt(type) {
+  var ta = document.getElementById('log-notes');
+  if (!ta) return;
+  var s = ta.selectionStart, e = ta.selectionEnd;
+  var sel = ta.value.slice(s, e);
+  var pre = ta.value.slice(0, s), post = ta.value.slice(e);
+  var insert, cur;
+  if (type === 'bold')   { insert = '**'+(sel||'fett')+'**';   cur = sel ? e+4 : s+2; }
+  if (type === 'italic') { insert = '*'+(sel||'kursiv')+'*';    cur = sel ? e+2 : s+1; }
+  if (type === 'ul') {
+    // Prefix each selected line or insert new bullet
+    if (sel) {
+      insert = sel.split('\n').map(function(l){ return '- '+l; }).join('\n');
+      cur = s + insert.length;
+    } else {
+      insert = (s===0||pre.endsWith('\n') ? '' : '\n') + '- ';
+      cur = s + insert.length;
+    }
+  }
+  if (type === 'quote') {
+    if (sel) {
+      insert = sel.split('\n').map(function(l){ return '> '+l; }).join('\n');
+      cur = s + insert.length;
+    } else {
+      insert = (s===0||pre.endsWith('\n') ? '' : '\n') + '> ';
+      cur = s + insert.length;
+    }
+  }
+  ta.value = pre + insert + post;
+  ta.focus();
+  ta.setSelectionRange(cur, cur);
+}
 function _updateLogSummary() {
   var el = document.getElementById('log-meta-summary');
   if (!el) return;
@@ -3282,6 +3355,12 @@ function showLogSheet(pre={}) {
     <div id="log-notes-wrap">
       <label class="field" style="flex:1;display:flex;flex-direction:column;min-height:0;">
         <span id="log-notes-label">${t('log_erfahrung')}</span>
+        <div class="md-toolbar">
+          <button class="md-btn" type="button" onclick="_mdFmt('bold')"><strong>B</strong></button>
+          <button class="md-btn" type="button" onclick="_mdFmt('italic')"><em>I</em></button>
+          <button class="md-btn" type="button" onclick="_mdFmt('ul')">• –</button>
+          <button class="md-btn" type="button" onclick="_mdFmt('quote')">" "</button>
+        </div>
         <textarea id="log-notes" placeholder="${t('log_notes_ph')}" style="flex:1;">${esc(notes)}</textarea>
       </label>
     </div>
@@ -3363,7 +3442,7 @@ function renderTagebuch() {
                 <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 2px;" title="L\xF6schen">×</button>
               </span>
             </div>
-            ${s.notes?`<div class="j-text">${esc(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
+            ${s.notes?`<div class="j-text">${renderMd(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
           </div>`;
         }).join('')
       }
