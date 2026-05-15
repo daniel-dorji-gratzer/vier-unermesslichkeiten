@@ -3258,6 +3258,18 @@ function editLog(id) {
   showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes });
 }
 
+function _updateMdPreview() {
+  var ta = document.getElementById('log-notes');
+  var pr = document.getElementById('md-preview');
+  if (!ta || !pr) return;
+  var rendered = renderMd(ta.value);
+  if (ta.value.trim()) {
+    pr.innerHTML = rendered;
+    pr.style.display = 'block';
+  } else {
+    pr.style.display = 'none';
+  }
+}
 function renderMd(text) {
   if (!text) return '';
   // Collect consecutive list lines into <ul> blocks
@@ -3290,7 +3302,6 @@ function _mdInline(s) {
 function _mdFmt(type) {
   var ta = document.getElementById('log-notes');
   if (!ta) return;
-  ta.focus(); // cancel pending blur-collapse before doing anything
   var s = ta.selectionStart, e = ta.selectionEnd;
   var sel = ta.value.slice(s, e);
   var pre = ta.value.slice(0, s), post = ta.value.slice(e);
@@ -3319,6 +3330,7 @@ function _mdFmt(type) {
   ta.value = pre + insert + post;
   ta.focus();
   ta.setSelectionRange(cur, cur);
+  _updateMdPreview();
 }
 function _updateLogSummary() {
   var el = document.getElementById('log-meta-summary');
@@ -3370,12 +3382,13 @@ function showLogSheet(pre={}) {
       <label class="field" style="flex:1;display:flex;flex-direction:column;min-height:0;">
         <span id="log-notes-label">${t('log_erfahrung')}</span>
         <div class="md-toolbar">
-          <button class="md-btn" type="button" onclick="_mdFmt('bold')"><strong>B</strong></button>
-          <button class="md-btn" type="button" onclick="_mdFmt('italic')"><em>I</em></button>
-          <button class="md-btn" type="button" onclick="_mdFmt('ul')">• –</button>
-          <button class="md-btn" type="button" onclick="_mdFmt('quote')">" "</button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('bold')"><strong>B</strong></button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('italic')"><em>I</em></button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('ul')">• –</button>
+          <button class="md-btn" type="button" onpointerdown="event.preventDefault()" onclick="_mdFmt('quote')">" "</button>
         </div>
-        <textarea id="log-notes" placeholder="${t('log_notes_ph')}" style="flex:1;">${esc(notes)}</textarea>
+        <textarea id="log-notes" placeholder="${t('log_notes_ph')}" style="flex:1;" oninput="_updateMdPreview()">${esc(notes)}</textarea>
+        <div id="md-preview" class="j-text" style="display:none;border-top:1px solid var(--line);padding-top:10px;margin-top:6px;font-size:.88rem;"></div>
       </label>
     </div>
     <div class="btn-row">
@@ -3388,6 +3401,7 @@ function showLogSheet(pre={}) {
   var sbg = document.getElementById('sheet-bg');
   var _blurTimer = null;
   _updateLogSummary();
+  _updateMdPreview();
   ta.addEventListener('focus', function() {
     clearTimeout(_blurTimer);
     sbg.classList.add('writing');
