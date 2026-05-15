@@ -407,10 +407,19 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   position: relative;
   transition: max-height .3s cubic-bezier(.4,0,.2,1), border-radius .3s cubic-bezier(.4,0,.2,1); }
 /* Writing mode: sheet expands full-screen when notes textarea is focused */
+@keyframes sheet-expand {
+  from { opacity: .6; transform: translateY(24px); }
+  to   { opacity: 1;  transform: none; }
+}
+@keyframes sheet-collapse {
+  from { opacity: 1;  transform: none; }
+  to   { opacity: .6; transform: translateY(24px); }
+}
 #sheet-bg.writing #sheet {
   position: absolute; inset: 0; max-height: none; border-radius: 0;
   display: flex; flex-direction: column; overflow: hidden;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  animation: sheet-expand .28s cubic-bezier(.4,0,.2,1) forwards; }
 #sheet-bg.writing #sheet-content { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 #sheet-bg.writing #log-meta-fields { display: none; }
 #sheet-bg.writing #log-meta-summary { display: flex !important; }
@@ -3281,6 +3290,7 @@ function _mdInline(s) {
 function _mdFmt(type) {
   var ta = document.getElementById('log-notes');
   if (!ta) return;
+  ta.focus(); // cancel pending blur-collapse before doing anything
   var s = ta.selectionStart, e = ta.selectionEnd;
   var sel = ta.value.slice(s, e);
   var pre = ta.value.slice(0, s), post = ta.value.slice(e);
@@ -3373,12 +3383,20 @@ function showLogSheet(pre={}) {
       <button class="btn-secondary" onclick="_closeSheet()">Abbrechen</button>
     </div>
   `);
-  // Writing-mode expand on textarea focus
+  // Writing-mode expand on textarea focus (debounced blur so toolbar taps don't collapse)
   var ta = document.getElementById('log-notes');
   var sbg = document.getElementById('sheet-bg');
+  var _blurTimer = null;
   _updateLogSummary();
-  ta.addEventListener('focus', function() { sbg.classList.add('writing'); });
-  ta.addEventListener('blur',  function() { sbg.classList.remove('writing'); });
+  ta.addEventListener('focus', function() {
+    clearTimeout(_blurTimer);
+    sbg.classList.add('writing');
+  });
+  ta.addEventListener('blur', function() {
+    _blurTimer = setTimeout(function() {
+      sbg.classList.remove('writing');
+    }, 250);
+  });
 }
 
 function saveLog() {
