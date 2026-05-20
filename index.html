@@ -4636,6 +4636,66 @@ showOnboarding();
     if (dx > 0 && cur > 0)                     setLehreTab(TABS_LEHRE[cur - 1]);
   }, { passive: true });
 })();
+
+// ── Swipe-down to close bottom sheet ─────────────────────────────────────
+(function() {
+  var sheet = document.getElementById('sheet');
+  var bg    = document.getElementById('sheet-bg');
+  var sx, sy, dragging;
+  var CLOSE_PX = 90;   // drag distance that triggers close
+
+  sheet.addEventListener('touchstart', function(e) {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    dragging = false;
+  }, { passive: true });
+
+  sheet.addEventListener('touchmove', function(e) {
+    var dy = e.touches[0].clientY - sy;
+    var dx = e.touches[0].clientX - sx;
+
+    if (!dragging) {
+      // Start drag only when: clearly downward, more vertical than horizontal,
+      // AND sheet content is scrolled to the very top
+      if (dy > 8 && dy > Math.abs(dx) * 1.5 && sheet.scrollTop <= 0) {
+        dragging = true;
+      } else {
+        return;
+      }
+    }
+
+    // We own this gesture — prevent the sheet from scrolling upward
+    e.preventDefault();
+    var offset = Math.max(0, dy);
+    sheet.style.transform = 'translateY(' + offset + 'px)';
+    // Fade backdrop proportionally
+    bg.style.opacity = Math.max(0, 1 - offset / 280);
+  }, { passive: false });   // non-passive so preventDefault works
+
+  sheet.addEventListener('touchend', function(e) {
+    if (!dragging) return;
+    dragging = false;
+    var dy = e.changedTouches[0].clientY - sy;
+    bg.style.opacity = '';
+
+    if (dy > CLOSE_PX) {
+      // Flick out, then close
+      sheet.style.transition = 'transform .22s ease-in';
+      sheet.style.transform  = 'translateY(100vh)';
+      setTimeout(function() {
+        sheet.style.transition = '';
+        sheet.style.transform  = '';
+        _closeSheet();
+      }, 220);
+    } else {
+      // Snap back
+      sheet.style.transition = 'transform .28s cubic-bezier(.4,0,.2,1)';
+      sheet.style.transform  = '';
+      setTimeout(function() { sheet.style.transition = ''; }, 300);
+    }
+  }, { passive: true });
+})();
+
 setTimeout(checkBackupDue, 1000);
 // Also re-apply theme if system preference changes (auto mode)
 window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function() {
