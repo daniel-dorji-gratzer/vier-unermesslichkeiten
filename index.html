@@ -105,22 +105,83 @@
   font-size: 1.3rem; background: none; border: none;
   color: var(--accent); padding: 4px 10px 4px 0; cursor: pointer; line-height: 1;
 }
+#reader-title-wrap {
+  flex: 1; text-align: center; padding: 0 6px; overflow: hidden; min-width: 0;
+}
 #reader-title {
   font-size: .85rem; font-weight: 600; color: var(--ink);
-  flex: 1; text-align: center; padding: 0 8px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#reader-subtitle {
+  font-size: .65rem; color: var(--ink-muted); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .02em;
+}
+#reader-progress-bar {
+  height: 2px; background: var(--line); flex-shrink: 0;
+}
+#reader-progress-fill {
+  height: 100%; background: var(--accent); width: 0%; transition: width .08s linear;
 }
 #reader-note-btn {
   font-size: .82rem; color: var(--accent); background: none;
   border: none; padding: 4px 0 4px 10px; cursor: pointer; white-space: nowrap;
+  opacity: .38; transition: opacity .2s;
+}
+#reader-note-btn.has-sel {
+  opacity: 1;
+}
+/* A3: floating selection bubble */
+#reader-sel-btn {
+  position: fixed; z-index: 215;
+  background: var(--accent); color: var(--bg);
+  border: none; border-radius: 20px; padding: 8px 16px;
+  font-size: .82rem; font-weight: 600; font-family: inherit;
+  box-shadow: 0 4px 18px rgba(0,0,0,.22);
+  cursor: pointer; white-space: nowrap; touch-action: manipulation;
+  display: none; pointer-events: none;
+}
+#reader-sel-btn.visible {
+  display: block; pointer-events: auto;
+  animation: sel-pop .15s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes sel-pop {
+  from { opacity: 0; transform: scale(.82) translateY(6px); }
+  to   { opacity: 1; transform: none; }
 }
 #reader-content {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding: 28px 22px 80px; background: var(--bg-card);
+  padding: 28px 22px 48px; background: var(--bg-card);
   counter-reset: para-counter;
 }
+#reader-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  border-top: 1px solid var(--line); flex-shrink: 0;
+  background: var(--bg-card);
+}
+#reader-nav button {
+  background: none; border: none; color: var(--accent);
+  font-size: 1.6rem; line-height: 1; padding: 6px 16px;
+  cursor: pointer; touch-action: manipulation; border-radius: 8px;
+  transition: opacity .15s;
+}
+#reader-nav button:disabled { color: var(--line); cursor: default; }
+#reader-nav-center {
+  display: flex; align-items: center; gap: 10px;
+}
+#reader-nav-ctr {
+  font-size: .75rem; color: var(--ink-muted);
+  font-variant-numeric: tabular-nums; letter-spacing: .03em;
+  min-width: 32px; text-align: center;
+}
+#reader-nav .font-btn {
+  font-size: .78rem; font-weight: 700; font-family: inherit;
+  color: var(--ink-soft); padding: 4px 8px; border-radius: 6px;
+  line-height: 1; letter-spacing: -.01em;
+}
+#reader-nav .font-btn:disabled { color: var(--line); }
 #reader-content p {
-  font-size: 1.05rem; line-height: 1.85;
+  font-size: var(--reader-fs, 1.05rem); line-height: 1.85;
   color: var(--ink); margin-bottom: 1.25em;
   font-family: Georgia, 'Times New Roman', serif;
   max-width: 65ch;
@@ -144,6 +205,13 @@
 #reader-content p.p-annotated::before {
   color: var(--accent);
   opacity: .7;
+}
+#reader-content p[data-annot-count]::after {
+  content: attr(data-annot-count);
+  position: absolute; left: 0; top: 1.55em;
+  font-size: .55rem; font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  width: 24px; text-align: right; color: var(--accent); font-weight: 700;
+  user-select: none; -webkit-user-select: none;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { height: 100%; }
@@ -361,11 +429,34 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   -webkit-user-select: text; user-select: text; }
 .notes-editor:focus { border-color: var(--accent); }
 .notes-editor:empty::before { content: attr(data-placeholder);
-  color: var(--ink-muted); pointer-events: none; }
+  color: var(--ink-muted); pointer-events: none;
+  white-space: normal; overflow-wrap: break-word; word-break: break-word; }
 .notes-editor ul { padding-left: 1.3em; }
 .notes-editor blockquote { border-left: 3px solid var(--line); padding-left: 12px;
   color: var(--ink-soft); margin: .4em 0; }
 #sheet-bg.writing .notes-editor { flex: 1; min-height: 0; border-radius: 8px; }
+
+/* ── C2: Gelesen-Indikator ── */
+.seen-label { display: flex; align-items: center; gap: 7px; }
+.seen-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: var(--line); transition: background .2s;
+}
+.seen-dot--read { background: var(--accent); opacity: .85; }
+
+/* ── Source context (B1 annotation) ── */
+.source-context {
+  background: var(--bg-soft); border-radius: 10px; padding: 10px 13px;
+  margin-bottom: 14px; border-left: 2px dotted var(--accent);
+}
+.source-context .source-ref {
+  font-size: .68rem; color: var(--ink-muted); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+}
+.source-context blockquote {
+  font-size: .88rem; color: var(--ink-soft); line-height: 1.55;
+  font-style: italic; margin: 0;
+}
 
 /* ── Calendar ── */
 .cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -472,7 +563,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 #backup-banner .bb-msg strong { color: var(--ink); }
 
 #toast { position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot) + 20px);
-  left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff;
+  left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg);
   padding: 10px 20px; border-radius: 100px; font-size: .86rem; font-weight: 500;
   opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 200; white-space: nowrap; }
 #toast.show { opacity: 1; }
@@ -757,13 +848,27 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 </div>
 
 <div id="reader-bg" style="display:none;">
+  <button id="reader-sel-btn" onclick="readerNote()"></button>
   <div id="reader">
     <div id="reader-header">
       <button id="reader-back" onclick="_closeReader()">←</button>
-      <span id="reader-title"></span>
+      <div id="reader-title-wrap">
+        <div id="reader-title"></div>
+        <div id="reader-subtitle"></div>
+      </div>
       <button id="reader-note-btn" onclick="readerNote()">Notiz →</button>
     </div>
+    <div id="reader-progress-bar"><div id="reader-progress-fill"></div></div>
     <div id="reader-content"></div>
+    <div id="reader-nav">
+      <button id="reader-nav-prev" onclick="_readerPrev()">‹</button>
+      <div id="reader-nav-center">
+        <button id="reader-font-down" class="font-btn" onclick="_readerFontDown()" title="Schrift kleiner">A−</button>
+        <span id="reader-nav-ctr"></span>
+        <button id="reader-font-up" class="font-btn" onclick="_readerFontUp()" title="Schrift größer">A+</button>
+      </div>
+      <button id="reader-nav-next" onclick="_readerNext()">›</button>
+    </div>
   </div>
 </div>
 
@@ -1683,6 +1788,8 @@ const STRINGS = {
     heute_fokus:'Aktueller Fokus', heute_jetzt_ueben:'Jetzt üben', heute_weg:'Weg',
     heute_selbst:'Selbsteinschätzung', heute_selbst_text:'Wie zeigen sich die vier Unermesslichkeiten in dir? Eine kurze Reflexion alle zwei Wochen.',
     heute_jetzt_einsch:'Jetzt einschätzen →', heute_geuebt:'Heute geübt',
+    heute_weiterlesen:'Weiterlesen',
+    reader_abschnitt:'Abschnitt', reader_quelle:'Textstelle', reader_notiz_sel:'Notiz zu Auswahl', reader_notiz_leer:'Notiz',
     fehler_laden:'Fehler beim Laden',
     lehre_module:'Module', lehre_sitzungen:'Sitzungen', lehre_verse:'Verse',
     lehre_qualitaeten:'Vier Qualitäten', lehre_module_lbl:'Modul', lehre_vers_e:'e',
@@ -1778,6 +1885,8 @@ const STRINGS = {
     heute_fokus:'Current focus', heute_jetzt_ueben:'Practice now', heute_weg:'Path',
     heute_selbst:'Self-assessment', heute_selbst_text:'How do the four immeasurables show in you? A brief reflection every two weeks.',
     heute_jetzt_einsch:'Assess now →', heute_geuebt:'Practiced today',
+    heute_weiterlesen:'Continue reading',
+    reader_abschnitt:'Paragraph', reader_quelle:'Source passage', reader_notiz_sel:'Note on selection', reader_notiz_leer:'Note',
     fehler_laden:'Error loading',
     lehre_module:'Modules', lehre_sitzungen:'Sessions', lehre_verse:'Verses',
     lehre_qualitaeten:'Four Qualities', lehre_module_lbl:'Module', lehre_vers_e:'',
@@ -2586,21 +2695,108 @@ var _readerNr = null;
 var _readerSelection = '';
 var _readerParaIdx = null;
 var _readerAnnotMap = {};
+
+// A1: font size control
+const READER_FONT_SIZES = [0.88, 1.05, 1.2, 1.38]; // rem steps
+function _readerFontIdx() {
+  var i = S.prefs && S.prefs.readerFontIdx;
+  return (i !== undefined && i !== null) ? i : 1;
+}
+function _applyReaderFont(idx) {
+  var sz = READER_FONT_SIZES[Math.max(0, Math.min(idx, READER_FONT_SIZES.length - 1))];
+  var content = document.getElementById('reader-content');
+  if (content) content.style.setProperty('--reader-fs', sz + 'rem');
+  var dBtn = document.getElementById('reader-font-down');
+  var uBtn = document.getElementById('reader-font-up');
+  if (dBtn) dBtn.disabled = idx <= 0;
+  if (uBtn) uBtn.disabled = idx >= READER_FONT_SIZES.length - 1;
+}
+function _readerFontDown() {
+  var idx = Math.max(0, _readerFontIdx() - 1);
+  S.prefs.readerFontIdx = idx; save(); _applyReaderFont(idx);
+}
+function _readerFontUp() {
+  var idx = Math.min(READER_FONT_SIZES.length - 1, _readerFontIdx() + 1);
+  S.prefs.readerFontIdx = idx; save(); _applyReaderFont(idx);
+}
+
+// D1: navigation helpers
+function _readerNavList() {
+  var withText = EINHEITEN_TEXTE.map(function(x){ return x.nr; });
+  return EINHEITEN
+    .filter(function(e){ return withText.indexOf(e.nr) !== -1; })
+    .map(function(e){ return e.nr; });
+}
+function _updateReaderNav(nr) {
+  var list = _readerNavList();
+  var i = list.indexOf(nr);
+  var prev = document.getElementById('reader-nav-prev');
+  var next = document.getElementById('reader-nav-next');
+  var ctr  = document.getElementById('reader-nav-ctr');
+  if (prev) prev.disabled = i <= 0;
+  if (next) next.disabled = i >= list.length - 1;
+  if (ctr)  ctr.textContent = (i + 1) + ' / ' + list.length;
+}
+function _readerPrev() {
+  var list = _readerNavList();
+  var i = list.indexOf(_readerNr);
+  if (i > 0) _readerGoTo(list[i - 1]);
+}
+function _readerNext() {
+  var list = _readerNavList();
+  var i = list.indexOf(_readerNr);
+  if (i < list.length - 1) _readerGoTo(list[i + 1]);
+}
+function _readerGoTo(nr) {
+  // Flush current scroll position immediately before navigating
+  var content = document.getElementById('reader-content');
+  if (content && _readerNr !== null) {
+    if (!S.prefs.readerPos) S.prefs.readerPos = {};
+    S.prefs.readerPos[_readerNr] = content.scrollTop;
+    save();
+  }
+  openReader(nr);
+}
 document.addEventListener('selectionchange', function() {
-  if (_readerNr !== null) {
-    var s = window.getSelection();
-    _readerSelection = s ? s.toString().trim() : '';
-    if (_readerSelection && s && s.anchorNode) {
-      var node = s.anchorNode;
-      while (node && node.nodeName !== 'P') node = node.parentNode;
-      if (node) {
-        var paras = document.getElementById('reader-content').querySelectorAll('p');
-        var idx = Array.prototype.indexOf.call(paras, node);
-        _readerParaIdx = idx >= 0 ? idx + 1 : null;
-      }
-    } else {
-      _readerParaIdx = null;
+  if (_readerNr === null) return;
+  var s = window.getSelection();
+  var selTxt = s ? s.toString().trim() : '';
+  _readerSelection = selTxt;
+
+  var selBtn  = document.getElementById('reader-sel-btn');
+  var noteBtn = document.getElementById('reader-note-btn');
+
+  if (selTxt && s && s.anchorNode) {
+    // Track which paragraph was selected
+    var node = s.anchorNode;
+    while (node && node.nodeName !== 'P') node = node.parentNode;
+    if (node) {
+      var paras = document.getElementById('reader-content').querySelectorAll('p');
+      var idx = Array.prototype.indexOf.call(paras, node);
+      _readerParaIdx = idx >= 0 ? idx + 1 : null;
     }
+
+    // A3: position floating bubble near selection
+    if (selBtn && s.rangeCount) {
+      var rect = s.getRangeAt(0).getBoundingClientRect();
+      if (rect.width > 0) {
+        var btnW = 160;
+        var topAbove = rect.top - 46;
+        var topBelow = rect.bottom + 8;
+        var top = topAbove > 70 ? topAbove : topBelow;
+        var left = Math.max(10, Math.min(window.innerWidth - btnW - 10,
+          rect.left + rect.width / 2 - btnW / 2));
+        selBtn.style.top  = top  + 'px';
+        selBtn.style.left = left + 'px';
+        selBtn.textContent = t('reader_notiz_sel') || 'Notiz zu Auswahl';
+        selBtn.classList.add('visible');
+      }
+    }
+    if (noteBtn) noteBtn.classList.add('has-sel');
+  } else {
+    _readerParaIdx = null;
+    if (selBtn) selBtn.classList.remove('visible');
+    if (noteBtn) noteBtn.classList.remove('has-sel');
   }
 });
 function openReader(nr) {
@@ -2609,33 +2805,59 @@ function openReader(nr) {
   if (!data || !e) return;
   _readerNr = nr;
   document.getElementById('reader-title').textContent = e.titel;
-  document.getElementById('reader-content').innerHTML =
-    data.absaetze.map(function(p){ return '<p>'+esc(p)+'</p>'; }).join('');
+  // A3: reset header note-button to inactive state
+  var _nb = document.getElementById('reader-note-btn');
+  if (_nb) { _nb.textContent = t('reader_notiz_leer') || 'Notiz'; _nb.classList.remove('has-sel'); }
+  // D2: Breadcrumb subtitle
+  var navList = _readerNavList();
+  var navIdx  = navList.indexOf(nr);
+  var sub = document.getElementById('reader-subtitle');
+  if (sub) sub.textContent = (t('lehre_einheit')||'Sitzung') + ' ' + nr
+    + (navIdx !== -1 ? ' · ' + (navIdx + 1) + ' / ' + navList.length : '');
+  _updateReaderNav(nr);
+  // D3 + C2: remember last opened unit; mark as seen
+  if (!S.prefs) S.prefs = {};
+  S.prefs.lastReaderNr = nr;
+  if (!S.prefs.readerSeen) S.prefs.readerSeen = {};
+  S.prefs.readerSeen[nr] = true;
+  save();
   var bg = document.getElementById('reader-bg');
-  bg.style.display = 'flex';
   var content = document.getElementById('reader-content');
+  content.innerHTML = data.absaetze.map(function(p){ return '<p>'+esc(p)+'</p>'; }).join('');
+  _applyReaderFont(_readerFontIdx()); // A1: restore saved font size
+  bg.style.display = 'flex';
 
-  // Build annotation map: paraIdx (1-based) → [session, ...]
+  // Build annotation map: paraIdx (1-based) → [session, ...]  (B1: uses source field)
   _readerAnnotMap = {};
   S.sessions.forEach(function(sess) {
-    if (!sess.notes) return;
-    var m = sess.notes.match(/^Sitzung\s+(\d+)[^\n]*Abschnitt\s+(\d+)/);
-    if (m && +m[1] === nr) {
-      var idx = +m[2];
+    if (sess.source && sess.source.sitzungNr === nr && sess.source.paraIdx) {
+      var idx = sess.source.paraIdx;
       if (!_readerAnnotMap[idx]) _readerAnnotMap[idx] = [];
       _readerAnnotMap[idx].push(sess);
     }
   });
-  // Mark annotated paragraphs
+  // Mark annotated paragraphs (B2: show count badge when >1 entry)
   var paras = content.querySelectorAll('p');
   paras.forEach(function(p, i) {
-    if (_readerAnnotMap[i + 1]) p.classList.add('p-annotated');
+    var annots = _readerAnnotMap[i + 1];
+    if (annots) {
+      p.classList.add('p-annotated');
+      if (annots.length > 1) p.dataset.annotCount = annots.length;
+    }
   });
 
   var pos = S.prefs.readerPos && S.prefs.readerPos[nr] || 0;
   content.scrollTop = pos;
+  // A2: initial progress fill
+  var _progFill = document.getElementById('reader-progress-fill');
+  function _updateProgress() {
+    var total = content.scrollHeight - content.clientHeight;
+    if (_progFill) _progFill.style.width = (total > 0 ? Math.min(100, content.scrollTop / total * 100) : 0) + '%';
+  }
+  _updateProgress();
   var _saveTimer = null;
   content.onscroll = function() {
+    _updateProgress();
     clearTimeout(_saveTimer);
     _saveTimer = setTimeout(function(){
       if (!S.prefs.readerPos) S.prefs.readerPos = {};
@@ -2649,19 +2871,46 @@ function _showReaderAnnotSheet(entries) {
   entries.forEach(function(s, i) {
     if (i > 0) html += '<hr class="divider">';
     var dateStr = s.date ? '<div class="small muted" style="margin-bottom:6px;">' + esc(s.date) + '</div>' : '';
-    // Strip the source reference line, show the rest
-    var body = (s.notes || '').replace(/^[^\n]+\n\n?/, '').trim();
+    // B1: use structured source.snippet; fall back to stripping old-format header
+    var snippetHtml = '';
+    if (s.source && s.source.snippet) {
+      var refLabel = (t('lehre_einheit')||'Sitzung') + ' ' + s.source.sitzungNr
+        + (s.source.paraIdx ? ' · ' + (t('reader_abschnitt')||'Abschnitt') + ' ' + s.source.paraIdx : '');
+      snippetHtml = '<div class="source-context" style="margin-bottom:10px;">'
+        + '<div class="source-ref">' + esc(refLabel) + '</div>'
+        + '<blockquote>„' + esc(s.source.snippet) + '"</blockquote>'
+        + '</div>';
+    }
+    var body = s.notes || '';
+    if (!s.source && body) body = body.replace(/^[^\n]+\n\n?/, '').trim(); // legacy strip
     html += dateStr
-      + '<div class="j-text">' + displayNotes(body) + '</div>'
+      + snippetHtml
+      + (body ? '<div class="j-text">' + displayNotes(body) + '</div>' : '')
       + (entries.length === 1
-          ? '<button class="btn-secondary" style="margin-top:14px;" onclick="_closeSheet();showLogSheet({id:\'' + s.id + '\'})">' + t('tj_bearbeiten') + '</button>'
+          ? '<button class="btn-secondary" style="margin-top:14px;" onclick="_closeSheet();editLog(\'' + s.id + '\')">' + t('tj_bearbeiten') + '</button>'
           : '');
   });
   openSheet('<h2 style="margin-bottom:14px;">' + t('tj_eintrag') + '</h2>' + html);
 }
 function _closeReader() {
+  var closedNr = _readerNr;
   document.getElementById('reader-bg').style.display = 'none';
   _readerNr = null;
+  // A3: clean up floating button + header state
+  var selBtn = document.getElementById('reader-sel-btn');
+  if (selBtn) selBtn.classList.remove('visible');
+  var noteBtn = document.getElementById('reader-note-btn');
+  if (noteBtn) noteBtn.classList.remove('has-sel');
+  // D5: scroll Lehre-Sitzungen tab back to the unit card we just read
+  if (activeTab === 'lehre' && closedNr) {
+    if (lehreTab !== 'sitzungen') {
+      setLehreTab('sitzungen');
+    }
+    requestAnimationFrame(function() {
+      var card = document.querySelector('#lehre-body [data-einheit="' + closedNr + '"]');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
 }
 // Delegated click: annotated paragraph → show journal entries
 document.getElementById('reader-content').addEventListener('click', function(e) {
@@ -2674,18 +2923,15 @@ document.getElementById('reader-content').addEventListener('click', function(e) 
   if (entries && entries.length) _showReaderAnnotSheet(entries);
 });
 function readerNote() {
-  var sel = _readerSelection;
-  var notes = '';
-  if (sel) {
-    var e = EINHEITEN.find(function(x){ return x.nr===_readerNr; });
-    var src = 'Sitzung ' + _readerNr + (e ? ' – ' + e.titel : '');
-    if (_readerParaIdx) src += ', Abschnitt ' + _readerParaIdx;
-    notes = src + '\n\n„' + sel + '”\n\nReflexion: ';
+  var sel = _readerSelection ? _readerSelection.trim() : '';
+  var src = null;
+  if (_readerNr) {
+    src = { sitzungNr: _readerNr, paraIdx: _readerParaIdx || null, snippet: sel };
   }
   _readerSelection = '';
   _readerParaIdx = null;
   _closeReader();
-  showLogSheet({ notes: notes, mode: 'Transkript' });
+  showLogSheet({ source: src, mode: 'Transkript' });
 }
 
 // ═══════════════════════════════════════════════
@@ -2779,6 +3025,25 @@ function renderHeute() {
             + '<button class="btn-secondary" onclick="showAssessmentSheet(\'' + phase.id + '\')" style="padding:10px 18px;">'+t('heute_jetzt_einsch')+'</button>'
             + '</div>'
           : '')
+      + (function(){
+          var lastNr = S.prefs && S.prefs.lastReaderNr;
+          if (!lastNr) return '';
+          var lastE = EINHEITEN.find(function(x){ return x.nr===lastNr; });
+          if (!lastE) return '';
+          var hasText = typeof EINHEITEN_TEXTE !== 'undefined' && EINHEITEN_TEXTE.find(function(x){ return x.nr===lastNr; });
+          if (!hasText) return '';
+          var pos = S.prefs.readerPos && S.prefs.readerPos[lastNr] || 0;
+          var pct = pos > 0 ? Math.min(100, Math.round(pos / 1000)) : 0; // rough indicator
+          return '<div class="card" onclick="openReader('+lastNr+')" style="cursor:pointer;display:flex;align-items:center;gap:12px;">'
+            + '<div style="font-size:1.4rem;line-height:1;">📖</div>'
+            + '<div style="flex:1;min-width:0;">'
+            + '<div class="label" style="margin-bottom:2px;">'+t('heute_weiterlesen')+'</div>'
+            + '<div class="small" style="color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(lastE.titel)+'</div>'
+            + '<div class="small muted">'+(t('lehre_einheit')||'Sitzung')+' '+lastNr+'</div>'
+            + '</div>'
+            + '<div style="color:var(--accent);font-size:1.1rem;">›</div>'
+            + '</div>';
+        })()
       + sessHtml;
 
     document.getElementById("panel-heute").innerHTML = html;
@@ -2853,14 +3118,22 @@ function renderLehreBody() {
       `).join('')}
     `;
   } else if (lehreTab === "sitzungen") {
+    const seen = (S.prefs && S.prefs.readerSeen) || {};
+    const hasTranscript = new Set(EINHEITEN_TEXTE.map(function(x){ return x.nr; }));
     el.innerHTML = `
-      ${EINHEITEN.map(e=>`
-        <div class="card" onclick="showEinheitSheet(${e.nr})" style="cursor:pointer;">
-          <div class="label" style="margin-bottom:4px;">${t('lehre_einheit')} ${e.nr} · ${esc(e.datum)}</div>
+      ${EINHEITEN.map(e=>{
+        const isSeen = !!seen[e.nr];
+        const hasText = hasTranscript.has(e.nr);
+        const dot = hasText
+          ? `<span class="seen-dot${isSeen ? ' seen-dot--read' : ''}"></span>`
+          : '';
+        return `
+        <div class="card" data-einheit="${e.nr}" onclick="showEinheitSheet(${e.nr})" style="cursor:pointer;">
+          <div class="label seen-label" style="margin-bottom:4px;">${dot}${t('lehre_einheit')} ${e.nr} · ${esc(e.datum)}</div>
           <div class="card-title">${esc(e.titel)}</div>
           <div class="small muted">${e.punkte.length}${t('lehre_schwerpunkte')}</div>
-        </div>
-      `).join('')}
+        </div>`;
+      }).join('')}
     `;
   } else {
     var KAPITEL = [
@@ -3263,11 +3536,12 @@ function startTimer() {
 let _logAfter = null;
 
 var _editId = null;
+var _logSource = null;  // B1: structured annotation source { sitzungNr, paraIdx, snippet }
 
 function editLog(id) {
   const s = S.sessions.find(function(x){ return x.id === id; });
   if (!s) return;
-  showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes });
+  showLogSheet({ id: s.id, date: s.date, duration: s.duration, focus: s.focus, mode: s.mode, notes: s.notes, source: s.source || null });
 }
 
 function _fmt(type) {
@@ -3333,12 +3607,19 @@ function _updateLogSummary() {
 function showLogSheet(pre={}) {
   _logAfter = pre.afterSave||null;
   _editId = pre.id||null;
+  _logSource = pre.source||null;   // B1
   const focus = pre.focus||S.arc.currentPhase;
   const dur = pre.duration||"";
   const mode = pre.mode||"";
   const date = pre.date||todayISO();
   const notes = pre.notes||"";
   const isEdit = !!_editId;
+  // B1: source context block (shown when annotation-linked)
+  const srcBlock = _logSource && _logSource.snippet ? `
+    <div class="source-context">
+      <div class="source-ref">${t('reader_quelle')} · ${t('lehre_einheit')} ${_logSource.sitzungNr}${_logSource.paraIdx ? ' · ' + t('reader_abschnitt') + ' ' + _logSource.paraIdx : ''}</div>
+      <blockquote>„${esc(_logSource.snippet)}"</blockquote>
+    </div>` : '';
   openSheet(`
     <h2>${isEdit ? t('log_bearbeiten') : t('log_eintragen_neu')}</h2>
     <div id="log-meta-summary"></div>
@@ -3359,6 +3640,7 @@ function showLogSheet(pre={}) {
         <input type="text" id="log-mode" value="${esc(mode)}" placeholder="${t('log_modus_ph')}" oninput="_updateLogSummary()">
       </label>
     </div>
+    ${srcBlock}
     <div id="log-notes-wrap">
       <label class="field" style="flex:1;display:flex;flex-direction:column;min-height:0;">
         <span id="log-notes-label">${t('log_erfahrung')}</span>
@@ -3404,12 +3686,20 @@ function saveLog() {
   const mode  = document.getElementById("log-mode").value.trim();
   const notesEl = document.getElementById("log-notes");
   const notes = notesEl ? notesEl.innerHTML.trim() : '';
+  const sourceToSave = _logSource || undefined;
+  _logSource = null;
   if (_editId) {
     const idx = S.sessions.findIndex(function(s){ return s.id === _editId; });
-    if (idx !== -1) S.sessions[idx] = Object.assign(S.sessions[idx], {date,duration:dur,focus,mode,notes});
+    if (idx !== -1) {
+      const upd = {date,duration:dur,focus,mode,notes};
+      if (sourceToSave !== undefined) upd.source = sourceToSave;
+      S.sessions[idx] = Object.assign(S.sessions[idx], upd);
+    }
     _editId = null;
   } else {
-    S.sessions.unshift({id:uid(),date,duration:dur,focus,mode,notes});
+    const newSess = {id:uid(),date,duration:dur,focus,mode,notes};
+    if (sourceToSave) newSess.source = sourceToSave;
+    S.sessions.unshift(newSess);
     S.sessionsSinceBackup = (S.sessionsSinceBackup || 0) + 1;
   }
   save();
@@ -3459,8 +3749,8 @@ function renderTagebuch() {
               ${q?`· <span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'· <span class="pill neutral">alle vier</span>':'')}
               ${s.mode?'· '+esc(s.mode):''}
               <span style="float:right;display:flex;gap:6px;align-items:center;">
-                <button onclick="editLog('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:.82rem;cursor:pointer;padding:0 2px;" title="Bearbeiten">✎</button>
-                <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:0 2px;" title="L\xF6schen">×</button>
+                <button onclick="editLog('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;" title="Bearbeiten">✎</button>
+                <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;line-height:1;" title="L\xF6schen">×</button>
               </span>
             </div>
             ${s.notes?`<div class="j-text">${displayNotes(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
@@ -3776,20 +4066,27 @@ function renderRadarChart(scores) {
     return 'M ' + cx + ' ' + (cy-r) + ' L ' + (cx+r) + ' ' + cy
       + ' L ' + cx + ' ' + (cy+r) + ' L ' + (cx-r) + ' ' + cy + ' Z';
   }
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    || (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  var gridStroke = isDark ? 'rgba(255,255,255,.10)' : 'rgba(0,0,0,.07)';
+  var axisStroke = isDark ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.08)';
   var grid = [25,50,75,100].map(function(p) {
     var r = p / 100 * R;
-    return '<path d="' + diamond(r) + '" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="1"/>';
+    return '<path d="' + diamond(r) + '" fill="none" stroke="' + gridStroke + '" stroke-width="1"/>';
   }).join('');
-  var axes = '<line x1="' + cx + '" y1="' + (cy-R) + '" x2="' + cx + '" y2="' + (cy+R) + '" stroke="rgba(0,0,0,.08)" stroke-width="1"/>'
-    + '<line x1="' + (cx-R) + '" y1="' + cy + '" x2="' + (cx+R) + '" y2="' + cy + '" stroke="rgba(0,0,0,.08)" stroke-width="1"/>';
-  var QC = { gleichmut:'#1a5878', liebe:'#6a4800', mitgefuehl:'#5a1080', freude:'#1a5c3a' };
+  var axes = '<line x1="' + cx + '" y1="' + (cy-R) + '" x2="' + cx + '" y2="' + (cy+R) + '" stroke="' + axisStroke + '" stroke-width="1"/>'
+    + '<line x1="' + (cx-R) + '" y1="' + cy + '" x2="' + (cx+R) + '" y2="' + cy + '" stroke="' + axisStroke + '" stroke-width="1"/>';
+  var QC = isDark
+    ? { gleichmut:'#6ec5f0', liebe:'#f5d070', mitgefuehl:'#d49cf0', freude:'#60d090' }
+    : { gleichmut:'#1a5878', liebe:'#6a4800', mitgefuehl:'#5a1080', freude:'#1a5c3a' };
   var ids = ['gleichmut','liebe','mitgefuehl','freude'];
   var pcts = ids.map(function(id) { return scores[id] || 0; });
   var pts = ids.map(function(id, i) { return pt(i, pcts[i]); });
   var poly = 'M ' + pts.map(function(p) { return p[0] + ' ' + p[1]; }).join(' L ') + ' Z';
   var dots = ids.map(function(id, i) {
     if (!pcts[i]) return '';
-    return '<circle cx="' + pts[i][0] + '" cy="' + pts[i][1] + '" r="5" fill="' + QC[id] + '" stroke="#fff" stroke-width="1.5"/>';
+    var dotStroke = isDark ? '#252019' : '#fff';
+    return '<circle cx="' + pts[i][0] + '" cy="' + pts[i][1] + '" r="5" fill="' + QC[id] + '" stroke="' + dotStroke + '" stroke-width="1.5"/>';
   }).join('');
   // Labels: names only (% already shown in bars below). Left/right anchored to edges.
   var label = function(x, y, anchor, id, name) {
@@ -4216,6 +4513,36 @@ function finishOnboarding() {
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
+
+// B1: Migrate old free-text annotation format → structured source field
+(function _migrateAnnotations() {
+  var changed = false;
+  var headerRe = /^Sitzung\s+(\d+)[^\n]*(?:,\s*Abschnitt\s+(\d+))?[^\n]*/;
+  var snippetRe = /^„([^"]+)"/;
+  S.sessions.forEach(function(sess) {
+    if (sess.source !== undefined) return; // already structured
+    if (!sess.notes) return;
+    var m = sess.notes.match(headerRe);
+    if (!m) return;
+    var sitzungNr = +m[1];
+    var paraIdx   = m[2] ? +m[2] : null;
+    // Remove header line + blank line
+    var rest = sess.notes.replace(/^[^\n]+\n\n?/, '');
+    // Extract inline snippet „…" if present at start
+    var snippet = '';
+    var sm = rest.match(snippetRe);
+    if (sm) {
+      snippet = sm[1];
+      rest = rest.replace(snippetRe + '\n\n?', '').replace(/^„[^"]+"\n\n?/, '');
+    }
+    // Remove "Reflexion: " prefix if present
+    rest = rest.replace(/^Reflexion:\s*/, '').trim();
+    sess.source = { sitzungNr: sitzungNr, paraIdx: paraIdx, snippet: snippet };
+    sess.notes   = rest;
+    changed = true;
+  });
+  if (changed) save();
+})();
 
 applyTheme();
 applyLang();
