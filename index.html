@@ -444,6 +444,36 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 }
 .seen-dot--read { background: var(--accent); opacity: .85; }
 
+/* ── Lehre: combined module+session view ── */
+.modul-section { margin-bottom: 6px; }
+.modul-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 4px 8px;
+}
+.modul-hdr-meta { flex: 1; }
+.modul-hdr-nr {
+  font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 2px;
+}
+.modul-hdr-titel { font-size: .97rem; font-weight: 600; color: var(--ink); }
+.btn-text {
+  background: none; border: none; color: var(--accent); font-size: .85rem;
+  cursor: pointer; padding: 4px 0 4px 12px; white-space: nowrap; flex-shrink: 0;
+}
+.einheit-flat {
+  background: var(--bg-card); border-radius: 14px; padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.punkte-preview {
+  padding-left: 16px; margin: 0 0 10px;
+  color: var(--ink-soft); list-style: disc;
+}
+.punkte-preview li { font-size: .84rem; line-height: 1.45; margin-bottom: 3px; }
+.punkte-preview li.extra { list-style: none; padding-left: 0; color: var(--ink-faint); font-style: italic; }
+.einheit-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-sm { padding: 6px 14px !important; font-size: .84rem !important; border-radius: 9px !important; }
+.modul-empty { font-size: .84rem; color: var(--ink-faint); padding: 4px 0 14px; font-style: italic; }
+
 /* ── Source context (B1 annotation) ── */
 .source-context {
   background: var(--bg-soft); border-radius: 10px; padding: 10px 13px;
@@ -1119,7 +1149,7 @@ const MODULE = [
 ];
 
 const EINHEITEN = [
-  { nr:1, titel:"Grundlage und Maitrī", datum:"01. Mai 2026",
+  { nr:1, modul:1, titel:"Grundlage und Maitrī", datum:"01. Mai 2026",
     punkte:[
       "Vers 1: Longchenpas Wiesen-Metapher – die Vier Unermesslichkeiten als Ort der Ruhe für sich und andere",
       "Zwei Traditionen: Brahmavihāra (Theravāda) und Grenzenlose Haltungen (Vajrayāna) – meist gleichbedeutend",
@@ -1137,7 +1167,7 @@ const EINHEITEN = [
       "„Gedanken haben keine eigenständige Realität – sie sind wie Worte: nützliche Konventionen, nicht mehr.”",
     ],
     link:"https://notes.granola.ai/t/d3db586d-d1e5-41d4-8e47-4b6a81610823-00best9l" },
-  { nr:2, titel:"Brahmavihāras vs. grenzenlose Haltungen", datum:"02. Mai 2026",
+  { nr:2, modul:1, titel:"Brahmavihāras vs. grenzenlose Haltungen", datum:"02. Mai 2026",
     punkte:[
       "Verse 2–4: Longchenpas Unterscheidung – ohne Weisheit führen die Qualitäten zu höherer Wiedergeburt, mit Weisheit zur Befreiung",
       "Die vier Brahma-Ebenen: Shamatha-Zustände (Dhyāna) – ruhige, konzentrierte Geisteszustände, aber noch innerhalb Samsāras",
@@ -1155,7 +1185,7 @@ const EINHEITEN = [
       "„Unsere gewöhnliche Haltung ist das genaue Gegenteil der Vier Unermesslichkeiten. Das ist der Ausgangspunkt.”",
     ],
     link:null },
-  { nr:3, titel:"Vier Bereiche, vier Wünsche", datum:"02. Mai 2026",
+  { nr:3, modul:2, titel:"Vier Bereiche, vier Wünsche", datum:"02. Mai 2026",
     punkte:[
       "Vers 5: Vier Bereiche – Unglückliche (→ Liebe), Leidende (→ Mitgefühl), Glückliche (→ Freude), Diskriminierende (→ Gleichmut)",
       "Patrul Rinpoches vier Bilder: Mutter für ihr einziges Kind / armlose Mutter / Kamelstute die ihr Junges wiederfindet / ruhiger See",
@@ -1173,7 +1203,7 @@ const EINHEITEN = [
       "„Diese vier Qualitäten sind Ausdruck der Freiheit des Geistes vom Imperativ des Ich.”",
     ],
     link:null },
-  { nr:4, titel:"Wie zu praktizieren ist", datum:"03. Mai 2026",
+  { nr:4, modul:3, titel:"Wie zu praktizieren ist", datum:"03. Mai 2026",
     punkte:[
       "Vers 6: Longchenpa empfiehlt Anfängern, mit Gleichmut zu beginnen – nicht mit Liebe",
       "Erster Schritt: Diskriminierung als eigenen Fehler erkennen, nicht als Reaktion auf andere",
@@ -3069,13 +3099,12 @@ function quickStart(mode) {
 //  LEHRE
 // ═══════════════════════════════════════════════
 
-let lehreTab = "module";
+let lehreTab = "sitzungen";
 
 function renderLehre() {
   document.getElementById("panel-lehre").innerHTML = `
     <div style="padding-top:6px;">
       <div class="seg">
-        <button class="${lehreTab==='module'?'active':''}" onclick="setLehreTab('module')">${t('lehre_module')}</button>
         <button class="${lehreTab==='sitzungen'?'active':''}" onclick="setLehreTab('sitzungen')">${t('lehre_sitzungen')}</button>
         <button class="${lehreTab==='verse'?'active':''}" onclick="setLehreTab('verse')">${t('lehre_verse')}</button>
       </div>
@@ -3088,7 +3117,7 @@ function renderLehre() {
 function setLehreTab(tab) {
   lehreTab = tab;
   document.querySelectorAll("#panel-lehre .seg button").forEach((b,i)=>{
-    b.classList.toggle("active", ['module','sitzungen','verse'][i] === tab);
+    b.classList.toggle("active", ['sitzungen','verse'][i] === tab);
   });
   renderLehreBody();
 }
@@ -3102,7 +3131,9 @@ function renderVerseText(text) {
 function renderLehreBody() {
   const el = document.getElementById("lehre-body");
   if (!el) return;
-  if (lehreTab === "module") {
+  if (lehreTab === "sitzungen") {
+    const seen = (S.prefs && S.prefs.readerSeen) || {};
+    const hasTranscript = new Set(EINHEITEN_TEXTE.map(function(x){ return x.nr; }));
     el.innerHTML = `
       <div class="card">
         <div class="card-title">${t('lehre_qualitaeten')}</div>
@@ -3116,30 +3147,44 @@ function renderLehreBody() {
           `).join('')}
         </div>
       </div>
-      ${MODULE.map(m=>`
-        <div class="card" onclick="showModulSheet(${m.nr})" style="cursor:pointer;">
-          <div class="label" style="margin-bottom:4px;">${t('lehre_module_lbl')} ${m.nr}</div>
-          <div class="card-title">${esc(m.titel)}</div>
-          <div class="small muted">${m.verse.length}${t('lehre_vers_e')} · ${t('lehre_studium')}</div>
-        </div>
-      `).join('')}
-    `;
-  } else if (lehreTab === "sitzungen") {
-    const seen = (S.prefs && S.prefs.readerSeen) || {};
-    const hasTranscript = new Set(EINHEITEN_TEXTE.map(function(x){ return x.nr; }));
-    el.innerHTML = `
-      ${EINHEITEN.map(e=>{
-        const isSeen = !!seen[e.nr];
-        const hasText = hasTranscript.has(e.nr);
-        const dot = hasText
-          ? `<span class="seen-dot${isSeen ? ' seen-dot--read' : ''}"></span>`
-          : '';
+      ${MODULE.map(m => {
+        const modulEinheiten = EINHEITEN.filter(e => e.modul === m.nr);
+        const sessionsHtml = modulEinheiten.length ? modulEinheiten.map(e => {
+          const isSeen = !!seen[e.nr];
+          const hasText = hasTranscript.has(e.nr);
+          const dot = hasText ? `<span class="seen-dot${isSeen?' seen-dot--read':''}"></span>` : '';
+          const showPunkte = e.punkte.slice(0, 3);
+          const extra = e.punkte.length - showPunkte.length;
+          const transcriptBtn = hasText
+            ? `<button class="btn-primary btn-sm" onclick="openReader(${e.nr})">${t('transkript')}</button>`
+            : e.link
+              ? `<a href="${esc(e.link)}" target="_blank" rel="noopener" class="btn-secondary btn-sm" style="text-decoration:none;">${t('transkript')}</a>`
+              : '';
+          return `
+            <div class="einheit-flat">
+              <div class="seen-label" style="margin-bottom:6px;">${dot}<span class="label">${t('lehre_einheit')} ${e.nr} · ${esc(e.datum)}</span></div>
+              <div style="font-weight:600;margin-bottom:8px;line-height:1.3;">${esc(e.titel)}</div>
+              <ul class="punkte-preview">
+                ${showPunkte.map(p=>`<li>${esc(p)}</li>`).join('')}
+                ${extra ? `<li class="extra">+${extra} weitere Schwerpunkte</li>` : ''}
+              </ul>
+              <div class="einheit-actions">
+                ${transcriptBtn}
+                <button class="btn-secondary btn-sm" onclick="showEinheitSheet(${e.nr})">${t('sitzung_schwerpunkte')}</button>
+              </div>
+            </div>`;
+        }).join('') : `<div class="modul-empty">Noch keine Sitzungen</div>`;
         return `
-        <div class="card" data-einheit="${e.nr}" onclick="showEinheitSheet(${e.nr})" style="cursor:pointer;">
-          <div class="label seen-label" style="margin-bottom:4px;">${dot}${t('lehre_einheit')} ${e.nr} · ${esc(e.datum)}</div>
-          <div class="card-title">${esc(e.titel)}</div>
-          <div class="small muted">${e.punkte.length}${t('lehre_schwerpunkte')}</div>
-        </div>`;
+          <div class="modul-section">
+            <div class="modul-hdr">
+              <div class="modul-hdr-meta">
+                <div class="modul-hdr-nr">${t('lehre_module_lbl')} ${m.nr}</div>
+                <div class="modul-hdr-titel">${esc(m.titel)}</div>
+              </div>
+              <button class="btn-text" onclick="showModulSheet(${m.nr})">${t('modul_studium')} ›</button>
+            </div>
+            ${sessionsHtml}
+          </div>`;
       }).join('')}
     `;
   } else {
