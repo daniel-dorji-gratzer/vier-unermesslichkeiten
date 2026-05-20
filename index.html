@@ -457,6 +457,12 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   font-size: .88rem; color: var(--ink-soft); line-height: 1.55;
   font-style: italic; margin: 0;
 }
+/* In journal list: tighter spacing + 4-line clamp for long snippets */
+.j-source-context { margin-bottom: 8px; }
+.j-source-quote {
+  display: -webkit-box; -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4; overflow: hidden;
+}
 
 /* ── Calendar ── */
 .cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -2953,12 +2959,13 @@ function renderHeute() {
         const q = getQ(s.focus);
         const pillClass = q ? q.farbe : 'neutral';
         const pillName = q ? q.name : (s.focus || '–');
+        const srcHtml  = _jSourceBlock(s);
         const notesHtml = s.notes ? '<div class="j-text">' + displayNotes(s.notes) + '</div>' : '';
         rows += '<div class="j-entry">'
           + '<div class="j-date">' + (s.duration ? s.duration + ' min · ' : '')
           + '<span class="pill ' + pillClass + '">' + pillName + '</span>'
           + (s.mode ? ' · ' + esc(s.mode) : '') + '</div>'
-          + notesHtml + '</div>';
+          + srcHtml + notesHtml + '</div>';
       });
       sessHtml = '<div class="card"><div class="label" style="margin-bottom:8px;">'+t('heute_geuebt')+'</div>' + rows + '</div>';
     } else {
@@ -3726,6 +3733,17 @@ function saveLog() {
 //  TAGEBUCH
 // ═══════════════════════════════════════════════
 
+// Renders the source-quote block for a session (Option A journal display)
+function _jSourceBlock(s) {
+  if (!s.source || !s.source.snippet) return '';
+  var ref = (t('lehre_einheit')||'Sitzung') + ' ' + s.source.sitzungNr
+    + (s.source.paraIdx ? ' · ' + (t('reader_abschnitt')||'Abschnitt') + ' ' + s.source.paraIdx : '');
+  return '<div class="source-context j-source-context">'
+    + '<div class="source-ref">' + esc(ref) + '</div>'
+    + '<blockquote class="j-source-quote">„' + esc(s.source.snippet) + '"</blockquote>'
+    + '</div>';
+}
+
 function renderTagebuch() {
   document.getElementById("panel-tagebuch").innerHTML = `
     <div class="card">
@@ -3742,7 +3760,9 @@ function renderTagebuch() {
       ${S.sessions.length===0?`<div class="muted small">${t('tj_leer')}</div>`:
         S.sessions.map(s=>{
           const q=getQ(s.focus);
-          return `<div class="j-entry" data-s="${esc((s.notes||'')+(s.mode||'')+(q?.name||''))}">
+          const snippet = s.source && s.source.snippet ? s.source.snippet : '';
+          const searchData = esc((s.notes||'')+(s.mode||'')+(q?.name||'')+snippet);
+          return `<div class="j-entry" data-s="${searchData}">
             <div class="j-date">
               ${fmtDateLong(s.date)}
               ${s.duration?'· '+s.duration+' min':''}
@@ -3753,7 +3773,8 @@ function renderTagebuch() {
                 <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;line-height:1;" title="L\xF6schen">×</button>
               </span>
             </div>
-            ${s.notes?`<div class="j-text">${displayNotes(s.notes)}</div>`:`<div class="small muted">${t('tj_keine_notizen')}</div>`}
+            ${_jSourceBlock(s)}
+            ${s.notes?`<div class="j-text">${displayNotes(s.notes)}</div>`:(snippet?'':`<div class="small muted">${t('tj_keine_notizen')}</div>`)}
           </div>`;
         }).join('')
       }
