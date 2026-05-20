@@ -4614,6 +4614,28 @@ applyTheme();
 applyLang();
 renderHeute();
 showOnboarding();
+
+// ── Swipe between Lehre sub-tabs ──────────────────────────────────────────
+(function() {
+  var TABS_LEHRE = ['sitzungen','verse'];
+  var sx, sy;
+  var panel = document.getElementById('panel-lehre');
+  panel.addEventListener('touchstart', function(e) {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, { passive: true });
+  panel.addEventListener('touchend', function(e) {
+    if (sx === undefined) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    var dy = e.changedTouches[0].clientY - sy;
+    sx = sy = undefined;
+    // Only react to clearly horizontal swipes (dx dominant, ≥ 50 px)
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    var cur = TABS_LEHRE.indexOf(lehreTab);
+    if (dx < 0 && cur < TABS_LEHRE.length - 1) setLehreTab(TABS_LEHRE[cur + 1]);
+    if (dx > 0 && cur > 0)                     setLehreTab(TABS_LEHRE[cur - 1]);
+  }, { passive: true });
+})();
 setTimeout(checkBackupDue, 1000);
 // Also re-apply theme if system preference changes (auto mode)
 window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function() {
