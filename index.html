@@ -397,6 +397,11 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
   text-align: center; white-space: pre-line; max-width: 520px; margin: 0 auto 22px; }
 .runner-text.italic { font-style: italic; color: var(--ink-soft); }
 .runner-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.verse-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin: 0 auto 16px; max-width: 360px; width: 100%;
+}
+.verse-nav-ctr { font-size: .8rem; color: var(--ink-faint); text-align: center; flex: 1; }
 .runner-progress { text-align: center; font-size: .78rem; color: var(--ink-muted); margin-top: 14px; }
 .timer-ring-wrap { position: relative; width: 180px; height: 180px; margin: 16px auto 8px; }
 .timer-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
@@ -1855,6 +1860,7 @@ const STRINGS = {
     runner_abschluss:'Abschluss', runner_rez_abschluss:'Widme die Tugend allen Wesen.',
     runner_vers_verweilen:'Welcher Satz hallt nach? Bleib bei ihm.',
     runner_vers_abschluss:'Eine kurze Notiz oder einfach gehen lassen.',
+    runner_vers_prev:'‹ Voriger', runner_vers_next:'Nächster ›',
     runner_stille:'In Stille sitzen', runner_beenden_eintragen:'Beenden & eintragen', runner_abbrechen:'Abbrechen',
     kontempl_vor_text:'Setze dich bequem hin. Ein paar Atemzüge. Optional die vier Zeilen rezitieren.',
     kontempl_verweilen:'Bleib einen Moment in dem, was sich gezeigt hat.',
@@ -1952,6 +1958,7 @@ const STRINGS = {
     runner_abschluss:'Closing', runner_rez_abschluss:'Dedicate the virtue to all beings.',
     runner_vers_verweilen:'Which sentence echoes? Stay with it.',
     runner_vers_abschluss:'A brief note, or simply let it go.',
+    runner_vers_prev:'‹ Previous', runner_vers_next:'Next ›',
     runner_stille:'Sitting in silence', runner_beenden_eintragen:'End & log', runner_abbrechen:'Cancel',
     kontempl_vor_text:'Sit comfortably. A few breaths. Optionally recite the four lines.',
     kontempl_verweilen:'Stay a moment with what has shown itself.',
@@ -3440,8 +3447,8 @@ function startMode(mode) {
     if (S.verseIdx === undefined) S.verseIdx = 0;
     const idx = S.verseIdx % VERSE.length;
     const v = VERSE[idx];
-    S.verseIdx = idx + 1; save();
-    RN = { mode, step:0, t0:Date.now(), timer:null, dur:8, qId:null, steps:[
+    // S.verseIdx is advanced only when user confirms the verse (rnNext on step 0)
+    RN = { mode, step:0, t0:Date.now(), timer:null, dur:8, qId:null, verseIdx:idx, steps:[
       {stage:t('lehre_vers_lbl')+' '+v.n+' / '+VERSE.length+' · Longchenpa', text:v.text, it:true},
       {stage:t('runner_verweilen'), text:t('runner_vers_verweilen'), it:false},
       {stage:t('runner_abschluss'), text:t('runner_vers_abschluss'), it:false},
@@ -3493,9 +3500,17 @@ function renderRunner() {
   if (!el) return;
   const step = RN.steps[RN.step];
   if (!step) { endRunner(); return; }
+  const isVerseStep = RN.mode==='verse' && RN.step===0;
+  const verseNav = isVerseStep ? `
+    <div class="verse-nav">
+      <button class="btn-secondary btn-sm" onclick="rnVersePrev()">${t('runner_vers_prev')}</button>
+      <span class="verse-nav-ctr">${t('lehre_vers_lbl')} ${VERSE[RN.verseIdx].n} / ${VERSE.length}</span>
+      <button class="btn-secondary btn-sm" onclick="rnVerseNext()">${t('runner_vers_next')}</button>
+    </div>` : '';
   el.innerHTML = `
     <div class="runner-stage">${esc(step.stage||'')} · ${RN.step+1}/${RN.steps.length}</div>
     <div class="runner-text${step.it?' italic':''}">${esc(step.text)}</div>
+    ${verseNav}
     <div class="runner-controls">
       ${RN.step>0?`<button class="btn-secondary" onclick="rnPrev()">${t('runner_zurueck')}</button>`:''}
       ${RN.step<RN.steps.length-1
@@ -3506,8 +3521,30 @@ function renderRunner() {
   `;
 }
 
-function rnNext() { RN.step=Math.min(RN.steps.length-1,RN.step+1); renderRunner(); }
+function rnNext() {
+  if (RN.mode==='verse' && RN.step===0) {
+    // User confirmed this verse — advance saved counter to the next one
+    S.verseIdx = (RN.verseIdx + 1) % VERSE.length; save();
+  }
+  RN.step=Math.min(RN.steps.length-1,RN.step+1); renderRunner();
+}
 function rnPrev() { RN.step=Math.max(0,RN.step-1); renderRunner(); }
+
+function rnVersePrev() {
+  if (RN.mode!=='verse' || RN.step!==0) return;
+  RN.verseIdx = (RN.verseIdx - 1 + VERSE.length) % VERSE.length;
+  _rnVerseUpdate();
+}
+function rnVerseNext() {
+  if (RN.mode!=='verse' || RN.step!==0) return;
+  RN.verseIdx = (RN.verseIdx + 1) % VERSE.length;
+  _rnVerseUpdate();
+}
+function _rnVerseUpdate() {
+  const v = VERSE[RN.verseIdx];
+  RN.steps[0] = {stage:t('lehre_vers_lbl')+' '+v.n+' / '+VERSE.length+' · Longchenpa', text:v.text, it:true};
+  renderRunner();
+}
 
 function finishRunner() {
   const mins = Math.max(1,Math.round((Date.now()-RN.t0)/60000));
