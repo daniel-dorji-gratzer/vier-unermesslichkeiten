@@ -1,4 +1,4 @@
-const CACHE = 'vum-v80';
+const CACHE = 'vum-v81';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/vier-unermesslichkeiten/'])));

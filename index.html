@@ -566,6 +566,9 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 #sheet-bg.writing #log-notes-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #sheet-bg.writing #log-notes-wrap .field { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #sheet-bg.writing #log-notes { flex: 1; min-height: 0; resize: none; }
+/* In writing mode: collapse source quote to just the ref label → editor gets the space */
+#sheet-bg.writing .source-context { padding: 5px 10px; margin-bottom: 6px; }
+#sheet-bg.writing .source-context blockquote { display: none; }
 #log-meta-summary { display: none; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-bottom: 12px; padding: 8px 12px; background: var(--bg-soft);
   border-radius: 10px; font-size: .82rem; color: var(--ink-soft); }
