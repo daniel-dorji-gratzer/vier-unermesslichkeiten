@@ -495,6 +495,19 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 /* In journal list: tighter spacing */
 .j-source-context { margin-bottom: 8px; }
 
+/* ── Bookmark button & filter ── */
+.j-bm-btn { background: none; border: none; font-size: 1.15rem; cursor: pointer;
+  padding: 4px 6px; touch-action: manipulation; line-height: 1;
+  color: var(--ink-muted); transition: color .15s; }
+.j-bm-btn.bm-on { color: #c9a227; }
+.bm-filter-active #j-bm-toggle { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+/* ── Inline log (after runner) ── */
+.inline-log-done { text-align: center; margin-bottom: 18px; }
+.inline-log-done .done-icon { font-size: 2rem; margin-bottom: 4px; color: var(--accent); }
+.inline-log-done .done-label { font-weight: 600; font-size: 1rem; }
+.inline-log-done .done-sub { font-size: .82rem; color: var(--ink-muted); margin-top: 2px; }
+
 /* ── Calendar ── */
 .cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .cal-head { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
@@ -1860,6 +1873,7 @@ const STRINGS = {
     runner_vers_verweilen:'Welcher Satz hallt nach? Bleib bei ihm.',
     runner_vers_abschluss:'Eine kurze Notiz oder einfach gehen lassen.',
     runner_vers_prev:'‹ Voriger', runner_vers_next:'Nächster ›',
+    runner_reflexion:'Reflexion', runner_ueberspringen:'Überspringen',
     runner_stille:'In Stille sitzen', runner_beenden_eintragen:'Beenden & eintragen', runner_abbrechen:'Abbrechen',
     kontempl_vor_text:'Setze dich bequem hin. Ein paar Atemzüge. Optional die vier Zeilen rezitieren.',
     kontempl_verweilen:'Bleib einen Moment in dem, was sich gezeigt hat.',
@@ -1874,6 +1888,7 @@ const STRINGS = {
     log_eingetragen:'Eingetragen ✓',
     tj_title:'Tagebuch', tj_neu:'+ Neu', tj_suchen:'Suchen …', tj_leer:'Noch keine Einträge.',
     tj_keine_notizen:'– keine Notizen –', tj_loeschen:'Eintrag löschen?', tj_geloescht:'Gelöscht',
+    tj_lesezeichen:'Lesezeichen', tj_alle:'Alle',
     tj_eintrag:'Tagebucheintrag', tj_bearbeiten:'Eintrag bearbeiten',
     weg_ueberblick:'Überblick', weg_lernpfad:'Lernpfad', weg_reflexion:'Reflexion',
     weg_streak:'Streak & Ziele', weg_bearbeiten:'bearbeiten →', weg_tage:'Tage in Folge',
@@ -1958,6 +1973,7 @@ const STRINGS = {
     runner_vers_verweilen:'Which sentence echoes? Stay with it.',
     runner_vers_abschluss:'A brief note, or simply let it go.',
     runner_vers_prev:'‹ Previous', runner_vers_next:'Next ›',
+    runner_reflexion:'Reflection', runner_ueberspringen:'Skip',
     runner_stille:'Sitting in silence', runner_beenden_eintragen:'End & log', runner_abbrechen:'Cancel',
     kontempl_vor_text:'Sit comfortably. A few breaths. Optionally recite the four lines.',
     kontempl_verweilen:'Stay a moment with what has shown itself.',
@@ -1972,6 +1988,7 @@ const STRINGS = {
     log_eingetragen:'Logged ✓',
     tj_title:'Journal', tj_neu:'+ New', tj_suchen:'Search …', tj_leer:'No entries yet.',
     tj_keine_notizen:'– no notes –', tj_loeschen:'Delete entry?', tj_geloescht:'Deleted',
+    tj_lesezeichen:'Bookmarks', tj_alle:'All',
     tj_eintrag:'Journal Entry', tj_bearbeiten:'Edit entry',
     weg_ueberblick:'Overview', weg_lernpfad:'Learning path', weg_reflexion:'Reflection',
     weg_streak:'Streak & Goals', weg_bearbeiten:'edit →', weg_tage:'Day streak',
@@ -3547,7 +3564,60 @@ function _rnVerseUpdate() {
 
 function finishRunner() {
   const mins = Math.max(1,Math.round((Date.now()-RN.t0)/60000));
-  showLogSheet({ duration:mins, focus:RN.qId||S.arc.currentPhase, mode:RN.mode, afterSave:()=>endRunner() });
+  const focus = RN.qId||S.arc.currentPhase;
+  const mode  = RN.mode;
+  const q = getQ(focus);
+  const el = document.getElementById('runner');
+  if (!el) { showLogSheet({ duration:mins, focus, mode, afterSave:()=>endRunner() }); return; }
+  // Show inline reflection form inside the runner container
+  const modeStr = mode==='stille'?t('timer_titel')||'Stille':mode==='verse'?t('vers_titel')||'Vers lesen':mode==='rezitation'?t('rez_titel')||'Rezitation':esc(mode||'');
+  el.innerHTML = `
+    <div class="inline-log-done">
+      <div class="done-icon">✓</div>
+      <div class="done-label">${mins} min${q?' · '+q.name:''}</div>
+      <div class="done-sub">${modeStr}</div>
+    </div>
+    <div class="label" style="margin-bottom:6px;">${t('runner_reflexion')}</div>
+    <div class="md-toolbar">
+      <button class="md-btn" onpointerdown="event.preventDefault()" onclick="_fmt('bold')"><strong>B</strong></button>
+      <button class="md-btn" onpointerdown="event.preventDefault()" onclick="_fmt('italic')"><em>I</em></button>
+      <button class="md-btn" onpointerdown="event.preventDefault()" onclick="_fmt('ul')">• –</button>
+      <button class="md-btn" onpointerdown="event.preventDefault()" onclick="_fmt('quote')">" "</button>
+    </div>
+    <div id="inline-notes" class="notes-editor j-text" contenteditable="true"
+      data-placeholder="${t('log_notes_ph')}" style="min-height:110px;margin-bottom:14px;"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="_saveInlineLog(${mins},'${focus}','${esc(mode||'')}')">${t('log_eintragen')}</button>
+      <button class="btn-ghost" onclick="endRunner()">${t('runner_ueberspringen')}</button>
+    </div>
+  `;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function _saveInlineLog(mins, focus, mode) {
+  const notesEl = document.getElementById('inline-notes');
+  const notes = notesEl ? notesEl.innerHTML.trim() : '';
+  const newSess = {id:uid(), date:todayISO(), duration:mins, focus, mode, notes};
+  S.sessions.unshift(newSess);
+  S.sessionsSinceBackup = (S.sessionsSinceBackup||0) + 1;
+  save();
+  // Auto-complete Lernpfad milestones (mirrors saveLog logic)
+  if (QUALITAETEN.find(function(q){ return q.id===focus; })) {
+    const ml = (mode||'').toLowerCase();
+    if (!S.path) S.path = {};
+    let changed = false;
+    if (ml==='kontemplation'||ml.includes('kontempl')) {
+      if (!S.path[pathKey(focus,'kontemplation')]) { S.path[pathKey(focus,'kontemplation')]=true; changed=true; }
+    }
+    if (ml==='stille'||ml.includes('medit')) {
+      if (!S.path[pathKey(focus,'meditation')]) { S.path[pathKey(focus,'meditation')]=true; changed=true; }
+    }
+    if (changed) save();
+  }
+  endRunner();
+  toast(t('log_eingetragen'));
+  renderPanel(activeTab);
+  checkBackupDue();
 }
 
 function endRunner() {
@@ -3633,7 +3703,7 @@ function editLog(id) {
 }
 
 function _fmt(type) {
-  var el = document.getElementById('log-notes');
+  var el = document.getElementById('log-notes') || document.getElementById('inline-notes');
   if (!el) return;
   el.focus();
   if (type === 'bold')   document.execCommand('bold',   false, null);
@@ -3814,6 +3884,32 @@ function saveLog() {
 //  TAGEBUCH
 // ═══════════════════════════════════════════════
 
+var _bmFilter = false;
+
+function toggleBmFilter() {
+  _bmFilter = !_bmFilter;
+  document.getElementById('panel-tagebuch').classList.toggle('bm-filter-active', _bmFilter);
+  document.getElementById('j-bm-toggle').textContent = _bmFilter ? t('tj_alle') : ('★ ' + t('tj_lesezeichen'));
+  filterJournal();
+}
+
+function toggleBookmark(id) {
+  var s = S.sessions.find(function(x){ return x.id === id; });
+  if (!s) return;
+  s.bookmarked = !s.bookmarked;
+  save();
+  // Update button and data-bm in-place without full re-render
+  var btn = document.querySelector('[data-bmid="'+id+'"]');
+  if (btn) {
+    btn.classList.toggle('bm-on', !!s.bookmarked);
+    btn.title = s.bookmarked ? '★' : '☆';
+    btn.textContent = s.bookmarked ? '★' : '☆';
+  }
+  var entry = document.querySelector('[data-jid="'+id+'"]');
+  if (entry) entry.dataset.bm = s.bookmarked ? '1' : '0';
+  if (_bmFilter) filterJournal();
+}
+
 // Renders the source-quote block for a session (Option A journal display)
 function _jSourceBlock(s) {
   if (!s.source || !s.source.snippet) return '';
@@ -3826,15 +3922,20 @@ function _jSourceBlock(s) {
 }
 
 function renderTagebuch() {
+  _bmFilter = false; // reset filter on re-render
   document.getElementById("panel-tagebuch").innerHTML = `
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div class="card-title" style="margin:0;">${t('tj_title')}</div>
         <button class="btn-primary" onclick="showLogSheet()" style="padding:8px 14px;font-size:.85rem;">${t('tj_neu')}</button>
       </div>
-      <div class="search-wrap">
-        <div class="search-icon">⌕</div>
-        <input type="text" id="j-search" placeholder="${t('tj_suchen')}" oninput="filterJournal()">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="search-wrap" style="flex:1;">
+          <div class="search-icon">⌕</div>
+          <input type="text" id="j-search" placeholder="${t('tj_suchen')}" oninput="filterJournal()">
+        </div>
+        <button id="j-bm-toggle" class="btn-secondary" onclick="toggleBmFilter()"
+          style="white-space:nowrap;padding:8px 12px;font-size:.82rem;flex-shrink:0;">★ ${t('tj_lesezeichen')}</button>
       </div>
     </div>
     <div class="card" id="j-list">
@@ -3843,13 +3944,15 @@ function renderTagebuch() {
           const q=getQ(s.focus);
           const snippet = s.source && s.source.snippet ? s.source.snippet : '';
           const searchData = esc((s.notes||'')+(s.mode||'')+(q?.name||'')+snippet);
-          return `<div class="j-entry" data-s="${searchData}">
+          return `<div class="j-entry" data-s="${searchData}" data-jid="${s.id}" data-bm="${s.bookmarked?'1':'0'}">
             <div class="j-date">
               ${fmtDateLong(s.date)}
               ${s.duration?'· '+s.duration+' min':''}
               ${q?`· <span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'· <span class="pill neutral">alle vier</span>':'')}
               ${s.mode?'· '+esc(s.mode):''}
-              <span style="float:right;display:flex;gap:6px;align-items:center;">
+              <span style="float:right;display:flex;gap:2px;align-items:center;">
+                <button class="j-bm-btn${s.bookmarked?' bm-on':''}" data-bmid="${s.id}"
+                  onclick="toggleBookmark('${s.id}')" title="${s.bookmarked?'★':'☆'}">${s.bookmarked?'★':'☆'}</button>
                 <button onclick="editLog('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;" title="Bearbeiten">✎</button>
                 <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;line-height:1;" title="L\xF6schen">×</button>
               </span>
@@ -3867,7 +3970,9 @@ function filterJournal() {
   const q = document.getElementById("j-search")?.value.toLowerCase()||"";
   document.querySelectorAll("#j-list .j-entry").forEach(el=>{
     const hay = ((el.dataset.s||"")+el.textContent).toLowerCase();
-    el.style.display = hay.includes(q)?"":"none";
+    const textOk = !q || hay.includes(q);
+    const bmOk   = !_bmFilter || el.dataset.bm === "1";
+    el.style.display = (textOk && bmOk) ? "" : "none";
   });
 }
 
