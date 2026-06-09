@@ -229,7 +229,7 @@ body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none; padding-bottom: 24px; }
+  overscroll-behavior-y: none; padding-bottom: 16px; }
 .panel { display: none; padding: calc(env(safe-area-inset-top, 0px) + 24px) 18px 0; animation: fadeIn .2s ease; }
 #panel-heute { padding-top: 0; }
 .panel.active { display: block; }
@@ -680,7 +680,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 
 /* ── Hero (Heute) ── */
 .hero-today {
-  margin: 0 -16px 20px;
+  margin: 0 -18px 20px;
   padding: calc(env(safe-area-inset-top, 0px) + 36px) 24px 22px;
   border-radius: 0 0 32px 32px;
   position: relative;
@@ -2769,45 +2769,74 @@ function heroGradient(id) {
 
 function heroIllustration(id) {
   const illus = {
-    // Gleichmut · Wasser — ruhige horizontale Ellipsen wie eine stille Seeoberfläche
+
+    // Gleichmut · Wasser — konzentrische Ringe auf einem stillen See
+    // Ein Stein fiel vor langer Zeit ins Wasser; die Wellen klingen sanft aus.
     gleichmut: `
-      <ellipse cx="320" cy="230" rx="290" ry="58" fill="rgba(255,255,255,.055)"/>
-      <ellipse cx="240" cy="178" rx="220" ry="36" fill="rgba(255,255,255,.045)"/>
-      <ellipse cx="360" cy="268" rx="310" ry="68" fill="rgba(255,255,255,.035)"/>
-      <ellipse cx="160" cy="130" rx="170" ry="22" fill="rgba(255,255,255,.04)"/>
-      <line x1="0" y1="200" x2="400" y2="188" stroke="rgba(255,255,255,.13)" stroke-width="1.2"/>
-      <line x1="0" y1="240" x2="400" y2="230" stroke="rgba(255,255,255,.07)" stroke-width=".8"/>
-      <line x1="40" y1="160" x2="300" y2="155" stroke="rgba(255,255,255,.06)" stroke-width=".8"/>`,
+      <g transform="translate(200,310)" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2">
+        <ellipse rx="38"  ry="14"  opacity=".90"/>
+        <ellipse rx="76"  ry="28"  opacity=".72" stroke-width="1.0"/>
+        <ellipse rx="118" ry="43"  opacity=".55" stroke-width=".9"/>
+        <ellipse rx="162" ry="59"  opacity=".40" stroke-width=".8"/>
+        <ellipse rx="210" ry="76"  opacity=".28" stroke-width=".7"/>
+        <ellipse rx="262" ry="94"  opacity=".18" stroke-width=".6"/>
+        <ellipse rx="318" ry="114" opacity=".10" stroke-width=".5"/>
+      </g>
+      <line x1="0" y1="208" x2="400" y2="196" stroke="rgba(255,255,255,.10)" stroke-width="1.0"/>
+      <line x1="0" y1="238" x2="400" y2="230" stroke="rgba(255,255,255,.06)" stroke-width=".7"/>`,
 
-    // Liebe · Boden — organische Erdschichten, warm und tragend
+    // Liebe · Boden — Wurzeln, die sich in der Erde ausbreiten
+    // Tragendes Netz unter der Oberfläche; Wärme und Halt.
     liebe: `
-      <path d="M-10 270 Q90 248 200 262 Q310 276 410 255 L410 320 L-10 320Z" fill="rgba(255,255,255,.07)"/>
-      <path d="M-10 228 Q70 208 185 220 Q295 232 410 212 L410 258 Q310 276 200 262 Q90 248 -10 270Z" fill="rgba(255,255,255,.055)"/>
-      <path d="M-10 195 Q110 176 200 186 Q305 196 410 175 L410 214 Q295 232 185 220 Q70 208 -10 228Z" fill="rgba(255,255,255,.04)"/>
-      <circle cx="340" cy="115" r="78" fill="rgba(255,255,255,.045)"/>
-      <circle cx="55" cy="185" r="48" fill="rgba(255,255,255,.038)"/>
-      <circle cx="200" cy="60" r="38" fill="rgba(255,255,255,.03)"/>`,
+      <path d="M200 280 L200 200" stroke="rgba(255,255,255,.22)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <path d="M200 240 Q155 215 110 225" stroke="rgba(255,255,255,.18)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <path d="M200 255 Q240 228 285 240" stroke="rgba(255,255,255,.18)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <path d="M200 215 Q168 195 138 202" stroke="rgba(255,255,255,.13)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M200 225 Q230 206 262 214" stroke="rgba(255,255,255,.13)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M110 225 Q82 230 60 220" stroke="rgba(255,255,255,.10)" stroke-width="1.0" stroke-linecap="round" fill="none"/>
+      <path d="M285 240 Q318 248 346 236" stroke="rgba(255,255,255,.10)" stroke-width="1.0" stroke-linecap="round" fill="none"/>
+      <path d="M138 202 Q112 196 88 204" stroke="rgba(255,255,255,.07)" stroke-width=".8" stroke-linecap="round" fill="none"/>
+      <path d="M262 214 Q290 208 316 218" stroke="rgba(255,255,255,.07)" stroke-width=".8" stroke-linecap="round" fill="none"/>
+      <path d="M-10 285 Q90 265 200 278 Q310 291 410 270 L410 320 L-10 320Z" fill="rgba(255,255,255,.06)"/>
+      <path d="M-10 302 Q90 292 200 300 Q310 308 410 296 L410 320 L-10 320Z" fill="rgba(255,255,255,.04)"/>`,
 
-    // Mitgefühl · Blumen — abstrakte Blütenblätter, aus einem Punkt strahlend
+    // Mitgefühl · Blumen — Lotusblüte, die sich öffnet
+    // Acht symmetrische Blütenblätter aus der Tiefe des Wassers.
     mitgefuehl: `
-      <ellipse cx="340" cy="55" rx="48" ry="115" fill="rgba(255,255,255,.055)" transform="rotate(-38 340 55)"/>
-      <ellipse cx="355" cy="70" rx="48" ry="115" fill="rgba(255,255,255,.045)" transform="rotate(12 355 70)"/>
-      <ellipse cx="325" cy="48" rx="44" ry="105" fill="rgba(255,255,255,.045)" transform="rotate(-82 325 48)"/>
-      <ellipse cx="355" cy="90" rx="38" ry="95" fill="rgba(255,255,255,.038)" transform="rotate(48 355 90)"/>
-      <ellipse cx="310" cy="75" rx="34" ry="90" fill="rgba(255,255,255,.035)" transform="rotate(-118 310 75)"/>
-      <circle cx="340" cy="65" r="22" fill="rgba(255,255,255,.08)"/>
-      <circle cx="340" cy="65" r="10" fill="rgba(255,255,255,.10)"/>`,
+      <g transform="translate(310,60)" fill="rgba(255,255,255,.0)" stroke="none">
+        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(0)"/>
+        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(45)"/>
+        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(90)"/>
+        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(135)"/>
+        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(22.5)"/>
+        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(67.5)"/>
+        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(112.5)"/>
+        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(157.5)"/>
+        <circle r="16" fill="rgba(255,255,255,.10)"/>
+        <circle r="8"  fill="rgba(255,255,255,.14)"/>
+        <circle r="3"  fill="rgba(255,255,255,.20)"/>
+      </g>
+      <g transform="translate(80,230)" fill="rgba(255,255,255,.0)">
+        <ellipse rx="13" ry="38" fill="rgba(255,255,255,.032)" transform="rotate(0)"/>
+        <ellipse rx="13" ry="38" fill="rgba(255,255,255,.032)" transform="rotate(60)"/>
+        <ellipse rx="13" ry="38" fill="rgba(255,255,255,.032)" transform="rotate(120)"/>
+        <circle r="9"  fill="rgba(255,255,255,.06)"/>
+        <circle r="4"  fill="rgba(255,255,255,.09)"/>
+      </g>`,
 
-    // Freude · Schatten — Lichtschäfte durch ein Blätterdach
+    // Freude · Licht durch Blätterdach — Lichtschäfte und Blattschatten
+    // Dappled light: warme Strahlen brechen durch Laub, Schattenflecken tanzen.
     freude: `
-      <polygon points="195,0 265,0 390,320 320,320" fill="rgba(255,255,255,.055)"/>
-      <polygon points="290,0 335,0 400,155 375,155" fill="rgba(255,255,255,.04)"/>
-      <polygon points="75,0 135,0 245,320 185,320" fill="rgba(255,255,255,.045)"/>
-      <polygon points="350,0 380,0 400,60 385,60" fill="rgba(255,255,255,.035)"/>
-      <ellipse cx="115" cy="85" rx="38" ry="25" fill="rgba(0,0,0,.07)" transform="rotate(-22 115 85)"/>
-      <ellipse cx="275" cy="140" rx="48" ry="30" fill="rgba(0,0,0,.06)" transform="rotate(15 275 140)"/>
-      <ellipse cx="55" cy="195" rx="28" ry="18" fill="rgba(0,0,0,.05)" transform="rotate(-8 55 195)"/>
-      <ellipse cx="320" cy="240" rx="42" ry="26" fill="rgba(0,0,0,.05)" transform="rotate(25 320 240)"/>`,
+      <polygon points="170,0 210,0 340,320 300,320" fill="rgba(255,255,255,.06)"/>
+      <polygon points="255,0 285,0 380,320 350,320" fill="rgba(255,255,255,.045)"/>
+      <polygon points="60,0 100,0 200,320 160,320"  fill="rgba(255,255,255,.05)"/>
+      <polygon points="320,0 345,0 400,120 388,120"  fill="rgba(255,255,255,.035)"/>
+      <polygon points="0,0 22,0 90,320 68,320"      fill="rgba(255,255,255,.025)"/>
+      <ellipse cx="128" cy="72"  rx="42" ry="18" fill="rgba(0,0,0,.09)" transform="rotate(-18 128 72)"/>
+      <ellipse cx="82"  cy="155" rx="28" ry="12" fill="rgba(0,0,0,.07)" transform="rotate(12 82 155)"/>
+      <ellipse cx="305" cy="105" rx="52" ry="20" fill="rgba(0,0,0,.08)" transform="rotate(22 305 105)"/>
+      <ellipse cx="240" cy="220" rx="36" ry="14" fill="rgba(0,0,0,.06)" transform="rotate(-8 240 220)"/>
+      <ellipse cx="355" cy="188" rx="30" ry="12" fill="rgba(0,0,0,.06)" transform="rotate(30 355 188)"/>`,
   };
   const shapes = illus[id] || '';
   return `<svg class="hero-illus" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`;
