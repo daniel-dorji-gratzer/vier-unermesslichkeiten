@@ -26,7 +26,7 @@
   --tab-h: 52px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bot: env(safe-area-inset-bottom, 0px);
-  --shadow: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.07);
+  --shadow: 0 2px 8px rgba(0,0,0,.07), 0 12px 32px rgba(0,0,0,.10);
   --r: 18px;
   --kap-gleichmut-border: #7BB3D4;
   --kap-liebe-border: #F5C842;
@@ -412,6 +412,10 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 /* ── Journal ── */
 .j-entry { padding: 13px 0; border-bottom: 1px solid var(--line); }
 .j-entry:last-child { border-bottom: none; }
+.j-date-hdr { font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--ink-faint); padding: 14px 0 4px;
+  border-top: 1px solid var(--line); }
+.j-date-hdr:first-child { padding-top: 2px; border-top: none; }
 .j-date { font-size: .78rem; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;
   text-transform: uppercase; letter-spacing: .05em; }
 .j-text { font-size: .92rem; color: var(--ink); line-height: 1.65; }
@@ -503,10 +507,31 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 .bm-filter-active #j-bm-toggle { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
 /* ── Inline log (after runner) ── */
-.inline-log-done { text-align: center; margin-bottom: 18px; }
-.inline-log-done .done-icon { font-size: 2rem; margin-bottom: 4px; color: var(--accent); }
-.inline-log-done .done-label { font-weight: 600; font-size: 1rem; }
-.inline-log-done .done-sub { font-size: .82rem; color: var(--ink-muted); margin-top: 2px; }
+/* Inline log — completion celebration */
+@keyframes ring-draw {
+  from { stroke-dashoffset: 125.7; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes check-pop {
+  0%   { opacity:0; transform:scale(.3); }
+  65%  { transform:scale(1.2); }
+  100% { opacity:1; transform:scale(1); }
+}
+@keyframes fade-up {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:none; }
+}
+.done-celebrate { text-align:center; padding:10px 0 22px; }
+.done-ring-svg  { display:block; margin:0 auto 10px; overflow:visible; }
+.done-ring-track { stroke:var(--line); }
+.done-ring-arc   { stroke:var(--accent); stroke-linecap:round;
+  animation:ring-draw .65s cubic-bezier(.4,0,.2,1) .05s both; }
+.done-check { animation:check-pop .38s cubic-bezier(.34,1.56,.64,1) .55s both;
+  display:inline-block; }
+.done-label { font-weight:700; font-size:1.05rem; margin-bottom:3px;
+  animation:fade-up .35s ease .7s both; }
+.done-sub   { font-size:.82rem; color:var(--ink-muted);
+  animation:fade-up .35s ease .82s both; }
 
 /* ── Calendar ── */
 .cal-wrap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -538,12 +563,16 @@ button.btn-ghost { background: transparent; color: var(--accent); border: none;
 
 /* ── Segment control ── */
 .seg { display: flex; background: var(--bg-soft); border-radius: 10px; padding: 3px;
-  margin-bottom: 14px; }
+  margin-bottom: 14px; position: relative; }
 .seg button { flex: 1; border: none; background: transparent; border-radius: 8px;
   padding: 8px; font-family: inherit; font-size: .86rem; font-weight: 500;
-  color: var(--ink-muted); cursor: pointer; transition: all .15s; touch-action: manipulation; }
-.seg button.active { background: var(--bg-card); color: var(--ink); font-weight: 600;
-  box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  color: var(--ink-muted); cursor: pointer; transition: color .18s; touch-action: manipulation;
+  position: relative; z-index: 1; }
+.seg button.active { color: var(--ink); font-weight: 600; background: transparent; box-shadow: none; }
+.seg-slide { position: absolute; top: 3px; height: calc(100% - 6px);
+  background: var(--bg-card); border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  transition: left .22s cubic-bezier(.4,0,.2,1), width .22s cubic-bezier(.4,0,.2,1), opacity .15s;
+  pointer-events: none; z-index: 0; opacity: 0; }
 
 /* ── Modal / Sheet ── */
 #sheet-bg { display: none; position: fixed; inset: 0; background: rgba(24,18,15,.25);
@@ -740,23 +769,21 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   flex-shrink: 0;
 }
 
-/* ── Lernpfad grid ── */
-.path-header { display: grid; grid-template-columns: 1fr 60px 60px 60px; gap: 6px; margin-bottom: 4px; }
-.path-hcell { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
-  color: var(--ink-muted); text-align: center; }
-.path-row { display: grid; grid-template-columns: 1fr 60px 60px 60px; gap: 6px; margin-bottom: 6px; align-items: center; }
-.path-q { min-width: 0; }
-.path-q-name { font-size: .82rem; font-weight: 700; line-height: 1.25; word-break: break-word; }
-.path-q-sub { font-size: .65rem; color: var(--ink-muted); margin-top: 1px; }
-.path-cell { border-radius: 10px; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; cursor: pointer; touch-action: manipulation; font-size: .6rem;
-  font-weight: 700; gap: 3px; padding: 6px 2px; text-align: center; min-height: 54px;
-  border: 1.5px solid var(--line); background: var(--bg-soft); color: var(--ink-muted);
-  transition: transform .1s; }
-.path-cell:active { transform: scale(.94); }
-.path-cell.done { color: #fff; border-color: transparent; }
-.path-cell.soft-locked { opacity: .38; }
-.path-cell-icon { font-size: 1rem; line-height: 1; }
+/* ── Lernpfad rings ── */
+.lp-rings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+.lp-ring-card { background: var(--bg); border-radius: 14px; padding: 12px 10px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.lp-ring-name { font-size: .78rem; font-weight: 700; text-align: center; }
+.lp-ring-sub  { font-size: .62rem; color: var(--ink-muted); margin-top: -2px; text-align: center; }
+.lp-ring-btns { display: flex; gap: 5px; width: 100%; margin-top: 4px; }
+.lp-ring-btn  { flex: 1; border: 1.5px solid var(--line); background: var(--bg-soft);
+  border-radius: 8px; font-size: .58rem; font-weight: 700; color: var(--ink-muted);
+  padding: 5px 2px; cursor: pointer; touch-action: manipulation; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 40px;
+  justify-content: center; transition: transform .1s; font-family: inherit; }
+.lp-ring-btn:active { transform: scale(.94); }
+.lp-ring-btn.done { color: #fff; border-color: transparent; }
+.lp-ring-btn.soft-locked { opacity: .38; pointer-events: none; }
 
 /* ── Quiz ── */
 .quiz-opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
@@ -856,13 +883,17 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 
 /* Segment selector */
 .seg-bar { display: flex; background: var(--bg-soft); border-radius: 10px;
-  padding: 3px; margin: 10px 0 12px; gap: 0; }
+  padding: 3px; margin: 10px 0 12px; gap: 0; position: relative; }
 .seg-btn { flex: 1; padding: 7px 4px; border: none; background: transparent;
   font-size: .78rem; font-weight: 600; color: var(--ink-muted);
   font-family: inherit; border-radius: 8px; cursor: pointer;
-  transition: all .18s; touch-action: manipulation; }
-.seg-btn.seg-active { background: var(--bg-card); color: var(--ink);
-  box-shadow: 0 1px 4px rgba(0,0,0,.10); }
+  transition: color .18s; touch-action: manipulation;
+  position: relative; z-index: 1; }
+.seg-btn.seg-active { background: transparent; color: var(--ink); box-shadow: none; }
+.seg-bar-slide { position: absolute; top: 3px; height: calc(100% - 6px);
+  background: var(--bg-card); border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  transition: left .22s cubic-bezier(.4,0,.2,1), width .22s cubic-bezier(.4,0,.2,1), opacity .15s;
+  pointer-events: none; z-index: 0; opacity: 0; }
 </style>
 </head>
 <body>
@@ -2117,6 +2148,41 @@ function fmtDateLong(iso) {
   const dt = new Date(iso+"T12:00:00");
   return dt.toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
 }
+function fmtDateHeader(iso) {
+  const dt = new Date(iso+"T12:00:00");
+  const today = todayISO();
+  const yest  = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (iso === today) return 'Heute';
+  if (iso === yest)  return 'Gestern';
+  return dt.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
+
+// ── Seg-pill animation ──
+function _posSegPill(seg) {
+  var isSeg = seg.classList.contains('seg');
+  var slideClass = isSeg ? 'seg-slide' : 'seg-bar-slide';
+  var activeClass = isSeg ? 'active' : 'seg-active';
+  var slide = seg.querySelector('.' + slideClass);
+  var active = seg.querySelector('button.' + activeClass);
+  if (!slide || !active) return;
+  slide.style.left  = active.offsetLeft + 'px';
+  slide.style.width = active.offsetWidth + 'px';
+  slide.style.opacity = '1';
+}
+function _initSegPills() {
+  requestAnimationFrame(function() {
+    document.querySelectorAll('.seg, .seg-bar').forEach(function(seg) {
+      var isSeg = seg.classList.contains('seg');
+      var slideClass = isSeg ? 'seg-slide' : 'seg-bar-slide';
+      if (!seg.querySelector('.' + slideClass)) {
+        var slide = document.createElement('div');
+        slide.className = slideClass;
+        seg.insertBefore(slide, seg.firstChild);
+      }
+      _posSegPill(seg);
+    });
+  });
+}
 function esc(s) {
   return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
@@ -3135,6 +3201,7 @@ function renderLehre() {
     </div>
   `;
   renderLehreBody();
+  _initSegPills();
 }
 
 function setLehreTab(tab) {
@@ -3142,6 +3209,8 @@ function setLehreTab(tab) {
   document.querySelectorAll("#panel-lehre .seg button").forEach((b,i)=>{
     b.classList.toggle("active", ['sitzungen','verse'][i] === tab);
   });
+  var seg = document.querySelector("#panel-lehre .seg");
+  if (seg) requestAnimationFrame(function(){ _posSegPill(seg); });
   renderLehreBody();
 }
 
@@ -3571,10 +3640,17 @@ function finishRunner() {
   if (!el) { showLogSheet({ duration:mins, focus, mode, afterSave:()=>endRunner() }); return; }
   // Show inline reflection form inside the runner container
   const modeStr = mode==='stille'?t('timer_titel')||'Stille':mode==='verse'?t('vers_titel')||'Vers lesen':mode==='rezitation'?t('rez_titel')||'Rezitation':esc(mode||'');
+  const CIRC = +(2 * Math.PI * 20).toFixed(2);
   el.innerHTML = `
-    <div class="inline-log-done">
-      <div class="done-icon">✓</div>
-      <div class="done-label">${mins} min${q?' · '+q.name:''}</div>
+    <div class="done-celebrate">
+      <svg class="done-ring-svg" width="76" height="76" viewBox="0 0 76 76">
+        <circle class="done-ring-track" cx="38" cy="38" r="20" fill="none" stroke-width="4.5"/>
+        <circle class="done-ring-arc" cx="38" cy="38" r="20" fill="none" stroke-width="4.5"
+          stroke-dasharray="${CIRC} ${CIRC}" transform="rotate(-90 38 38)"/>
+        <text x="38" y="39" text-anchor="middle" dominant-baseline="middle"
+          font-size="22" class="done-check" fill="var(--accent)">✓</text>
+      </svg>
+      <div class="done-label">${mins} min${q?` · <span class="pill ${q.farbe}">${q.name}</span>`:''}</div>
       <div class="done-sub">${modeStr}</div>
     </div>
     <div class="label" style="margin-bottom:6px;">${t('runner_reflexion')}</div>
@@ -3940,27 +4016,38 @@ function renderTagebuch() {
     </div>
     <div class="card" id="j-list">
       ${S.sessions.length===0?`<div class="muted small">${t('tj_leer')}</div>`:
-        S.sessions.map(s=>{
-          const q=getQ(s.focus);
-          const snippet = s.source && s.source.snippet ? s.source.snippet : '';
-          const searchData = esc((s.notes||'')+(s.mode||'')+(q?.name||'')+snippet);
-          return `<div class="j-entry" data-s="${searchData}" data-jid="${s.id}" data-bm="${s.bookmarked?'1':'0'}">
-            <div class="j-date">
-              ${fmtDateLong(s.date)}
-              ${s.duration?'· '+s.duration+' min':''}
-              ${q?`· <span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'· <span class="pill neutral">alle vier</span>':'')}
-              ${s.mode?'· '+esc(s.mode):''}
-              <span style="float:right;display:flex;gap:2px;align-items:center;">
-                <button class="j-bm-btn${s.bookmarked?' bm-on':''}" data-bmid="${s.id}"
-                  onclick="toggleBookmark('${s.id}')" title="${s.bookmarked?'★':'☆'}">${s.bookmarked?'★':'☆'}</button>
-                <button onclick="editLog('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;" title="Bearbeiten">✎</button>
-                <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;line-height:1;" title="L\xF6schen">×</button>
-              </span>
-            </div>
-            ${_jSourceBlock(s)}
-            ${s.notes?`<div class="j-text">${displayNotes(s.notes)}</div>`:(snippet?'':`<div class="small muted">${t('tj_keine_notizen')}</div>`)}
-          </div>`;
-        }).join('')
+        (()=>{
+          // group by date (sessions are newest-first)
+          const groups=[], dateMap={};
+          S.sessions.forEach(s=>{
+            if(!dateMap[s.date]){ dateMap[s.date]=[]; groups.push({date:s.date,entries:dateMap[s.date]}); }
+            dateMap[s.date].push(s);
+          });
+          return groups.map((g,gi)=>{
+            const hdr = `<div class="j-date-hdr">${fmtDateHeader(g.date)}</div>`;
+            const entries = g.entries.map(s=>{
+              const q=getQ(s.focus);
+              const snippet = s.source && s.source.snippet ? s.source.snippet : '';
+              const searchData = esc((s.notes||'')+(s.mode||'')+(q?.name||'')+snippet);
+              return `<div class="j-entry" data-s="${searchData}" data-jid="${s.id}" data-bm="${s.bookmarked?'1':'0'}">
+                <div class="j-date">
+                  ${s.duration?s.duration+' min · ':''}
+                  ${q?`<span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'<span class="pill neutral">alle vier</span>':'')}
+                  ${s.mode?' · '+esc(s.mode):''}
+                  <span style="float:right;display:flex;gap:2px;align-items:center;">
+                    <button class="j-bm-btn${s.bookmarked?' bm-on':''}" data-bmid="${s.id}"
+                      onclick="toggleBookmark('${s.id}')">${s.bookmarked?'★':'☆'}</button>
+                    <button onclick="editLog('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;">✎</button>
+                    <button onclick="delSession('${s.id}')" style="background:none;border:none;color:var(--ink-muted);font-size:1.3rem;cursor:pointer;padding:4px 8px;touch-action:manipulation;line-height:1;">×</button>
+                  </span>
+                </div>
+                ${_jSourceBlock(s)}
+                ${s.notes?`<div class="j-text">${displayNotes(s.notes)}</div>`:(snippet?'':`<div class="small muted">${t('tj_keine_notizen')}</div>`)}
+              </div>`;
+            }).join('');
+            return hdr + entries;
+          }).join('');
+        })()
       }
     </div>
   `;
@@ -3988,40 +4075,60 @@ function delSession(id) {
 
 function renderLernpfad() {
   const aspects = [
-    { key:'studium',      label:t('lp_studium'),   icon:'S' },
-    { key:'kontemplation',label:t('lp_kontempl'), icon:'K' },
-    { key:'meditation',   label:t('lp_medit'),    icon:'M' }
+    { key:'studium',       label:t('lp_studium'),  icon:'S' },
+    { key:'kontemplation', label:t('lp_kontempl'), icon:'K' },
+    { key:'meditation',    label:t('lp_medit'),    icon:'M' }
   ];
-  const rows = QUALITAETEN.map(q => {
+  const TOTAL = 3;
+  const R = 18, CX = 22, CY = 22, CIRC = +(2 * Math.PI * R).toFixed(2);
+
+  const rings = QUALITAETEN.map(q => {
     const locked = isQualitySoftLocked(q.id);
     const c = Q_COLOR[q.id];
-    const cells = aspects.map(a => {
-      const done = isPathDone(q.id, a.key);
-      const style = done ? `background:${c};border-color:${c};` : '';
+    const doneCount = aspects.filter(a => isPathDone(q.id, a.key)).length;
+    const filled = +(doneCount / TOTAL * CIRC).toFixed(2);
+
+    const svgArc = doneCount > 0
+      ? `<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${c}" stroke-width="4"
+           stroke-dasharray="${filled} ${CIRC}" stroke-linecap="round"
+           transform="rotate(-90 ${CX} ${CY})"/>`
+      : '';
+
+    const svgRing = `<svg width="44" height="44" viewBox="0 0 44 44" style="display:block;margin:0 auto;">
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--line)" stroke-width="4"/>
+      ${svgArc}
+      <text x="${CX}" y="${CY+1}" text-anchor="middle" dominant-baseline="middle"
+        font-size="9.5" font-weight="700"
+        fill="${doneCount===TOTAL ? c : 'var(--ink-muted)'}">
+        ${doneCount}/${TOTAL}
+      </text>
+    </svg>`;
+
+    const btns = aspects.map(a => {
+      const isDone = isPathDone(q.id, a.key);
       const fn = a.key === 'studium'
         ? `showQuizSheet('${q.id}')`
         : `showPathInfo('${q.id}','${a.key}')`;
-      return `<div class="path-cell${done?' done':''}${locked?' soft-locked':''}" style="${style}" onclick="${fn}">
-        <div class="path-cell-icon">${done ? '✓' : '○'}</div>
-        <div>${a.label}</div>
-      </div>`;
+      const style = isDone ? `background:${c};border-color:${c};` : '';
+      return `<button class="lp-ring-btn${isDone?' done':''}${locked?' soft-locked':''}"
+        style="${style}" onclick="${fn}">
+        <span style="font-size:.85rem;line-height:1;">${isDone ? '✓' : '○'}</span>
+        <span>${a.icon}</span>
+      </button>`;
     }).join('');
-    return `<div class="path-row">
-      <div class="path-q">
-        <div class="path-q-name" style="color:${c}${locked?';opacity:.5':''}">${q.name}</div>
-        <div class="path-q-sub">${q.sanskrit}</div>
-      </div>
-      ${cells}
+
+    return `<div class="lp-ring-card"${locked ? ' style="opacity:.55"' : ''}>
+      ${svgRing}
+      <div class="lp-ring-name" style="color:${c}">${q.name}</div>
+      <div class="lp-ring-sub">${q.sanskrit}</div>
+      <div class="lp-ring-btns">${btns}</div>
     </div>`;
   }).join('');
+
   return `<div class="card">
     <div class="card-title" style="margin-bottom:10px;">${t('lp_titel')}</div>
-    <div class="path-header">
-      <div></div>
-      ${aspects.map(a=>`<div class="path-hcell">${a.label}</div>`).join('')}
-    </div>
-    ${rows}
-    <div class="small muted" style="margin-top:6px;line-height:1.6;">${t('lp_hint')}</div>
+    <div class="lp-rings">${rings}</div>
+    <div class="small muted" style="margin-top:2px;line-height:1.6;">${t('lp_hint')}</div>
   </div>`;
 }
 
@@ -4321,6 +4428,7 @@ var _wegSeg = 'ueberblick';
 function switchWegSeg(name) {
   _wegSeg = name;
   renderBogen();
+  _initSegPills();
   // keep scroll position at top of segment content
   var el = document.getElementById('weg-seg-content');
   if (el) el.scrollIntoView({block:'nearest'});
@@ -4535,6 +4643,7 @@ function renderBogen() {
     + '<div id="weg-seg-content">'
     + segContent
     + '</div>';
+  _initSegPills();
 }
 
 function showPhaseSwitcher() {
