@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
 <meta name="theme-color" content="#f4f1ee" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1c1714" media="(prefers-color-scheme: dark)">
@@ -220,14 +220,14 @@ body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { display: flex; flex-direction: column;
   position: fixed; inset: 0;
-  padding-top: env(safe-area-inset-top, 0px);
   background: var(--bg-card); }
 #content { background: var(--bg); }
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none; padding-bottom: 16px; }
-.panel { display: none; padding: 20px 16px 0; animation: fadeIn .2s ease; }
+.panel { display: none; padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px 0; animation: fadeIn .2s ease; }
+#panel-heute { padding-top: 0; }
 .panel.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
@@ -253,8 +253,8 @@ body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--
 #tabbar button.active svg { stroke-width: 2.2; }
 
 /* ── Cards ── */
-.card { background: var(--bg-card); border-radius: var(--r); padding: 18px;
-  margin-bottom: 12px; box-shadow: var(--shadow); }
+.card { background: var(--bg-card); border-radius: var(--r); padding: 20px;
+  margin-bottom: 14px; box-shadow: var(--shadow); }
 .card-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: var(--ink); letter-spacing: -.01em; }
 .card-sub { font-size: .84rem; color: var(--ink-muted); margin-bottom: 10px; }
 hr.divider { border: none; border-top: 1px solid var(--line); margin: 14px 0; }
@@ -679,71 +679,65 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 
 /* ── Hero (Heute) ── */
 .hero-today {
-  margin: -20px -16px 20px;
-  padding: 36px 24px 22px;
-  border-radius: 0 0 28px 28px;
+  margin: 0 -16px 20px;
+  padding: calc(env(safe-area-inset-top, 0px) + 36px) 24px 22px;
+  border-radius: 0 0 32px 32px;
   position: relative;
   overflow: hidden;
   color: #fff;
-  min-height: 210px;
+  min-height: calc(env(safe-area-inset-top, 0px) + 230px);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
 }
-.hero-glow {
+.hero-illus {
   position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(50px);
-}
-.hero-dot {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,.55);
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 .hero-time-row {
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 18px;
-  font-size: .72rem;
+  margin-bottom: 14px;
+  font-size: .68rem;
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
-  opacity: .75;
+  opacity: .7;
 }
 .hero-time-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 .hero-quality-name {
-  font-size: 2.6rem;
+  font-size: 3.2rem;
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -.025em;
-  margin-bottom: 5px;
+  line-height: .95;
+  letter-spacing: -.03em;
+  margin-bottom: 7px;
 }
 .hero-quality-sanskrit {
-  font-size: .88rem;
+  font-size: .85rem;
   font-style: italic;
-  opacity: .65;
-  margin-bottom: 10px;
+  opacity: .6;
+  margin-bottom: 8px;
 }
 .hero-bild {
-  font-size: .78rem;
-  opacity: .68;
-  line-height: 1.55;
-  margin-bottom: 18px;
-  max-width: 260px;
+  font-size: .76rem;
+  opacity: .65;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  max-width: 270px;
 }
 .hero-stats-row {
   display: flex;
   align-items: center;
-  border-top: 1px solid rgba(255,255,255,.2);
+  border-top: 1px solid rgba(255,255,255,.18);
   padding-top: 14px;
-  margin-top: 0;
 }
 .hero-stat {
   flex: 1;
@@ -751,21 +745,21 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 }
 .hero-stat-num {
   display: block;
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   font-weight: 700;
   line-height: 1;
   margin-bottom: 3px;
 }
 .hero-stat-label {
-  font-size: .58rem;
-  opacity: .6;
+  font-size: .56rem;
+  opacity: .58;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
 .hero-stat-sep {
   width: 1px;
   height: 28px;
-  background: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.16);
   flex-shrink: 0;
 }
 
@@ -2736,11 +2730,57 @@ function weekSessions() {
 
 function heroGradient(id) {
   return {
-    gleichmut:  'linear-gradient(155deg,#1b3a5c 0%,#2c5f8a 50%,#4a87ae 100%)',
-    liebe:      'linear-gradient(155deg,#3d2800 0%,#6b4800 50%,#a07010 100%)',
-    mitgefuehl: 'linear-gradient(155deg,#200a30 0%,#3d1560 50%,#6830a0 100%)',
-    freude:     'linear-gradient(155deg,#0a2e18 0%,#1a5c32 50%,#2e8a52 100%)',
-  }[id] || 'linear-gradient(155deg,#2a2a3a 0%,#3a3a5a 100%)';
+    gleichmut:  'linear-gradient(170deg,#152f4a 0%,#1e4d78 55%,#3a7aa0 100%)',
+    liebe:      'linear-gradient(170deg,#3a2000 0%,#6a4200 55%,#9a6808 100%)',
+    mitgefuehl: 'linear-gradient(170deg,#1e0830 0%,#3a1258 55%,#5e28a0 100%)',
+    freude:     'linear-gradient(170deg,#082510 0%,#185430 55%,#267848 100%)',
+  }[id] || 'linear-gradient(170deg,#222232 0%,#363660 100%)';
+}
+
+function heroIllustration(id) {
+  const illus = {
+    // Gleichmut · Wasser — ruhige horizontale Ellipsen wie eine stille Seeoberfläche
+    gleichmut: `
+      <ellipse cx="320" cy="230" rx="290" ry="58" fill="rgba(255,255,255,.055)"/>
+      <ellipse cx="240" cy="178" rx="220" ry="36" fill="rgba(255,255,255,.045)"/>
+      <ellipse cx="360" cy="268" rx="310" ry="68" fill="rgba(255,255,255,.035)"/>
+      <ellipse cx="160" cy="130" rx="170" ry="22" fill="rgba(255,255,255,.04)"/>
+      <line x1="0" y1="200" x2="400" y2="188" stroke="rgba(255,255,255,.13)" stroke-width="1.2"/>
+      <line x1="0" y1="240" x2="400" y2="230" stroke="rgba(255,255,255,.07)" stroke-width=".8"/>
+      <line x1="40" y1="160" x2="300" y2="155" stroke="rgba(255,255,255,.06)" stroke-width=".8"/>`,
+
+    // Liebe · Boden — organische Erdschichten, warm und tragend
+    liebe: `
+      <path d="M-10 270 Q90 248 200 262 Q310 276 410 255 L410 320 L-10 320Z" fill="rgba(255,255,255,.07)"/>
+      <path d="M-10 228 Q70 208 185 220 Q295 232 410 212 L410 258 Q310 276 200 262 Q90 248 -10 270Z" fill="rgba(255,255,255,.055)"/>
+      <path d="M-10 195 Q110 176 200 186 Q305 196 410 175 L410 214 Q295 232 185 220 Q70 208 -10 228Z" fill="rgba(255,255,255,.04)"/>
+      <circle cx="340" cy="115" r="78" fill="rgba(255,255,255,.045)"/>
+      <circle cx="55" cy="185" r="48" fill="rgba(255,255,255,.038)"/>
+      <circle cx="200" cy="60" r="38" fill="rgba(255,255,255,.03)"/>`,
+
+    // Mitgefühl · Blumen — abstrakte Blütenblätter, aus einem Punkt strahlend
+    mitgefuehl: `
+      <ellipse cx="340" cy="55" rx="48" ry="115" fill="rgba(255,255,255,.055)" transform="rotate(-38 340 55)"/>
+      <ellipse cx="355" cy="70" rx="48" ry="115" fill="rgba(255,255,255,.045)" transform="rotate(12 355 70)"/>
+      <ellipse cx="325" cy="48" rx="44" ry="105" fill="rgba(255,255,255,.045)" transform="rotate(-82 325 48)"/>
+      <ellipse cx="355" cy="90" rx="38" ry="95" fill="rgba(255,255,255,.038)" transform="rotate(48 355 90)"/>
+      <ellipse cx="310" cy="75" rx="34" ry="90" fill="rgba(255,255,255,.035)" transform="rotate(-118 310 75)"/>
+      <circle cx="340" cy="65" r="22" fill="rgba(255,255,255,.08)"/>
+      <circle cx="340" cy="65" r="10" fill="rgba(255,255,255,.10)"/>`,
+
+    // Freude · Schatten — Lichtschäfte durch ein Blätterdach
+    freude: `
+      <polygon points="195,0 265,0 390,320 320,320" fill="rgba(255,255,255,.055)"/>
+      <polygon points="290,0 335,0 400,155 375,155" fill="rgba(255,255,255,.04)"/>
+      <polygon points="75,0 135,0 245,320 185,320" fill="rgba(255,255,255,.045)"/>
+      <polygon points="350,0 380,0 400,60 385,60" fill="rgba(255,255,255,.035)"/>
+      <ellipse cx="115" cy="85" rx="38" ry="25" fill="rgba(0,0,0,.07)" transform="rotate(-22 115 85)"/>
+      <ellipse cx="275" cy="140" rx="48" ry="30" fill="rgba(0,0,0,.06)" transform="rotate(15 275 140)"/>
+      <ellipse cx="55" cy="195" rx="28" ry="18" fill="rgba(0,0,0,.05)" transform="rotate(-8 55 195)"/>
+      <ellipse cx="320" cy="240" rx="42" ry="26" fill="rgba(0,0,0,.05)" transform="rotate(25 320 240)"/>`,
+  };
+  const shapes = illus[id] || '';
+  return `<svg class="hero-illus" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`;
 }
 function timeGreeting() {
   const h = new Date().getHours();
@@ -3105,15 +3145,9 @@ function renderHeute() {
 
     const greet = timeGreeting();
     const heroSvgIcon = '<svg class="hero-time-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">' + greet.svg + '</svg>';
-    const heroDots = [
-      [14,12,3,.4],[78,8,4,.25],[88,55,3,.3],[6,70,2.5,.2],[55,18,2,.35],
-      [34,82,3.5,.15],[92,30,2,.4],[20,40,2,.2],[68,78,4,.18],[45,5,2.5,.3]
-    ].map(function(d){return '<div class="hero-dot" style="left:'+d[0]+'%;top:'+d[1]+'%;width:'+d[2]+'px;height:'+d[2]+'px;opacity:'+d[3]+';"></div>';}).join('');
-    const heroGlows = '<div class="hero-glow" style="width:180px;height:180px;background:rgba(255,255,255,.07);top:-60px;right:-50px;"></div>'
-      + '<div class="hero-glow" style="width:120px;height:120px;background:rgba(255,255,255,.05);bottom:10px;left:-30px;"></div>';
 
     const html = '<div class="hero-today" style="background:' + heroGradient(phase.id) + ';">'
-      + heroGlows + heroDots
+      + heroIllustration(phase.id)
       + '<div class="hero-time-row">' + heroSvgIcon + greet.label + '</div>'
       + '<div class="hero-quality-name">' + esc(phase.name) + '</div>'
       + '<div class="hero-quality-sanskrit">' + esc(phase.sanskrit) + '</div>'
