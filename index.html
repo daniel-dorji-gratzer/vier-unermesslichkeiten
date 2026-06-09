@@ -250,11 +250,7 @@ body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; padding: 6px 4px; color: var(--ink-muted); font-size: 10px; font-weight: 500;
   font-family: inherit; transition: color .15s; height: var(--tab-h); touch-action: manipulation; }
-/* Safe-area fill — same glass effect as tabbar, visually seamless */
-#safe-fill { display: block; height: env(safe-area-inset-bottom, 0px);
-  background: rgba(255,255,255,.88);
-  backdrop-filter: saturate(200%) blur(28px); -webkit-backdrop-filter: saturate(200%) blur(28px);
-  flex-shrink: 0; }
+#safe-fill { display: none; }
 #tabbar button.active { color: var(--accent); }
 #tabbar button svg { width: 23px; height: 23px; fill: none; stroke: currentColor;
   stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -275,7 +271,6 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
 :root[data-theme="dark"] #tabbar { background: rgba(28,23,20,.92);
   border-top: 1px solid rgba(255,255,255,.07);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
-:root[data-theme="dark"] #safe-fill { background: rgba(28,23,20,.92); }
 :root[data-theme="dark"] .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
 :root[data-theme="dark"] .pill.liebe      { background: #3d2d00; color: #f5d070; }
 :root[data-theme="dark"] .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
@@ -296,7 +291,6 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) #tabbar { background: rgba(28,23,20,.92);
     border-top: 1px solid rgba(255,255,255,.07);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) #safe-fill { background: rgba(28,23,20,.92); }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.liebe      { background: #3d2d00; color: #f5d070; }
   :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
