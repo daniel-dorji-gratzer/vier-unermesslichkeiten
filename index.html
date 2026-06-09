@@ -686,7 +686,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   position: relative;
   overflow: hidden;
   color: #fff;
-  min-height: calc(env(safe-area-inset-top, 0px) + 230px);
+  min-height: calc(66svh - var(--tab-h, 52px) - env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
