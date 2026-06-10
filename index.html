@@ -229,7 +229,7 @@ body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--
 
 /* ── Tab content ── */
 #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none; padding-bottom: 16px; }
+  overscroll-behavior-y: none; padding-bottom: calc(var(--tab-h) + 16px); }
 .panel { display: none; padding: calc(env(safe-area-inset-top, 0px) + 24px) 18px 0; animation: fadeIn .2s ease; }
 #panel-heute { padding-top: 0; }
 .panel.active { display: block; }
@@ -241,7 +241,8 @@ body { height: 100%; overflow: hidden; background: var(--bg-card); color: var(--
 .panel-header .sub { font-size: .88rem; color: var(--ink-muted); margin-top: 5px; }
 
 /* ── Bottom tab bar ── */
-#tabbar { flex-shrink: 0; background: rgba(255,255,255,.88); --tabbar-dark-bg: rgba(28,23,20,.96);
+#tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: rgba(255,255,255,.88); --tabbar-dark-bg: rgba(28,23,20,.96);
   backdrop-filter: saturate(200%) blur(28px); -webkit-backdrop-filter: saturate(200%) blur(28px);
   border-top: 1px solid rgba(255,255,255,.6);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
@@ -2760,10 +2761,10 @@ function weekSessions() {
 
 function heroGradient(id) {
   return {
-    gleichmut:  'linear-gradient(170deg,rgba(21,47,74,.68) 0%,rgba(30,77,120,.50) 55%,rgba(58,122,160,.32) 100%),url("/vier-unermesslichkeiten/gleichmut-hero.jpg") center/cover no-repeat',
+    gleichmut:  'linear-gradient(170deg,rgba(21,47,74,.68) 0%,rgba(30,77,120,.50) 55%,rgba(58,122,160,.32) 100%),url(/vier-unermesslichkeiten/gleichmut-hero.jpg) center/cover no-repeat',
     liebe:      'linear-gradient(170deg,#3a2000 0%,#6a4200 55%,#9a6808 100%)',
-    mitgefuehl: 'linear-gradient(170deg,rgba(30,8,48,.70) 0%,rgba(58,18,88,.52) 55%,rgba(94,40,160,.35) 100%),url("/vier-unermesslichkeiten/mitgefuehl-hero.jpg") center/cover no-repeat',
-    freude:     'linear-gradient(170deg,rgba(8,37,16,.72) 0%,rgba(24,84,48,.55) 55%,rgba(38,120,72,.38) 100%),url("/vier-unermesslichkeiten/freude-hero.jpg") center/cover no-repeat',
+    mitgefuehl: 'linear-gradient(170deg,rgba(30,8,48,.70) 0%,rgba(58,18,88,.52) 55%,rgba(94,40,160,.35) 100%),url(/vier-unermesslichkeiten/mitgefuehl-hero.jpg) center/cover no-repeat',
+    freude:     'linear-gradient(170deg,rgba(8,37,16,.72) 0%,rgba(24,84,48,.55) 55%,rgba(38,120,72,.38) 100%),url(/vier-unermesslichkeiten/freude-hero.jpg) center/cover no-repeat',
   }[id] || 'linear-gradient(170deg,#222232 0%,#363660 100%)';
 }
 
