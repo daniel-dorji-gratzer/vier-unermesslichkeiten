@@ -2762,7 +2762,7 @@ function heroGradient(id) {
   return {
     gleichmut:  'linear-gradient(170deg,#152f4a 0%,#1e4d78 55%,#3a7aa0 100%)',
     liebe:      'linear-gradient(170deg,#3a2000 0%,#6a4200 55%,#9a6808 100%)',
-    mitgefuehl: 'linear-gradient(170deg,#1e0830 0%,#3a1258 55%,#5e28a0 100%)',
+    mitgefuehl: 'linear-gradient(170deg,rgba(30,8,48,.70) 0%,rgba(58,18,88,.52) 55%,rgba(94,40,160,.35) 100%),url("/vier-unermesslichkeiten/mitgefuehl-hero.jpg") center/cover no-repeat',
     freude:     'linear-gradient(170deg,rgba(8,37,16,.72) 0%,rgba(24,84,48,.55) 55%,rgba(38,120,72,.38) 100%),url("/vier-unermesslichkeiten/freude-hero.jpg") center/cover no-repeat',
   }[id] || 'linear-gradient(170deg,#222232 0%,#363660 100%)';
 }
@@ -2796,29 +2796,7 @@ function heroIllustration(id) {
       <path d="M-10 285 Q90 265 200 278 Q310 291 410 270 L410 320 L-10 320Z" fill="rgba(255,255,255,.06)"/>
       <path d="M-10 302 Q90 292 200 300 Q310 308 410 296 L410 320 L-10 320Z" fill="rgba(255,255,255,.04)"/>`,
 
-    // Mitgefühl · Blumen — Lotusblüte, die sich öffnet
-    // Acht symmetrische Blütenblätter aus der Tiefe des Wassers.
-    mitgefuehl: `
-      <g transform="translate(310,60)" fill="rgba(255,255,255,.0)" stroke="none">
-        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(0)"/>
-        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(45)"/>
-        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(90)"/>
-        <ellipse rx="22" ry="68" fill="rgba(255,255,255,.055)" transform="rotate(135)"/>
-        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(22.5)"/>
-        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(67.5)"/>
-        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(112.5)"/>
-        <ellipse rx="18" ry="58" fill="rgba(255,255,255,.038)" transform="rotate(157.5)"/>
-        <circle r="16" fill="rgba(255,255,255,.10)"/>
-        <circle r="8"  fill="rgba(255,255,255,.14)"/>
-        <circle r="3"  fill="rgba(255,255,255,.20)"/>
-      </g>
-      <g transform="translate(80,230)" fill="rgba(255,255,255,.0)">
-        <ellipse rx="13" ry="38" fill="rgba(255,255,255,.032)" transform="rotate(0)"/>
-        <ellipse rx="13" ry="38" fill="rgba(255,255,255,.032)" transform="rotate(60)"/>
-        <ellipse rx="13" ry="38" fill="rgba(255,255,255,.032)" transform="rotate(120)"/>
-        <circle r="9"  fill="rgba(255,255,255,.06)"/>
-        <circle r="4"  fill="rgba(255,255,255,.09)"/>
-      </g>`,
+    mitgefuehl: '',  // Foto-Hintergrund — keine SVG-Überlagerung
 
     freude: '',  // Foto-Hintergrund — keine SVG-Überlagerung
   };
