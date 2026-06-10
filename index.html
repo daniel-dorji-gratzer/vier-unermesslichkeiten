@@ -223,7 +223,8 @@ body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
   font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px;
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { display: flex; flex-direction: column;
-  position: fixed; inset: 0;
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 100dvh;
   background: var(--bg); }
 #content { background: var(--bg); }
 
@@ -2063,7 +2064,7 @@ const STRINGS = {
 };
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v100';
+var APP_VER = 'v101';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
