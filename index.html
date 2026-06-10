@@ -2763,7 +2763,7 @@ function heroGradient(id) {
     gleichmut:  'linear-gradient(170deg,#152f4a 0%,#1e4d78 55%,#3a7aa0 100%)',
     liebe:      'linear-gradient(170deg,#3a2000 0%,#6a4200 55%,#9a6808 100%)',
     mitgefuehl: 'linear-gradient(170deg,#1e0830 0%,#3a1258 55%,#5e28a0 100%)',
-    freude:     'linear-gradient(170deg,#082510 0%,#185430 55%,#267848 100%)',
+    freude:     'linear-gradient(170deg,rgba(8,37,16,.72) 0%,rgba(24,84,48,.55) 55%,rgba(38,120,72,.38) 100%),url("/vier-unermesslichkeiten/freude-hero.jpg") center/cover no-repeat',
   }[id] || 'linear-gradient(170deg,#222232 0%,#363660 100%)';
 }
 
@@ -2820,19 +2820,7 @@ function heroIllustration(id) {
         <circle r="4"  fill="rgba(255,255,255,.09)"/>
       </g>`,
 
-    // Freude · Licht durch Blätterdach — Lichtschäfte und Blattschatten
-    // Dappled light: warme Strahlen brechen durch Laub, Schattenflecken tanzen.
-    freude: `
-      <polygon points="170,0 210,0 340,320 300,320" fill="rgba(255,255,255,.06)"/>
-      <polygon points="255,0 285,0 380,320 350,320" fill="rgba(255,255,255,.045)"/>
-      <polygon points="60,0 100,0 200,320 160,320"  fill="rgba(255,255,255,.05)"/>
-      <polygon points="320,0 345,0 400,120 388,120"  fill="rgba(255,255,255,.035)"/>
-      <polygon points="0,0 22,0 90,320 68,320"      fill="rgba(255,255,255,.025)"/>
-      <ellipse cx="128" cy="72"  rx="42" ry="18" fill="rgba(0,0,0,.09)" transform="rotate(-18 128 72)"/>
-      <ellipse cx="82"  cy="155" rx="28" ry="12" fill="rgba(0,0,0,.07)" transform="rotate(12 82 155)"/>
-      <ellipse cx="305" cy="105" rx="52" ry="20" fill="rgba(0,0,0,.08)" transform="rotate(22 305 105)"/>
-      <ellipse cx="240" cy="220" rx="36" ry="14" fill="rgba(0,0,0,.06)" transform="rotate(-8 240 220)"/>
-      <ellipse cx="355" cy="188" rx="30" ry="12" fill="rgba(0,0,0,.06)" transform="rotate(30 355 188)"/>`,
+    freude: '',  // Foto-Hintergrund — keine SVG-Überlagerung
   };
   const shapes = illus[id] || '';
   return `<svg class="hero-illus" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`;

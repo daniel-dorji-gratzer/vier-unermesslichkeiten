@@ -1,7 +1,10 @@
-const CACHE = 'vum-v90';
+const CACHE = 'vum-v91';
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/vier-unermesslichkeiten/'])));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll([
+    '/vier-unermesslichkeiten/',
+    '/vier-unermesslichkeiten/freude-hero.jpg',
+  ])));
   self.skipWaiting();
 });
 
