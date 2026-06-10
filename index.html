@@ -2061,6 +2061,8 @@ const STRINGS = {
 };
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
+var APP_VER = 'v95';
+
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
   liebe:      { a:'#c99200', bg:'#fdf4d8', txt:'#3a1800' },
@@ -4632,7 +4634,7 @@ function renderBogen() {
     segContent += '<div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">'
       + t('weg_footer')+'<br>'
       + t('weg_footer2')+'<br>'
-      + '<span id="app-ver" style="font-size:.7rem;opacity:.5;">…</span></div>';
+      + '<span style="font-size:.7rem;opacity:.45;">' + APP_VER + '</span></div>';
 
   } else if (_wegSeg === 'lernpfad') {
     segContent += renderLernpfad();
@@ -5001,11 +5003,6 @@ window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', func
   if (!S.prefs.theme || S.prefs.theme === 'auto') applyTheme();
 });
 
-fetch('/vier-unermesslichkeiten/sw.js').then(r=>r.text()).then(txt=>{
-  var m = txt.match(/vum-v(\d+)/);
-  var el = document.getElementById('app-ver');
-  if (m && el) el.textContent = 'v' + m[1];
-}).catch(function(){});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/vier-unermesslichkeiten/sw.js').then(reg => {
