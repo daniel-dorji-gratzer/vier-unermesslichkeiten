@@ -219,20 +219,19 @@
   user-select: none; -webkit-user-select: none;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
-body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
+/* Document-level scrolling: the body itself scrolls. Only then does iOS
+   expand the viewport to the full screen height — with an inner scroller
+   the webview stays in its "small viewport" state and refuses to paint
+   the bottom ~59px, which produced the persistent gap under the tab bar. */
+body { background: var(--bg); color: var(--ink);
+  min-height: calc(100lvh + 1px);
   font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px;
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
-#app { display: flex; flex-direction: column;
-  position: fixed; top: 0; left: 0; right: 0;
-  height: 100dvh; height: var(--app-h, 100dvh);
-  background: var(--bg); }
+#app { background: var(--bg); }
 #content { background: var(--bg); }
 
 /* ── Tab content ── */
-#content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
-  padding-bottom: calc(var(--tab-h) + var(--safe-bot) + 16px); }
+#content { padding-bottom: calc(var(--tab-h) + var(--safe-bot) + 16px); }
 .panel { display: none; padding: calc(env(safe-area-inset-top, 0px) + 24px) 18px 0; animation: fadeIn .2s ease; }
 #panel-heute { padding-top: 0; }
 .panel.active { display: block; }
@@ -244,8 +243,7 @@ body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
 .panel-header .sub { font-size: .88rem; color: var(--ink-muted); margin-top: 5px; }
 
 /* ── Bottom tab bar ── */
-#tabbar { position: fixed; left: 0; right: 0; z-index: 50;
-  top: calc(var(--app-h, 100dvh) - var(--tab-h) - var(--safe-bot));
+#tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
   height: calc(var(--tab-h) + var(--safe-bot));
   padding-bottom: var(--safe-bot);
   background: rgba(250,248,245,.85);
@@ -2067,55 +2065,27 @@ const STRINGS = {
   }
 };
 
-// ── App height ────────────────────────────────────────────────────────────────
-// In iOS standalone PWA mode the layout viewport (innerHeight, 100dvh) is
-// screen height minus the status bar inset, anchored at the top — so anything
-// sized to the viewport ends ~59px above the physical bottom edge. The webview
-// itself spans the full screen, so we size #app to screen.height instead.
-function setAppH() {
-  var h = window.navigator.standalone === true ? screen.height : window.innerHeight;
-  document.documentElement.style.setProperty('--app-h', h + 'px');
-}
-setAppH();
-window.addEventListener('resize', setAppH);
-
-// ── TEMP: visual ruler to verify bottom geometry (remove after v105 check) ───
-(function drawRuler() {
-  var box = document.createElement('div');
-  box.style.cssText = 'position:fixed;top:0;left:0;right:0;height:1200px;pointer-events:none;z-index:9999;';
-  var html = '';
-  for (var y = 700; y <= 900; y += 10) {
-    var major = (y % 50 === 0);
-    html += '<div style="position:absolute;top:' + y + 'px;left:0;right:0;height:1px;'
-      + 'background:rgba(255,80,80,' + (major ? '.9' : '.35') + ');">'
-      + (major ? '<span style="position:absolute;right:4px;top:-14px;font-size:10px;color:#ff5050;background:rgba(0,0,0,.5);padding:0 3px;">' + y + '</span>' : '')
-      + '</div>';
-  }
-  var ih = window.innerHeight;
-  html += '<div style="position:absolute;top:' + ih + 'px;left:0;right:0;height:2px;background:#00e5ff;">'
-    + '<span style="position:absolute;left:4px;top:-15px;font-size:10px;color:#00e5ff;background:rgba(0,0,0,.5);padding:0 3px;">ih ' + ih + '</span></div>';
-  html += '<div style="position:absolute;top:' + (screen.height - 1) + 'px;left:0;right:0;height:2px;background:#ffe100;">'
-    + '<span style="position:absolute;left:80px;top:-15px;font-size:10px;color:#ffe100;background:rgba(0,0,0,.5);padding:0 3px;">scr ' + screen.height + '</span></div>';
-  box.innerHTML = html;
-  document.body.appendChild(box);
-})();
 
 // ── Viewport debug info (shown next to version in Weg footer) ────────────────
 function debugViewport() {
-  var probe = document.createElement('div');
-  probe.style.cssText = 'position:fixed;height:env(safe-area-inset-bottom,0px);visibility:hidden;';
-  document.body.appendChild(probe);
-  var sab = probe.offsetHeight;
-  probe.removeChild ? probe.remove() : document.body.removeChild(probe);
+  function measure(css) {
+    var probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;visibility:hidden;height:' + css + ';';
+    document.body.appendChild(probe);
+    var h = probe.offsetHeight;
+    probe.remove();
+    return h;
+  }
   return 'standalone:' + (window.navigator.standalone === true ? 'ja' : 'nein')
     + ' · ih:' + window.innerHeight
-    + ' · vv:' + (window.visualViewport ? Math.round(window.visualViewport.height) : '–')
+    + ' · lvh:' + measure('100lvh')
+    + ' · svh:' + measure('100svh')
     + ' · scr:' + screen.height
-    + ' · sab:' + sab;
+    + ' · sab:' + measure('env(safe-area-inset-bottom,0px)');
 }
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v105';
+var APP_VER = 'v106';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2887,14 +2857,14 @@ let activeTab = "heute";
 const scrollPos = {};
 
 function switchTab(name) {
-  if (name === activeTab) { document.getElementById("content").scrollTop=0; return; }
-  scrollPos[activeTab] = document.getElementById("content").scrollTop;
+  if (name === activeTab) { window.scrollTo(0, 0); return; }
+  scrollPos[activeTab] = window.scrollY;
   activeTab = name;
   document.querySelectorAll("#tabbar button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+name));
   renderPanel(name);
   requestAnimationFrame(()=>{
-    document.getElementById("content").scrollTop = scrollPos[name]||0;
+    window.scrollTo(0, scrollPos[name]||0);
   });
 }
 
