@@ -2064,13 +2064,17 @@ const STRINGS = {
   }
 };
 
-// ── App height: window.innerHeight gives full physical height in iOS PWA ──────
-(function setAppH() {
-  document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
-})();
-window.addEventListener('resize', function() {
-  document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
-});
+// ── App height ────────────────────────────────────────────────────────────────
+// In iOS standalone PWA mode the layout viewport (innerHeight, 100dvh) is
+// screen height minus the status bar inset, anchored at the top — so anything
+// sized to the viewport ends ~59px above the physical bottom edge. The webview
+// itself spans the full screen, so we size #app to screen.height instead.
+function setAppH() {
+  var h = window.navigator.standalone === true ? screen.height : window.innerHeight;
+  document.documentElement.style.setProperty('--app-h', h + 'px');
+}
+setAppH();
+window.addEventListener('resize', setAppH);
 
 // ── Viewport debug info (shown next to version in Weg footer) ────────────────
 function debugViewport() {
@@ -2087,7 +2091,7 @@ function debugViewport() {
 }
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v103';
+var APP_VER = 'v104';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
