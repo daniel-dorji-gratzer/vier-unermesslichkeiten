@@ -686,9 +686,8 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 
 /* ── Hero (Heute) ── */
 .hero-today {
-  margin: 0 -18px 20px;
-  padding: calc(env(safe-area-inset-top, 0px) + 36px) 24px 22px;
-  border-radius: 0 0 32px 32px;
+  margin: 0 -18px 0;
+  padding: calc(env(safe-area-inset-top, 0px) + 36px) 24px 54px;
   position: relative;
   overflow: hidden;
   color: #fff;
@@ -696,6 +695,14 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+}
+/* Content below the hero rises over the image like a sheet */
+.hero-sheet {
+  position: relative;
+  margin: -32px -18px 0;
+  padding: 24px 18px 0;
+  background: var(--bg);
+  border-radius: 32px 32px 0 0;
 }
 .hero-illus {
   position: absolute;
@@ -2067,7 +2074,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v107';
+var APP_VER = 'v108';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2770,7 +2777,7 @@ function weekSessions() {
 function heroGradient(id) {
   return {
     gleichmut:  'linear-gradient(170deg,rgba(21,47,74,.68) 0%,rgba(30,77,120,.50) 55%,rgba(58,122,160,.32) 100%),url(/vier-unermesslichkeiten/gleichmut-hero.jpg) center/cover no-repeat',
-    liebe:      'linear-gradient(170deg,#3a2000 0%,#6a4200 55%,#9a6808 100%)',
+    liebe:      'linear-gradient(170deg,rgba(74,42,2,.68) 0%,rgba(122,80,8,.50) 55%,rgba(168,122,20,.32) 100%),url(/vier-unermesslichkeiten/liebe-hero.jpg) center/cover no-repeat',
     mitgefuehl: 'linear-gradient(170deg,rgba(30,8,48,.70) 0%,rgba(58,18,88,.52) 55%,rgba(94,40,160,.35) 100%),url(/vier-unermesslichkeiten/mitgefuehl-hero.jpg) center/cover no-repeat',
     freude:     'linear-gradient(170deg,rgba(8,37,16,.72) 0%,rgba(24,84,48,.55) 55%,rgba(38,120,72,.38) 100%),url(/vier-unermesslichkeiten/freude-hero.jpg) center/cover no-repeat',
   }[id] || 'linear-gradient(170deg,#222232 0%,#363660 100%)';
@@ -2781,20 +2788,7 @@ function heroIllustration(id) {
 
     gleichmut: '',  // Foto-Hintergrund — keine SVG-Überlagerung
 
-    // Liebe · Boden — Wurzeln, die sich in der Erde ausbreiten
-    // Tragendes Netz unter der Oberfläche; Wärme und Halt.
-    liebe: `
-      <path d="M200 280 L200 200" stroke="rgba(255,255,255,.22)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-      <path d="M200 240 Q155 215 110 225" stroke="rgba(255,255,255,.18)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-      <path d="M200 255 Q240 228 285 240" stroke="rgba(255,255,255,.18)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-      <path d="M200 215 Q168 195 138 202" stroke="rgba(255,255,255,.13)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-      <path d="M200 225 Q230 206 262 214" stroke="rgba(255,255,255,.13)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-      <path d="M110 225 Q82 230 60 220" stroke="rgba(255,255,255,.10)" stroke-width="1.0" stroke-linecap="round" fill="none"/>
-      <path d="M285 240 Q318 248 346 236" stroke="rgba(255,255,255,.10)" stroke-width="1.0" stroke-linecap="round" fill="none"/>
-      <path d="M138 202 Q112 196 88 204" stroke="rgba(255,255,255,.07)" stroke-width=".8" stroke-linecap="round" fill="none"/>
-      <path d="M262 214 Q290 208 316 218" stroke="rgba(255,255,255,.07)" stroke-width=".8" stroke-linecap="round" fill="none"/>
-      <path d="M-10 285 Q90 265 200 278 Q310 291 410 270 L410 320 L-10 320Z" fill="rgba(255,255,255,.06)"/>
-      <path d="M-10 302 Q90 292 200 300 Q310 308 410 296 L410 320 L-10 320Z" fill="rgba(255,255,255,.04)"/>`,
+    liebe: '',  // Foto-Hintergrund — keine SVG-Überlagerung
 
     mitgefuehl: '',  // Foto-Hintergrund — keine SVG-Überlagerung
 
@@ -3184,6 +3178,7 @@ function renderHeute() {
         )
       + '</div>'
       + '</div>'
+      + '<div class="hero-sheet">'
       + '<div class="card reminder">'
       + '<div class="label" style="margin-bottom:6px;">'+t('heute_impuls')+'</div>'
       + '<div class="quote">„' + esc(rem.t) + '“</div>'
@@ -3225,7 +3220,8 @@ function renderHeute() {
             + '<div style="color:var(--ink-muted);font-size:1.1rem;">›</div>'
             + '</div>';
         })()
-      + sessHtml;
+      + sessHtml
+      + '</div>';
 
     document.getElementById("panel-heute").innerHTML = html;
   } catch(err) {
