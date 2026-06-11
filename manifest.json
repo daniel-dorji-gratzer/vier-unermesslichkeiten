@@ -1,0 +1,22 @@
+{
+  "name": "Vier Unermesslichkeiten",
+  "short_name": "4 Unermessliche",
+  "description": "Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa",
+  "start_url": "/vier-unermesslichkeiten/",
+  "scope": "/vier-unermesslichkeiten/",
+  "display": "standalone",
+  "background_color": "#1c1714",
+  "theme_color": "#1c1714",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

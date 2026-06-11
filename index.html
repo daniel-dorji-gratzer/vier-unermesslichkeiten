@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
 <meta name="theme-color" content="#f4f1ee" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1c1714" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>Vier Unermesslichkeiten</title>
@@ -2071,8 +2072,22 @@ window.addEventListener('resize', function() {
   document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
 });
 
+// ── Viewport debug info (shown next to version in Weg footer) ────────────────
+function debugViewport() {
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;height:env(safe-area-inset-bottom,0px);visibility:hidden;';
+  document.body.appendChild(probe);
+  var sab = probe.offsetHeight;
+  probe.removeChild ? probe.remove() : document.body.removeChild(probe);
+  return 'standalone:' + (window.navigator.standalone === true ? 'ja' : 'nein')
+    + ' · ih:' + window.innerHeight
+    + ' · vv:' + (window.visualViewport ? Math.round(window.visualViewport.height) : '–')
+    + ' · scr:' + screen.height
+    + ' · sab:' + sab;
+}
+
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v102';
+var APP_VER = 'v103';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -4645,7 +4660,8 @@ function renderBogen() {
     segContent += '<div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">'
       + t('weg_footer')+'<br>'
       + t('weg_footer2')+'<br>'
-      + '<span style="font-size:.7rem;opacity:.45;">' + APP_VER + '</span></div>';
+      + '<span style="font-size:.7rem;opacity:.45;">' + APP_VER + '</span><br>'
+      + '<span style="font-size:.65rem;opacity:.45;">' + debugViewport() + '</span></div>';
 
   } else if (_wegSeg === 'lernpfad') {
     segContent += renderLernpfad();
