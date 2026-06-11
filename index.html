@@ -2066,26 +2066,8 @@ const STRINGS = {
 };
 
 
-// ── Viewport debug info (shown next to version in Weg footer) ────────────────
-function debugViewport() {
-  function measure(css) {
-    var probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;visibility:hidden;height:' + css + ';';
-    document.body.appendChild(probe);
-    var h = probe.offsetHeight;
-    probe.remove();
-    return h;
-  }
-  return 'standalone:' + (window.navigator.standalone === true ? 'ja' : 'nein')
-    + ' · ih:' + window.innerHeight
-    + ' · lvh:' + measure('100lvh')
-    + ' · svh:' + measure('100svh')
-    + ' · scr:' + screen.height
-    + ' · sab:' + measure('env(safe-area-inset-bottom,0px)');
-}
-
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v106';
+var APP_VER = 'v107';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -4658,8 +4640,7 @@ function renderBogen() {
     segContent += '<div class="small muted" style="text-align:center;padding:10px 0 4px;line-height:1.7;">'
       + t('weg_footer')+'<br>'
       + t('weg_footer2')+'<br>'
-      + '<span style="font-size:.7rem;opacity:.45;">' + APP_VER + '</span><br>'
-      + '<span style="font-size:.65rem;opacity:.45;">' + debugViewport() + '</span></div>';
+      + '<span style="font-size:.7rem;opacity:.45;">' + APP_VER + '</span></div>';
 
   } else if (_wegSeg === 'lernpfad') {
     segContent += renderLernpfad();
