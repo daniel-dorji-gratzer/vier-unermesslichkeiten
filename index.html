@@ -224,7 +224,7 @@ body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { display: flex; flex-direction: column;
   position: fixed; top: 0; left: 0; right: 0;
-  height: 100dvh;
+  height: 100dvh; height: var(--app-h, 100dvh);
   background: var(--bg); }
 #content { background: var(--bg); }
 
@@ -2063,8 +2063,16 @@ const STRINGS = {
   }
 };
 
+// ── App height: window.innerHeight gives full physical height in iOS PWA ──────
+(function setAppH() {
+  document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+})();
+window.addEventListener('resize', function() {
+  document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+});
+
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v101';
+var APP_VER = 'v102';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
