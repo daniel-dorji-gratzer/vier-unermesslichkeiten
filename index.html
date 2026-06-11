@@ -684,6 +684,11 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 /* ── Scroll restoration ── */
 #content { scroll-behavior: auto; }
 
+/* ── Kompakte Phasen-Verlauf-Zeile ── */
+.ph-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+.ph-row .pill { flex-shrink: 0; }
+.ph-row .small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 /* ── Hero (Heute) ── */
 .hero-today {
   margin: 0 -18px 0;
@@ -691,7 +696,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   position: relative;
   overflow: hidden;
   color: #fff;
-  min-height: calc(66svh - var(--tab-h, 52px) - env(safe-area-inset-bottom, 0px));
+  min-height: calc(74svh - var(--tab-h, 52px) - env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -712,15 +717,18 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   pointer-events: none;
 }
 .hero-time-row {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  left: 24px;
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 14px;
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
-  opacity: .7;
+  opacity: .85;
+  text-shadow: 0 1px 10px rgba(0,0,0,.35);
 }
 .hero-time-icon {
   width: 16px;
@@ -728,34 +736,39 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   flex-shrink: 0;
 }
 .hero-quality-name {
-  font-size: 3.2rem;
+  font-size: 2.75rem;
   font-weight: 800;
-  line-height: .95;
+  line-height: .98;
   letter-spacing: -.03em;
-  margin-bottom: 7px;
-}
-.hero-quality-sanskrit {
-  font-size: .85rem;
-  font-style: italic;
-  opacity: .6;
   margin-bottom: 8px;
 }
+.hero-quality-sanskrit {
+  font-size: 1.02rem;
+  font-style: italic;
+  opacity: .85;
+  margin-bottom: 9px;
+}
 .hero-bild {
-  font-size: .76rem;
-  opacity: .65;
+  font-size: .8rem;
+  opacity: .75;
   line-height: 1.5;
   margin-bottom: 20px;
-  max-width: 270px;
+  max-width: 280px;
 }
 .hero-stats-row {
   display: flex;
-  align-items: center;
-  border-top: 1px solid rgba(255,255,255,.18);
-  padding-top: 14px;
+  align-items: stretch;
+  gap: 8px;
 }
 .hero-stat {
   flex: 1;
   text-align: center;
+  background: rgba(255,255,255,.13);
+  border: 1px solid rgba(255,255,255,.17);
+  border-radius: 15px;
+  padding: 11px 6px 9px;
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 .hero-stat-num {
   display: block;
@@ -771,10 +784,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   text-transform: uppercase;
 }
 .hero-stat-sep {
-  width: 1px;
-  height: 28px;
-  background: rgba(255,255,255,.16);
-  flex-shrink: 0;
+  display: none;
 }
 
 /* ── Lernpfad rings ── */
@@ -1934,6 +1944,7 @@ const STRINGS = {
     weg_beste:'Bester Streak', weg_gesamt:'Sitzungen gesamt', weg_woche:'Diese Woche',
     weg_kalender:'Kalender', weg_verteilung:'Verteilung', weg_sitzungen_ges:'Sitzungen',
     weg_minuten:'Minuten', weg_phasen:'Phasen-Verlauf',
+    weg_phasen_alle:'Alle anzeigen', weg_phasen_weniger:'Weniger anzeigen',
     weg_einst:'Einstellungen', weg_timer_std:'Standard-Timer (Minuten)', weg_glocke:'Glocke aktivieren',
     weg_export:'Export (JSON)', weg_import:'Import', weg_reset:'Alle Daten zurücksetzen',
     weg_reset_confirm:'Wirklich alle Daten löschen?',
@@ -2034,6 +2045,7 @@ const STRINGS = {
     weg_beste:'Best streak', weg_gesamt:'Sessions total', weg_woche:'This week',
     weg_kalender:'Calendar', weg_verteilung:'Distribution', weg_sitzungen_ges:'sessions',
     weg_minuten:'minutes', weg_phasen:'Phase history',
+    weg_phasen_alle:'Show all', weg_phasen_weniger:'Show fewer',
     weg_einst:'Settings', weg_timer_std:'Default timer (minutes)', weg_glocke:'Enable bell',
     weg_export:'Export (JSON)', weg_import:'Import', weg_reset:'Reset all data',
     weg_reset_confirm:'Really delete all data?',
@@ -2074,7 +2086,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v108';
+var APP_VER = 'v109';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2775,12 +2787,28 @@ function weekSessions() {
 }
 
 function heroGradient(id) {
-  return {
-    gleichmut:  'linear-gradient(170deg,rgba(21,47,74,.68) 0%,rgba(30,77,120,.50) 55%,rgba(58,122,160,.32) 100%),url(/vier-unermesslichkeiten/gleichmut-hero.jpg) center/cover no-repeat',
-    liebe:      'linear-gradient(170deg,rgba(74,42,2,.68) 0%,rgba(122,80,8,.50) 55%,rgba(168,122,20,.32) 100%),url(/vier-unermesslichkeiten/liebe-hero.jpg) center/cover no-repeat',
-    mitgefuehl: 'linear-gradient(170deg,rgba(30,8,48,.70) 0%,rgba(58,18,88,.52) 55%,rgba(94,40,160,.35) 100%),url(/vier-unermesslichkeiten/mitgefuehl-hero.jpg) center/cover no-repeat',
-    freude:     'linear-gradient(170deg,rgba(8,37,16,.72) 0%,rgba(24,84,48,.55) 55%,rgba(38,120,72,.38) 100%),url(/vier-unermesslichkeiten/freude-hero.jpg) center/cover no-repeat',
-  }[id] || 'linear-gradient(170deg,#222232 0%,#363660 100%)';
+  // Scrim statt Vollverlauf: oben leichte Abdunklung (Statusleiste/Begrüßung),
+  // Mitte fast pur, unten qualitätsgetönte Abdunklung für den Textblock.
+  var tint = {
+    gleichmut:  '18,38,58',
+    liebe:      '62,36,2',
+    mitgefuehl: '32,10,52',
+    freude:     '8,34,18',
+  }[id] || '32,32,46';
+  var img = {
+    gleichmut:  'gleichmut-hero.jpg',
+    liebe:      'liebe-hero.jpg',
+    mitgefuehl: 'mitgefuehl-hero.jpg',
+    freude:     'freude-hero.jpg',
+  }[id];
+  var scrim = 'linear-gradient(180deg,'
+    + 'rgba(0,0,0,.32) 0%,rgba(0,0,0,0) 22%,'
+    + 'rgba(' + tint + ',0) 46%,'
+    + 'rgba(' + tint + ',.55) 74%,'
+    + 'rgba(' + tint + ',.82) 100%)';
+  return img
+    ? scrim + ',url(/vier-unermesslichkeiten/' + img + ') center/cover no-repeat'
+    : scrim;
 }
 
 function heroIllustration(id) {
@@ -2842,6 +2870,15 @@ function switchTab(name) {
   requestAnimationFrame(()=>{
     window.scrollTo(0, scrollPos[name]||0);
   });
+}
+
+function togglePhaseHistory() {
+  var more = document.getElementById('ph-more');
+  var btn = document.getElementById('ph-toggle');
+  if (!more || !btn) return;
+  var open = more.style.display !== 'none';
+  more.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? t('weg_phasen_alle') + ' (' + (more.children.length + 3) + ')' : t('weg_phasen_weniger');
 }
 
 function renderPanel(name) {
@@ -4583,18 +4620,33 @@ function renderBogen() {
         }).join('')
       + '</div>';
 
-    // Phasen-Verlauf
-    if (S.arc.phaseHistory.length) {
+    // Phasen-Verlauf — kompakt, Rausch-Einträge gefiltert, max. 3 sichtbar
+    var phEntries = S.arc.phaseHistory.filter(function(h){
+      var s = h.startedAt ? h.startedAt.slice(0,10) : null;
+      var c = h.completedAt ? h.completedAt.slice(0,10) : null;
+      // 0-Sitzungen-Phasen, die am selben Tag begannen und endeten, sind
+      // Artefakte vom Durchschalten — ausblenden
+      return (h.count||0) > 0 || !s || !c || s !== c;
+    });
+    if (phEntries.length) {
+      var fmtD = function(iso){ return iso ? iso.slice(8,10)+'.'+iso.slice(5,7)+'.' : '?'; };
+      var phRows = phEntries.map(function(h){
+        var q=getQ(h.phase);
+        return '<div class="ph-row">'
+          +'<span class="pill '+q.farbe+'">'+q.name+'</span>'
+          +'<span class="small muted">'+fmtD(h.startedAt)+'–'+fmtD(h.completedAt)
+          +' · '+(h.count||0)+' '+t('weg_sitzungen_ges')+'</span>'
+          +'</div>';
+      });
+      var PH_MAX = 3;
       segContent += '<div class="card">'
         + '<div class="card-title" style="margin-bottom:10px;">'+t('weg_phasen')+'</div>'
-        + S.arc.phaseHistory.map(function(h){
-            var q=getQ(h.phase);
-            return '<div class="j-entry">'
-              +'<div class="j-date">'+(h.startedAt?h.startedAt.slice(0,10):'?')+' – '+(h.completedAt?h.completedAt.slice(0,10):'?')+'</div>'
-              +'<div style="margin-top:2px;"><span class="pill '+q.farbe+'">'+q.name+'</span>'
-              +'<span class="small muted" style="margin-left:8px;">'+(h.count||0)+' '+t('weg_sitzungen_ges')+'</span></div>'
-              +'</div>';
-          }).join('')
+        + (phRows.length > PH_MAX
+            ? '<div id="ph-more" style="display:none;">' + phRows.slice(0, phRows.length-PH_MAX).join('') + '</div>'
+              + phRows.slice(-PH_MAX).join('')
+              + '<button class="btn-ghost" id="ph-toggle" onclick="togglePhaseHistory()" style="padding-left:0;color:var(--ink-muted);">'
+              + t('weg_phasen_alle') + ' (' + phRows.length + ')</button>'
+            : phRows.join(''))
         + '</div>';
     }
 
