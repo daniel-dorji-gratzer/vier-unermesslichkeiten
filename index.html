@@ -6,8 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="4 Unermesslichkeiten">
-<meta name="theme-color" content="#f4f1ee" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1c1714" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f1ee">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -40,9 +39,20 @@
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --font-body: -apple-system, 'Helvetica Neue', sans-serif;
-  --bg: #f4f1ee;
-  --bg-card: #ffffff;
-  --bg-soft: #ede8e3;
+  /* Tageslicht-Token (Stufe "tag" = neutral; überschrieben je data-time) */
+  --light-tint: #ffffff;
+  --light-mix: 0%;
+  --shadow-col: rgba(40,35,30,.09);
+  --shadow-y: 2px;
+  --shadow-blur: 8px;
+  /* Basisflächen — die sichtbaren Flächen werden unten per color-mix
+     mit der Lichtfarbe der Tagesstufe eingefärbt */
+  --bg-base: #f4f1ee;
+  --bg-card-base: #ffffff;
+  --bg-soft-base: #ede8e3;
+  --bg: color-mix(in oklab, var(--bg-base) calc(100% - var(--light-mix)), var(--light-tint));
+  --bg-card: color-mix(in oklab, var(--bg-card-base) calc(100% - var(--light-mix)), var(--light-tint));
+  --bg-soft: color-mix(in oklab, var(--bg-soft-base) calc(100% - var(--light-mix)), var(--light-tint));
   --ink: #18120f;
   --ink-soft: #4a3f3a;
   --ink-muted: #9a8d87;
@@ -53,7 +63,8 @@
   --tab-h: 52px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bot: env(safe-area-inset-bottom, 0px);
-  --shadow: 0 2px 8px rgba(0,0,0,.07), 0 12px 32px rgba(0,0,0,.10);
+  --shadow: 0 var(--shadow-y) var(--shadow-blur) var(--shadow-col),
+            0 calc(var(--shadow-y) * 6) calc(var(--shadow-blur) * 4) var(--shadow-col);
   --r: 18px;
   --kap-gleichmut-border: #7BB3D4;
   --kap-liebe-border: #F5C842;
@@ -64,42 +75,45 @@
   --q-accent-bg:  #e2eff8;
   --q-accent-txt: #fff;
 }
-/* ── Dark mode variables ── */
-:root[data-theme="dark"] {
-  --bg: #1c1714;
-  --bg-card: #252019;
-  --bg-soft: #302924;
-  --ink: #f0ebe5;
-  --ink-soft: #c5b8b0;
-  --ink-muted: #7a6d66;
-  --accent: #c97a82;
-  --accent-soft: #e8a0a8;
-  --accent-bg: #2c181b;
-  --line: #3a332d;
-  --shadow: 0 1px 4px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.5);
+/* ── Tageslicht-Stufen ──
+   morgen: goldenes Licht, weiche etwas längere Schatten
+   tag:    neutral (Defaults in :root)
+   abend:  bernsteinfarbenes Licht, lange warme Schatten
+   nacht:  tiefes Blaugrau, Kerzenlicht-Akzent, Linien statt Schatten */
+:root[data-time="morgen"] {
+  --light-tint: #e8c98a;
+  --light-mix: 5%;
+  --shadow-col: rgba(120,90,40,.10);
+  --shadow-y: 3px;
+  --shadow-blur: 12px;
+  --ink-muted: #8d7d72;
+}
+:root[data-time="abend"] {
+  --light-tint: #d9a05c;
+  --light-mix: 7%;
+  --shadow-col: rgba(110,60,20,.13);
+  --shadow-y: 6px;
+  --shadow-blur: 20px;
+  --ink-muted: #75645a;
+}
+:root[data-time="nacht"] {
+  --bg-base: #171a22;
+  --bg-card-base: #1f2330;
+  --bg-soft-base: #272c3b;
+  --light-tint: #8a93b8;
+  --light-mix: 0%;
+  --ink: #ecebf2;
+  --ink-soft: #bcbacb;
+  --ink-muted: #8e8da3;
+  --accent: #d49a62;
+  --accent-soft: #e8c096;
+  --accent-bg: #2b2433;
+  --line: #2e3342;
+  --shadow: none;
   --kap-gleichmut-border: rgba(110,197,240,.45);
   --kap-liebe-border: rgba(245,208,112,.45);
   --kap-mitgefuehl-border: rgba(212,156,240,.45);
   --kap-freude-border: rgba(96,208,144,.45);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    --bg: #1c1714;
-    --bg-card: #252019;
-    --bg-soft: #302924;
-    --ink: #f0ebe5;
-    --ink-soft: #c5b8b0;
-    --ink-muted: #7a6d66;
-    --accent: #c97a82;
-    --accent-soft: #e8a0a8;
-    --accent-bg: #2c181b;
-    --line: #3a332d;
-    --shadow: 0 1px 4px rgba(0,0,0,.3), 0 8px 28px rgba(0,0,0,.5);
-    --kap-gleichmut-border: rgba(110,197,240,.45);
-    --kap-liebe-border: rgba(245,208,112,.45);
-    --kap-mitgefuehl-border: rgba(212,156,240,.45);
-    --kap-freude-border: rgba(96,208,144,.45);
-  }
 }
 /* ── Reader overlay ── */
 #reader-bg {
@@ -120,17 +134,10 @@
   box-shadow: 0 1px 0 rgba(0,0,0,.05), inset 0 -1px 0 rgba(0,0,0,.03);
   position: relative; z-index: 1;
 }
-:root[data-theme="dark"] #reader-header {
-  background: rgba(37,32,25,.80);
+:root[data-time="nacht"] #reader-header {
+  background: rgba(31,35,48,.80);
   border-bottom: 1px solid rgba(255,255,255,.07);
   box-shadow: 0 1px 0 rgba(0,0,0,.2), inset 0 -1px 0 rgba(0,0,0,.1);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="dark"]) #reader-header {
-    background: rgba(37,32,25,.80);
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    box-shadow: 0 1px 0 rgba(0,0,0,.2), inset 0 -1px 0 rgba(0,0,0,.1);
-  }
 }
 #reader-back {
   font-size: 1.3rem; background: none; border: none;
@@ -300,49 +307,30 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
 .card-accent { border-top: 3px solid var(--accent); }
 .card-accent .card-title { color: var(--ink); }
 
-/* ── Dark-mode element overrides ── */
-:root[data-theme="dark"] #tabbar { background: rgba(28,23,20,.8);
+/* ── Nacht-Element-Overrides (Tageslicht-System) ── */
+:root[data-time="nacht"] #tabbar { background: rgba(23,26,34,.8);
   border-top: 1px solid rgba(255,255,255,.07);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
-:root[data-theme="dark"] .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
-:root[data-theme="dark"] .pill.liebe      { background: #3d2d00; color: #f5d070; }
-:root[data-theme="dark"] .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
-:root[data-theme="dark"] .pill.freude     { background: #0e3520; color: #60d090; }
-:root[data-theme="dark"] .quiz-opt.correct { border-color: #5BBB8A; background: #0d3522; color: var(--ink); }
-:root[data-theme="dark"] .quiz-opt.wrong   { border-color: #c97a82; background: #2c181b; color: var(--ink); }
-:root[data-theme="dark"] .quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
-:root[data-theme="dark"] .quiz-opt.wrong   .quiz-opt-dot { border-color: #c97a82; background: #c97a82; }
-:root[data-theme="dark"] input, :root[data-theme="dark"] textarea, :root[data-theme="dark"] select {
+:root[data-time="nacht"] .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
+:root[data-time="nacht"] .pill.liebe      { background: #3d2d00; color: #f5d070; }
+:root[data-time="nacht"] .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
+:root[data-time="nacht"] .pill.freude     { background: #0e3520; color: #60d090; }
+:root[data-time="nacht"] .quiz-opt.correct { border-color: #5BBB8A; background: #0d3522; color: var(--ink); }
+:root[data-time="nacht"] .quiz-opt.wrong   { border-color: #c97a82; background: #2a1d24; color: var(--ink); }
+:root[data-time="nacht"] .quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
+:root[data-time="nacht"] .quiz-opt.wrong   .quiz-opt-dot { border-color: #c97a82; background: #c97a82; }
+:root[data-time="nacht"] input, :root[data-time="nacht"] textarea, :root[data-time="nacht"] select {
   background: var(--bg-soft); color: var(--ink); border-color: var(--line); }
-:root[data-theme="dark"] #sheet { background: rgba(37,32,25,.82);
+:root[data-time="nacht"] #sheet { background: rgba(31,35,48,.82);
   border: 1px solid rgba(255,255,255,.09); border-bottom: none;
   box-shadow: 0 -8px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); }
-:root[data-theme="dark"] #sheet::before {
+:root[data-time="nacht"] #sheet::before {
   background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 100%); }
-:root[data-theme="dark"] #sheet-bg { background: rgba(6,4,3,.35); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="dark"]) #tabbar { background: rgba(28,23,20,.8);
-    border-top: 1px solid rgba(255,255,255,.07);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.gleichmut  { background: #1a3345; color: #6ec5f0; }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.liebe      { background: #3d2d00; color: #f5d070; }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.mitgefuehl { background: #2d1545; color: #d49cf0; }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .pill.freude     { background: #0e3520; color: #60d090; }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.correct { border-color: #5BBB8A; background: #0d3522; color: var(--ink); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.wrong   { border-color: #c97a82; background: #2c181b; color: var(--ink); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.correct .quiz-opt-dot { border-color: #5BBB8A; background: #5BBB8A; }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .quiz-opt.wrong   .quiz-opt-dot { border-color: #c97a82; background: #c97a82; }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) input,
-  :root:not([data-theme="light"]):not([data-theme="dark"]) textarea,
-  :root:not([data-theme="light"]):not([data-theme="dark"]) select {
-    background: var(--bg-soft); color: var(--ink); border-color: var(--line); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) #sheet { background: rgba(37,32,25,.82);
-    border: 1px solid rgba(255,255,255,.09); border-bottom: none;
-    box-shadow: 0 -8px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) #sheet::before {
-    background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 100%); }
-  :root:not([data-theme="light"]):not([data-theme="dark"]) #sheet-bg { background: rgba(6,4,3,.35); }
-}
+:root[data-time="nacht"] #sheet-bg { background: rgba(4,6,12,.35); }
+/* Nacht: Karten minimal heller als Grund + 1px-Linien statt Schatten.
+   Transparenter Rand in den hellen Stufen haelt die Geometrie konstant. */
+.card, #runner { border: 1px solid transparent; }
+:root[data-time="nacht"] .card, :root[data-time="nacht"] #runner { border-color: var(--line); }
 
 /* ── Typography ── */
 .muted { color: var(--ink-muted); }
@@ -733,6 +721,32 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+}
+/* Tageslicht-Overlay auf dem Hero-Bild; Text liegt darüber (z-index) */
+.hero-today > * { position: relative; z-index: 1; }
+.hero-today::after {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; opacity: 0; transition: opacity .8s ease;
+}
+:root[data-time="morgen"] .hero-today::after {
+  background: linear-gradient(180deg, rgba(232,201,138,.55) 0%, rgba(232,201,138,0) 65%);
+  mix-blend-mode: soft-light; opacity: 1;
+}
+:root[data-time="abend"] .hero-today::after {
+  background: linear-gradient(180deg, #d9a05c 0%, #6a4a8a 100%);
+  mix-blend-mode: multiply; opacity: .35;
+}
+:root[data-time="nacht"] .hero-today::after {
+  background: #1a2545;
+  mix-blend-mode: multiply; opacity: .55;
+}
+/* Stufenwechsel: weicher Lichtwechsel (JS setzt .time-fade kurzzeitig) */
+html.time-fade, html.time-fade * {
+  transition: background-color .8s ease, background .8s ease, color .8s ease,
+    box-shadow .8s ease, border-color .8s ease, opacity .8s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.time-fade, html.time-fade *, .hero-today::after { transition: none !important; }
 }
 /* Content below the hero rises over the image like a sheet */
 .hero-sheet {
@@ -1992,7 +2006,8 @@ const STRINGS = {
     weg_reset_confirm:'Wirklich alle Daten löschen?',
     weg_footer:'Begleiter zur Praxis der vier Unermesslichkeiten nach Longchenpa.',
     weg_footer2:'Belehrungen mit Trinley Tulku, Mai 2026.',
-    weg_lang:'Sprache', weg_erscheinungsbild:'Erscheinungsbild', weg_hell:'Hell', weg_dunkel:'Dunkel', weg_auto:'Auto',
+    weg_lang:'Sprache', weg_erscheinungsbild:'Erscheinungsbild',
+    weg_zeit_auto:'Auto (Tageslicht)', weg_zeit_morgen:'Morgen', weg_zeit_tag:'Tag', weg_zeit_abend:'Abend', weg_zeit_nacht:'Nacht',
     lp_titel:'Lernpfad', lp_studium:'Studium', lp_kontempl:'Kontempl.', lp_medit:'Medit.',
     lp_hint:'Studium: Quiz · Kontemplation & Meditation: werden beim Üben automatisch abgehakt',
     pi_abgeschlossen:'✓ Abgeschlossen', pi_zeichen:'Zeichen',
@@ -2093,7 +2108,8 @@ const STRINGS = {
     weg_reset_confirm:'Really delete all data?',
     weg_footer:'Companion for the practice of the four immeasurables according to Longchenpa.',
     weg_footer2:'Teachings with Trinley Tulku, May 2026.',
-    weg_lang:'Language', weg_erscheinungsbild:'Appearance', weg_hell:'Light', weg_dunkel:'Dark', weg_auto:'Auto',
+    weg_lang:'Language', weg_erscheinungsbild:'Appearance',
+    weg_zeit_auto:'Auto (daylight)', weg_zeit_morgen:'Morning', weg_zeit_tag:'Day', weg_zeit_abend:'Evening', weg_zeit_nacht:'Night',
     lp_titel:'Learning path', lp_studium:'Study', lp_kontempl:'Contempl.', lp_medit:'Medit.',
     lp_hint:'Study: Quiz · Contemplation & Meditation: automatically checked off when practiced',
     pi_abgeschlossen:'✓ Completed', pi_zeichen:'Sign',
@@ -2128,7 +2144,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v110';
+var APP_VER = 'v111';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2143,10 +2159,8 @@ var Q_ACCENT_DARK = {
   freude:     { a:'#4aab7a', bg:'#082218', txt:'#fff'    },
 };
 function setQualityAccent(qid) {
-  var isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-    || (!document.documentElement.getAttribute('data-theme')
-        && window.matchMedia('(prefers-color-scheme:dark)').matches);
-  var map = isDark ? Q_ACCENT_DARK : Q_ACCENT_LIGHT;
+  var isNight = document.documentElement.dataset.time === 'nacht';
+  var map = isNight ? Q_ACCENT_DARK : Q_ACCENT_LIGHT;
   var v = map[qid] || map.gleichmut;
   var r = document.documentElement.style;
   r.setProperty('--accent',        v.a);
@@ -2156,23 +2170,41 @@ function setQualityAccent(qid) {
   r.setProperty('--q-accent-txt',  v.txt);
 }
 
-function applyTheme(pref) {
-  var p = pref || (S && S.prefs && S.prefs.theme) || 'auto';
-  if (p === 'dark')  { document.documentElement.dataset.theme = 'dark'; }
-  else if (p === 'light') { document.documentElement.dataset.theme = 'light'; }
-  else               { delete document.documentElement.dataset.theme; }
-  // keep meta theme-color in sync
-  var isDark = p === 'dark' || (p !== 'light' && window.matchMedia('(prefers-color-scheme:dark)').matches);
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = isDark ? '#1c1714' : '#f4f1ee';
-  // re-apply quality accent with correct dark/light values
-  if (S && S.arc) setQualityAccent(S.arc.currentPhase || 'gleichmut');
+// ── Tageslicht-System ─────────────────────────────────────────────────────────
+// Die App vollzieht das Licht des Tages mit: morgen / tag / abend / nacht.
+// Auto folgt der Uhrzeit; manuelle Stufen sind in S.prefs.timeMode persistiert.
+var TIME_META_COLOR = { morgen:'#f4efe3', tag:'#f4f1ee', abend:'#f3ebdc', nacht:'#171a22' };
+
+function timeStageFromHour(h) {
+  if (h >= 5  && h < 10) return 'morgen';
+  if (h >= 10 && h < 17) return 'tag';
+  if (h >= 17 && h < 21) return 'abend';
+  return 'nacht';
 }
-function setTheme(pref) {
-  S.prefs.theme = pref;
+function currentTimeStage() {
+  return document.documentElement.dataset.time || 'tag';
+}
+function applyTimeMode(opts) {
+  var mode = (S && S.prefs && S.prefs.timeMode) || 'auto';
+  var stage = mode === 'auto' ? timeStageFromHour(new Date().getHours()) : mode;
+  var prev = document.documentElement.dataset.time;
+  if (stage === prev) return;
+  if (opts && opts.fade && prev) {
+    document.documentElement.classList.add('time-fade');
+    setTimeout(function(){ document.documentElement.classList.remove('time-fade'); }, 900);
+  }
+  document.documentElement.dataset.time = stage;
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = TIME_META_COLOR[stage];
+  if (S && S.arc) setQualityAccent(S.arc.currentPhase || 'gleichmut');
+  // Hero neu rendern, damit heroImage() das Bild der Stufe lädt
+  if (prev && typeof activeTab !== 'undefined' && activeTab === 'heute') renderPanel('heute');
+}
+function setTimeMode(mode) {
+  S.prefs.timeMode = mode;
   save();
-  applyTheme(pref);
-  renderPanel(activeTab); // re-render to update button states
+  applyTimeMode({ fade: true });
+  renderPanel(activeTab); // Button-Zustände aktualisieren
 }
 
 function t(key) {
@@ -2209,7 +2241,7 @@ const SK = "vier_unermesslichkeiten_v1";
 const defaultState = () => ({
   sessions: [],
   arc: { currentPhase:"gleichmut", phaseStarted:null, phaseHistory:[] },
-  prefs: { timerDefault:20, bell:true, theme:'auto', readerPos:{} },
+  prefs: { timerDefault:20, bell:true, timeMode:'auto', readerPos:{} },
   goals: { dailyMin:20, weeklyDays:5 },
   path: {},
   assessments: {},
@@ -2828,6 +2860,25 @@ function weekSessions() {
   return S.sessions.filter(s=>s.date>=start);
 }
 
+// Vorhandene Nacht-Bilder ('<qualität>-hero-nacht.jpg') hier eintragen,
+// sobald sie im Repo (und im sw.js-Precache) liegen. Ohne Eintrag wird
+// nachts das Tagbild mit dem tiefblauen CSS-Overlay (::after) verwendet.
+var HERO_NIGHT_ASSETS = [];
+
+function heroImage(quality, time) {
+  var day = {
+    gleichmut:  'gleichmut-hero.jpg',
+    liebe:      'liebe-hero.jpg',
+    mitgefuehl: 'mitgefuehl-hero.jpg',
+    freude:     'freude-hero.jpg',
+  }[quality];
+  if (time === 'nacht') {
+    var night = quality + '-hero-nacht.jpg';
+    if (HERO_NIGHT_ASSETS.indexOf(night) !== -1) return night;
+  }
+  return day;
+}
+
 function heroGradient(id) {
   // Scrim statt Vollverlauf: oben leichte Abdunklung (Statusleiste/Begrüßung),
   // Mitte fast pur, unten qualitätsgetönte Abdunklung für den Textblock.
@@ -2837,12 +2888,7 @@ function heroGradient(id) {
     mitgefuehl: '32,10,52',
     freude:     '8,34,18',
   }[id] || '32,32,46';
-  var img = {
-    gleichmut:  'gleichmut-hero.jpg',
-    liebe:      'liebe-hero.jpg',
-    mitgefuehl: 'mitgefuehl-hero.jpg',
-    freude:     'freude-hero.jpg',
-  }[id];
+  var img = heroImage(id, currentTimeStage());
   var scrim = 'linear-gradient(180deg,'
     + 'rgba(0,0,0,.32) 0%,rgba(0,0,0,0) 22%,'
     + 'rgba(' + tint + ',0) 46%,'
@@ -4511,8 +4557,7 @@ function renderRadarChart(scores) {
     return 'M ' + cx + ' ' + (cy-r) + ' L ' + (cx+r) + ' ' + cy
       + ' L ' + cx + ' ' + (cy+r) + ' L ' + (cx-r) + ' ' + cy + ' Z';
   }
-  var isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-    || (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  var isDark = document.documentElement.dataset.time === 'nacht';
   var gridStroke = isDark ? 'rgba(255,255,255,.10)' : 'rgba(0,0,0,.07)';
   var axisStroke = isDark ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.08)';
   var grid = [25,50,75,100].map(function(p) {
@@ -4707,16 +4752,16 @@ function renderBogen() {
       + '<button class="btn-'+((!S.prefs.lang||S.prefs.lang==='de')?'secondary':'ghost')+'" onclick="setLang(\'de\')" style="padding:6px 14px;font-size:.84rem;">DE</button>'
       + '<button class="btn-'+(S.prefs.lang==='en'?'secondary':'ghost')+'" onclick="setLang(\'en\')" style="padding:6px 14px;font-size:.84rem;">EN</button>'
       + '</div></label>'
-      + '<label class="field" style="display:flex;align-items:center;justify-content:space-between;font-size:.9rem;margin-top:4px;">'
+      + '<label class="field" style="display:block;font-size:.9rem;margin-top:4px;">'
       + '<span>'+t('weg_erscheinungsbild')+'</span>'
-      + '<div style="display:flex;gap:4px;">'
-      + (function(th){
-          return ['light','auto','dark'].map(function(v){
-            var lbl = v==='light'?t('weg_hell'):v==='dark'?t('weg_dunkel'):t('weg_auto');
-            var active = th===v || (!th&&v==='auto');
-            return '<button class="btn-'+(active?'secondary':'ghost')+'" onclick="setTheme(\''+v+'\')" style="padding:6px 10px;font-size:.82rem;">'+lbl+'</button>';
+      + '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;">'
+      + (function(tm){
+          return ['auto','morgen','tag','abend','nacht'].map(function(v){
+            var lbl = t('weg_zeit_'+v);
+            var active = tm===v || (!tm&&v==='auto');
+            return '<button class="btn-'+(active?'secondary':'ghost')+'" onclick="setTimeMode(\''+v+'\')" style="padding:6px 10px;font-size:.8rem;">'+lbl+'</button>';
           }).join('');
-        })(S.prefs.theme)
+        })(S.prefs.timeMode)
       + '</div></label>'
       + '<hr class="divider">'
       + '<div class="btn-row">'
@@ -5006,7 +5051,14 @@ function finishOnboarding() {
   if (changed) save();
 })();
 
-applyTheme();
+// Migration: altes Erscheinungsbild (data-theme) → Tageslicht-Stufe
+if (S.prefs.timeMode === undefined) {
+  S.prefs.timeMode = S.prefs.theme === 'dark' ? 'nacht'
+    : S.prefs.theme === 'light' ? 'tag' : 'auto';
+  delete S.prefs.theme;
+  save();
+}
+applyTimeMode();
 applyLang();
 setQualityAccent((S.arc && S.arc.currentPhase) || 'gleichmut');
 renderHeute();
@@ -5094,9 +5146,10 @@ showOnboarding();
 })();
 
 setTimeout(checkBackupDue, 1000);
-// Also re-apply theme if system preference changes (auto mode)
-window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function() {
-  if (!S.prefs.theme || S.prefs.theme === 'auto') applyTheme();
+// Tageslicht: alle 15 min sowie beim Zurückkehren in die App neu prüfen
+setInterval(function(){ applyTimeMode({ fade: true }); }, 15 * 60 * 1000);
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) applyTimeMode({ fade: true });
 });
 
 
