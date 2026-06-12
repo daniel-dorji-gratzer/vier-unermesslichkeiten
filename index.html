@@ -13,7 +13,33 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>Vier Unermesslichkeiten</title>
 <style>
+/* ── Selbst gehostete Schriften (offline-fähig, im SW-Precache) ── */
+@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/fraunces-roman-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/fraunces-roman-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Fraunces'; font-style: italic; font-weight: 100 900; font-display: swap;
+  src: url(fonts/fraunces-italic-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Fraunces'; font-style: italic; font-weight: 100 900; font-display: swap;
+  src: url(fonts/fraunces-italic-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url(fonts/plexmono-400-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url(fonts/plexmono-500-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url(fonts/plexmono-600-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 :root {
+  /* Zwei-Stimmen-Typografie: Display/Kontemplativ + Trainer/Utility */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-body: -apple-system, 'Helvetica Neue', sans-serif;
   --bg: #f4f1ee;
   --bg-card: #ffffff;
   --bg-soft: #ede8e3;
@@ -175,7 +201,7 @@
   display: flex; align-items: center; gap: 10px;
 }
 #reader-nav-ctr {
-  font-size: .75rem; color: var(--ink-muted);
+  font-family: var(--font-mono); font-size: .75rem; color: var(--ink-muted);
   font-variant-numeric: tabular-nums; letter-spacing: .03em;
   min-width: 32px; text-align: center;
 }
@@ -188,7 +214,8 @@
 #reader-content p {
   font-size: var(--reader-fs, 1.05rem); line-height: 1.85;
   color: var(--ink); margin-bottom: 1.25em;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 24, "SOFT" 60;
   max-width: 65ch;
   counter-increment: para-counter;
   position: relative;
@@ -199,7 +226,7 @@
   position: absolute; left: 0; top: 0.35em;
   font-size: 0.62rem; line-height: 1;
   color: var(--ink-muted);
-  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  font-family: var(--font-mono);
   width: 24px; text-align: right;
   user-select: none; -webkit-user-select: none;
 }
@@ -214,7 +241,7 @@
 #reader-content p[data-annot-count]::after {
   content: attr(data-annot-count);
   position: absolute; left: 0; top: 1.55em;
-  font-size: .55rem; font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  font-size: .55rem; font-family: var(--font-mono);
   width: 24px; text-align: right; color: var(--accent); font-weight: 700;
   user-select: none; -webkit-user-select: none;
 }
@@ -225,7 +252,7 @@
    the bottom ~59px, which produced the persistent gap under the tab bar. */
 body { background: var(--bg); color: var(--ink);
   min-height: calc(100lvh + 1px);
-  font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px;
+  font-family: var(--font-body); font-size: 16px;
   line-height: 1.6; -webkit-font-smoothing: antialiased; }
 #app { background: var(--bg); }
 #content { background: var(--bg); }
@@ -255,7 +282,7 @@ body { background: var(--bg); color: var(--ink);
 #tabbar button { flex: 1; border: none; background: transparent; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; padding: 6px 4px; color: var(--ink-muted); font-size: 10px; font-weight: 500;
-  font-family: inherit; transition: color .15s; height: var(--tab-h); touch-action: manipulation; }
+  font-family: var(--font-mono); transition: color .15s; height: var(--tab-h); touch-action: manipulation; }
 #safe-fill { display: none; }
 #tabbar button.active { color: var(--accent); }
 #tabbar button svg { width: 23px; height: 23px; fill: none; stroke: currentColor;
@@ -320,8 +347,8 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
 /* ── Typography ── */
 .muted { color: var(--ink-muted); }
 .small { font-size: .85rem; }
-.label { font-size: .72rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--ink-muted); }
+.label { font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .14em; color: var(--ink-muted); }
 
 /* ── Pills ── */
 .pill { display: inline-block; padding: 3px 10px; border-radius: 100px;
@@ -334,9 +361,9 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
 
 /* ── Buttons ── */
 button.btn-primary { background: var(--accent); color: var(--q-accent-txt, #fff); border: none;
-  border-radius: 12px; padding: 13px 22px; font-size: .95rem; font-family: inherit;
-  font-weight: 600; cursor: pointer; touch-action: manipulation;
-  transition: transform .1s, opacity .15s; letter-spacing: -.01em; }
+  border-radius: 12px; padding: 13px 22px; font-size: .9rem; font-family: var(--font-mono);
+  font-weight: 500; cursor: pointer; touch-action: manipulation;
+  transition: transform .1s, opacity .15s; }
 button.btn-primary:active { opacity: .85; transform: scale(.98); }
 button.btn-secondary { background: var(--bg-soft); color: var(--ink); border: none;
   border-radius: 12px; padding: 13px 22px; font-size: .95rem; font-family: inherit;
@@ -356,22 +383,25 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .list-item .li-sub   { font-size: .85rem; color: var(--ink-muted); margin-top: 4px; }
 
 /* ── Verse block ── */
-.verse { color: var(--ink-soft); line-height: 1.35;
+.verse { color: var(--ink-soft); line-height: 1.45;
   border-left: 3px solid var(--accent);
-  padding: 8px 0 8px 16px; margin: 10px 0; font-size: .93rem;
+  padding: 8px 0 8px 16px; margin: 10px 0; font-size: 1.3rem;
   background: var(--accent-bg); border-radius: 0 8px 8px 0;
-  font-family: Georgia, 'Times New Roman', serif; }
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 70; }
 .verse-line { display: block; margin-bottom: 0.6em; }
 .verse-line:last-child { margin-bottom: 0; }
 
 /* ── Streak ── */
-.streak-num { font-size: 3.2rem; font-weight: 800; color: var(--accent); line-height: 1;
-  letter-spacing: -.03em; }
+.streak-num { font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: 3.2rem; font-weight: 600; color: var(--accent); line-height: 1; }
 .streak-row { display: flex; align-items: center; gap: 20px; padding: 4px 0; }
 
 /* ── Reminder quote ── */
 .reminder { background: var(--accent-bg); border-left: 4px solid var(--accent); }
-.reminder .quote { font-style: italic; color: var(--ink-soft); line-height: 1.75; font-size: .95rem; }
+.reminder .quote { font-style: italic; color: var(--ink-soft); line-height: 1.45; font-size: 1.3rem;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 70; }
 
 /* ── Mode buttons ── */
 .mode-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
@@ -399,8 +429,9 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 /* ── Practice runner ── */
 #runner { background: var(--bg-card); border-radius: var(--r); padding: 28px 22px;
   box-shadow: var(--shadow); display: none; margin-bottom: 12px; }
-.runner-stage { font-size: .72rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .1em; color: var(--ink-muted); margin-bottom: 12px; text-align: center; }
+.runner-stage { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .14em; color: var(--ink-muted);
+  margin-bottom: 12px; text-align: center; }
 .runner-text { font-size: 1rem; line-height: 1.85; color: var(--ink);
   text-align: center; white-space: pre-line; max-width: 520px; margin: 0 auto 22px; }
 .runner-text.italic { font-style: italic; color: var(--ink-soft); }
@@ -409,22 +440,24 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
   display: flex; align-items: center; justify-content: space-between;
   gap: 8px; margin: 0 auto 16px; max-width: 360px; width: 100%;
 }
-.verse-nav-ctr { font-size: .8rem; color: var(--ink-faint); text-align: center; flex: 1; }
+.verse-nav-ctr { font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: .8rem; color: var(--ink-faint); text-align: center; flex: 1; }
 .runner-progress { text-align: center; font-size: .78rem; color: var(--ink-muted); margin-top: 14px; }
 .timer-ring-wrap { position: relative; width: 180px; height: 180px; margin: 16px auto 8px; }
 .timer-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
 .timer-display { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: 2.8rem; font-weight: 700; color: var(--accent);
-  font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+  font-family: var(--font-mono); font-size: 2.8rem; font-weight: 600; color: var(--accent);
+  font-variant-numeric: tabular-nums; }
 
 /* ── Journal ── */
 .j-entry { padding: 14px 0; }
 .j-entry + .j-entry { margin-top: 2px; }
-.j-date-hdr { font-size: .72rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .06em; color: var(--ink-faint); padding: 20px 0 6px; }
+.j-date-hdr { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--ink-faint); padding: 20px 0 6px; }
 .j-date-hdr:first-child { padding-top: 4px; }
-.j-date { font-size: .78rem; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;
-  text-transform: uppercase; letter-spacing: .05em; }
+.j-date { font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  color: var(--ink-muted); margin-bottom: 4px;
+  text-transform: uppercase; letter-spacing: .12em; }
 .j-text { font-size: 1rem; color: var(--ink); line-height: 1.65; }
 .j-text p { margin-bottom: .7em; }
 .j-text p:last-child { margin-bottom: 0; }
@@ -468,7 +501,7 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 }
 .modul-hdr-meta { flex: 1; }
 .modul-hdr-nr {
-  font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .12em;
   text-transform: uppercase; color: var(--ink-faint); margin-bottom: 2px;
 }
 .modul-hdr-titel { font-size: 1rem; font-weight: 600; color: var(--ink); }
@@ -496,8 +529,8 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
   margin-bottom: 14px; border-left: 2px dotted var(--accent);
 }
 .source-context .source-ref {
-  font-size: .68rem; color: var(--ink-muted); margin-bottom: 5px;
-  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-muted); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: .12em; font-weight: 500;
 }
 .source-context blockquote {
   font-size: .88rem; color: var(--ink-soft); line-height: 1.55;
@@ -723,9 +756,10 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   display: flex;
   align-items: center;
   gap: 7px;
+  font-family: var(--font-mono);
   font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .1em;
+  font-weight: 500;
+  letter-spacing: .14em;
   text-transform: uppercase;
   opacity: .85;
   text-shadow: 0 1px 10px rgba(0,0,0,.35);
@@ -736,13 +770,17 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   flex-shrink: 0;
 }
 .hero-quality-name {
+  font-family: var(--font-display);
   font-size: 2.75rem;
-  font-weight: 800;
+  font-weight: 420;
+  font-variation-settings: "opsz" 100, "SOFT" 60;
   line-height: .98;
-  letter-spacing: -.03em;
+  letter-spacing: -.01em;
   margin-bottom: 8px;
 }
 .hero-quality-sanskrit {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 70;
   font-size: 1.02rem;
   font-style: italic;
   opacity: .85;
@@ -772,15 +810,19 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
 }
 .hero-stat-num {
   display: block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 1.65rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   margin-bottom: 3px;
 }
 .hero-stat-label {
+  font-family: var(--font-mono);
+  font-weight: 500;
   font-size: .56rem;
   opacity: .58;
-  letter-spacing: .06em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 .hero-stat-sep {
@@ -852,7 +894,7 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   transition: all .3s; flex-shrink: 0; }
 .ob-dot.ob-active { width: 24px; background: rgba(255,255,255,.9); }
 .ob-slide { color: #fff; width: 100%; }
-.ob-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+.ob-eyebrow { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .14em;
   text-transform: uppercase; opacity: .65; margin-bottom: 10px; }
 .ob-title { font-size: 2.1rem; font-weight: 800; line-height: 1.1;
   letter-spacing: -.035em; margin-bottom: 12px; }
@@ -2086,7 +2128,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v109';
+var APP_VER = 'v110';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
