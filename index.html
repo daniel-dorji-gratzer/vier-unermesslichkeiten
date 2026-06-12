@@ -808,20 +808,6 @@ html.time-fade, html.time-fade * {
   background: var(--bg);
   border-radius: 32px 32px 0 0;
 }
-/* Flache Wellen-Kante statt gerader Rundung (Fallback: Rundung oben) */
-@supports (mask-repeat: repeat-x) or (-webkit-mask-repeat: repeat-x) {
-  .hero-sheet {
-    border-radius: 0;
-    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16' preserveAspectRatio='none'><path d='M0 16 V9 Q15 1 30 7 T60 7 T90 7 T120 7 V16 Z' fill='black'/></svg>"), linear-gradient(#000 0 0);
-    -webkit-mask-size: 120px 16px, 100% calc(100% - 15px);
-    -webkit-mask-position: top left, left 15px;
-    -webkit-mask-repeat: repeat-x, no-repeat;
-    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16' preserveAspectRatio='none'><path d='M0 16 V9 Q15 1 30 7 T60 7 T90 7 T120 7 V16 Z' fill='black'/></svg>"), linear-gradient(#000 0 0);
-    mask-size: 120px 16px, 100% calc(100% - 15px);
-    mask-position: top left, left 15px;
-    mask-repeat: repeat-x, no-repeat;
-  }
-}
 .hero-illus {
   position: absolute;
   inset: 0;
@@ -881,6 +867,9 @@ html.time-fade, html.time-fade * {
 .hero-stat {
   flex: 1;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   background: var(--hero-chip);
   border: 1px solid var(--hero-chip-line);
   border-radius: 15px;
@@ -2009,7 +1998,7 @@ const STRINGS = {
     heute_nicht_geuebt:'Noch nicht geübt', heute_fuenf_min:'Auch fünf Minuten zählen. Was darf es heute sein?',
     heute_vers:'Vers lesen', heute_rez:'Rezitation', heute_kontempl:'Kontemplation', heute_nur_eintragen:'Nur eintragen →',
     heute_erste_sitzung:'Erste Sitzung wartet', heute_auch_5:'Auch 5 Minuten zählen',
-    heute_tage:'Tage in Folge', heute_sitzungen:'Sitzungen', heute_min_woche:'Min. diese Woche',
+    heute_tage:'Tage in Folge', heute_sitzungen:'Sitzungen', heute_min_woche:'Min. / Woche',
     heute_impuls:'Impuls für heute', heute_alle_vier:'alle vier',
     heute_fokus:'Aktueller Fokus', heute_jetzt_ueben:'Jetzt üben', heute_weg:'Weg',
     heute_selbst:'Selbsteinschätzung', heute_selbst_text:'Wie zeigen sich die vier Unermesslichkeiten in dir? Eine kurze Reflexion alle zwei Wochen.',
@@ -2111,7 +2100,7 @@ const STRINGS = {
     heute_nicht_geuebt:'Not yet practiced', heute_fuenf_min:'Even five minutes count. What shall it be today?',
     heute_vers:'Read Verse', heute_rez:'Recitation', heute_kontempl:'Contemplation', heute_nur_eintragen:'Just log →',
     heute_erste_sitzung:'First session awaits', heute_auch_5:'Even 5 minutes count',
-    heute_tage:'Day streak', heute_sitzungen:'Sessions', heute_min_woche:'Min. this week',
+    heute_tage:'Day streak', heute_sitzungen:'Sessions', heute_min_woche:'Min. / week',
     heute_impuls:'Today\'s impulse', heute_alle_vier:'all four',
     heute_fokus:'Current focus', heute_jetzt_ueben:'Practice now', heute_weg:'Path',
     heute_selbst:'Self-assessment', heute_selbst_text:'How do the four immeasurables show in you? A brief reflection every two weeks.',
@@ -2212,7 +2201,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v112';
+var APP_VER = 'v113';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2973,10 +2962,10 @@ function heroIllustration(id) {
 }
 function timeGreeting() {
   const h = new Date().getHours();
-  if (h >= 5  && h < 12) return { label:t('guten_morgen'), svg:'<circle cx="9" cy="9" r="3.2" stroke="white" stroke-width="1.6" fill="none"/><line x1="9" y1="1" x2="9" y2="3.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="14.8" x2="9" y2="17" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="9" x2="3.2" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.8" y1="9" x2="17" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="3.6" y1="3.6" x2="5.2" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="12.8" y1="12.8" x2="14.4" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="14.4" y1="3.6" x2="12.8" y2="5.2" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="5.2" y1="12.8" x2="3.6" y2="14.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
-  if (h >= 12 && h < 18) return { label:t('guten_tag'),    svg:'<circle cx="9" cy="9" r="4" stroke="white" stroke-width="1.6" fill="white" fill-opacity=".25"/><line x1="9" y1="0.5" x2="9" y2="3" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="15" x2="9" y2="17.5" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="0.5" y1="9" x2="3" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/><line x1="15" y1="9" x2="17.5" y2="9" stroke="white" stroke-width="1.4" stroke-linecap="round"/>' };
-  if (h >= 18 && h < 23) return { label:t('guten_abend'),  svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="white" stroke-width="1.5" fill="white" fill-opacity=".2" stroke-linejoin="round"/>' };
-  return                         { label:t('gute_nacht'),   svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="white" stroke-width="1.5" fill="white" fill-opacity=".2" stroke-linejoin="round"/><circle cx="12.5" cy="4" r="1" fill="white" opacity=".7"/><circle cx="15" cy="7" r=".6" fill="white" opacity=".5"/>' };
+  if (h >= 5  && h < 12) return { label:t('guten_morgen'), svg:'<circle cx="9" cy="9" r="3.2" stroke="currentColor" stroke-width="1.6" fill="none"/><line x1="9" y1="1" x2="9" y2="3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="14.8" x2="9" y2="17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="9" x2="3.2" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="14.8" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="3.6" y1="3.6" x2="5.2" y2="5.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="12.8" y1="12.8" x2="14.4" y2="14.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="14.4" y1="3.6" x2="12.8" y2="5.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="5.2" y1="12.8" x2="3.6" y2="14.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' };
+  if (h >= 12 && h < 18) return { label:t('guten_tag'),    svg:'<circle cx="9" cy="9" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity=".25"/><line x1="9" y1="0.5" x2="9" y2="3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="15" x2="9" y2="17.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="0.5" y1="9" x2="3" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="15" y1="9" x2="17.5" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' };
+  if (h >= 18 && h < 23) return { label:t('guten_abend'),  svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".2" stroke-linejoin="round"/>' };
+  return                         { label:t('gute_nacht'),   svg:'<path d="M13.5 9A6 6 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity=".2" stroke-linejoin="round"/><circle cx="12.5" cy="4" r="1" fill="currentColor" opacity=".7"/><circle cx="15" cy="7" r=".6" fill="currentColor" opacity=".5"/>' };
 }
 
 function todayReminder() {
