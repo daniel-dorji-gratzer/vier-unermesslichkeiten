@@ -487,8 +487,8 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
   font-variant-numeric: tabular-nums; }
 
 /* ── Journal ── */
-.j-entry { padding: 16px 0; }
-.j-entry + .j-entry { margin-top: 2px; }
+.j-entry { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.j-entry + .j-entry { margin-top: 0; }
 .j-date-hdr { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
   text-transform: uppercase; letter-spacing: .12em; color: var(--ink-faint); padding: 20px 0 6px; }
 .j-date-hdr:first-child { padding-top: 4px; }
@@ -2222,7 +2222,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v117';
+var APP_VER = 'v118';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
