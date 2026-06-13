@@ -1,4 +1,4 @@
-const CACHE = 'vum-v116';
+const CACHE = 'vum-v117';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll([
@@ -7,6 +7,10 @@ self.addEventListener('install', e => {
     '/vier-unermesslichkeiten/freude-hero.jpg',
     '/vier-unermesslichkeiten/mitgefuehl-hero.jpg',
     '/vier-unermesslichkeiten/liebe-hero.jpg',
+    '/vier-unermesslichkeiten/gleichmut-hero-nacht.jpg',
+    '/vier-unermesslichkeiten/liebe-hero-nacht.jpg',
+    '/vier-unermesslichkeiten/mitgefuehl-hero-nacht.jpg',
+    '/vier-unermesslichkeiten/freude-hero-nacht.jpg',
     '/vier-unermesslichkeiten/fonts/fraunces-roman-latin.woff2',
     '/vier-unermesslichkeiten/fonts/fraunces-roman-latin-ext.woff2',
     '/vier-unermesslichkeiten/fonts/fraunces-italic-latin.woff2',

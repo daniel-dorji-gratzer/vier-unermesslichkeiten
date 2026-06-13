@@ -797,6 +797,8 @@ blockquote { margin: 10px 0; padding: 10px 16px; border-left: 4px solid var(--ac
   background: #1a2545;
   mix-blend-mode: multiply; opacity: .55;
 }
+/* Echtes Nacht-Foto ist bereits dunkel — kein zusätzliches Overlay */
+:root[data-time="nacht"] .hero-today--nightphoto::after { opacity: 0; }
 /* Stufenwechsel: weicher Lichtwechsel (JS setzt .time-fade kurzzeitig) */
 html.time-fade, html.time-fade * {
   transition: background-color .8s ease, background .8s ease, color .8s ease,
@@ -2220,7 +2222,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v116';
+var APP_VER = 'v117';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2940,7 +2942,12 @@ function weekSessions() {
 // Vorhandene Nacht-Bilder ('<qualität>-hero-nacht.jpg') hier eintragen,
 // sobald sie im Repo (und im sw.js-Precache) liegen. Ohne Eintrag wird
 // nachts das Tagbild mit dem tiefblauen CSS-Overlay (::after) verwendet.
-var HERO_NIGHT_ASSETS = [];
+var HERO_NIGHT_ASSETS = [
+  'gleichmut-hero-nacht.jpg',
+  'liebe-hero-nacht.jpg',
+  'mitgefuehl-hero-nacht.jpg',
+  'freude-hero-nacht.jpg',
+];
 
 function heroImage(quality, time) {
   var day = {
@@ -3351,8 +3358,11 @@ function renderHeute() {
 
     const greet = timeGreeting();
     const heroSvgIcon = '<svg class="hero-time-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">' + greet.svg + '</svg>';
+    // Bei echtem Nacht-Foto kein zusätzliches Dunkel-Overlay (Bild ist schon dunkel)
+    const heroNightPhoto = currentTimeStage() === 'nacht'
+      && HERO_NIGHT_ASSETS.indexOf(phase.id + '-hero-nacht.jpg') !== -1;
 
-    const html = '<div class="hero-today" style="background:' + heroGradient(phase.id) + ';">'
+    const html = '<div class="hero-today' + (heroNightPhoto ? ' hero-today--nightphoto' : '') + '" style="background:' + heroGradient(phase.id) + ';">'
       + heroIllustration(phase.id)
       + '<div class="hero-time-row">' + heroSvgIcon + greet.label + '</div>'
       + '<div class="hero-text">'
