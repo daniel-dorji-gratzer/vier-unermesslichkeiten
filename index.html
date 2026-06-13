@@ -419,10 +419,8 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .list-item .li-sub   { font-size: .85rem; color: var(--ink-muted); margin-top: 4px; }
 
 /* ── Verse block ── */
-.verse { color: var(--ink-soft); line-height: 1.45;
-  border-left: 3px solid var(--accent);
-  padding: 8px 0 8px 16px; margin: 10px 0; font-size: 1.08rem;
-  background: var(--q-wash); border-radius: 0 8px 8px 0;
+.verse { color: var(--ink); line-height: 1.5;
+  margin: 2px 0; font-size: 1.1rem;
   font-family: var(--font-display);
   font-variation-settings: "opsz" 32, "SOFT" 70; }
 .verse-line { display: block; margin-bottom: 0.6em; }
@@ -2222,7 +2220,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v118';
+var APP_VER = 'v119';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -3558,8 +3556,8 @@ function renderLehreBody() {
             </summary>
             <div style="margin-top:10px;border-top:1px solid var(--line);padding-top:6px;">
               ${kapVerse.map((v,vi)=>`
-                <div style="padding:14px 0;${vi>0?'border-top:1px solid var(--line);':''}">
-                  <div class="small muted" style="margin-bottom:6px;">${t('lehre_vers_lbl')} ${v.n}</div>
+                <div style="padding:16px 0;${vi>0?'border-top:1px solid var(--line);':''}">
+                  <div class="label" style="margin-bottom:8px;">${t('lehre_vers_lbl')} ${v.n}</div>
                   <div class="verse">${renderVerseText(v.text)}</div>
                 </div>
               `).join('')}
