@@ -96,6 +96,7 @@
   --wiese-ground:#c2d2a4; --wiese-ground-rich:#a6bf7c; --wiese-grass:#6f9a55;
   --wiese-water:#8fbdd9; --wiese-water-hi:#dceef6; --wiese-shadow:#39492a;
   --wiese-moon:#ffffff; --wiese-moon-op:0;
+  --licht-soil:#cdbfa3; --licht-soil-edge:#bcab89;
 }
 /* ── Tageslicht-Stufen ──
    morgen: goldenes Licht, weiche etwas längere Schatten
@@ -146,6 +147,7 @@
   --wiese-ground:#2a3730; --wiese-ground-rich:#33442d; --wiese-grass:#496a43;
   --wiese-water:#33526f; --wiese-water-hi:#9fc0dd; --wiese-shadow:#04070e;
   --wiese-moon:#eef2ff; --wiese-moon-op:.9;
+  --licht-soil:#3a352c; --licht-soil-edge:#2b2820;
   --kap-gleichmut-border: rgba(110,197,240,.45);
   --kap-liebe-border: rgba(245,208,112,.45);
   --kap-mitgefuehl-border: rgba(212,156,240,.45);
@@ -451,14 +453,41 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .wiese-zahlen { font-family:var(--font-mono); font-size:.8rem; color:var(--ink-muted);
   letter-spacing:.02em; margin-bottom:14px; }
 .wiese-streifen { display:block; width:100%; height:42px; }
-.hero-meadow { cursor:pointer; }
-.hero-meadow .wiese-streifen { filter:drop-shadow(0 1px 4px rgba(0,0,0,.3)); }
-.hero-substats { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.07em;
-  text-transform:uppercase; opacity:.78; text-align:center; margin-top:7px; color:var(--hero-ink); }
 @keyframes wiese-grow { from { opacity:0; transform:scale(.4); } to { opacity:1; transform:none; } }
 .wiese-grow { transform-box:fill-box; transform-origin:center bottom;
   animation:wiese-grow .6s cubic-bezier(.34,1.4,.6,1) both; }
 @media (prefers-reduced-motion: reduce) { .wiese-grow { animation:none; } }
+/* ── Heute v2: CTA, Ansage, Lichtung-Streifen, Fokus-Zeile ── */
+.cta-sitzung { display:block; width:100%; text-align:left; border:none; cursor:pointer;
+  background:var(--accent); color:var(--q-accent-txt,#fff); border-radius:16px;
+  padding:18px 22px; box-shadow:var(--shadow); margin:0 0 8px;
+  font-family:var(--font-mono); touch-action:manipulation; transition:transform .1s, opacity .15s; }
+.cta-sitzung:active { transform:scale(.99); opacity:.92; }
+.cta-main { display:flex; align-items:center; justify-content:space-between;
+  font-size:1.12rem; font-weight:500; letter-spacing:.01em; }
+.cta-arrow { font-weight:400; opacity:.9; }
+.cta-sub { display:block; font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; opacity:.82; margin-top:5px; }
+.ansage { border-left:3px solid var(--accent); padding-left:16px; }
+.ansage-text { font-family:var(--font-display); font-variation-settings:"opsz" 30, "SOFT" 55;
+  font-size:1.12rem; line-height:1.5; color:var(--ink); }
+.ansage-text strong { font-weight:600; }
+.lichtung-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; }
+.lichtung-sub { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink-muted); }
+.lichtung-streifen { display:block; width:100%; height:auto; cursor:pointer; }
+.lichtung-zahlen { font-family:var(--font-mono); font-size:.82rem; color:var(--ink-muted);
+  letter-spacing:.02em; margin:12px 0 10px; }
+.fokus-row { display:flex; align-items:center; gap:14px; width:100%; margin:0 -18px;
+  padding:18px 24px; border:none; border-bottom:1px solid var(--line); background:transparent;
+  font-family:inherit; text-align:left; cursor:pointer; touch-action:manipulation; }
+.fokus-row:active { background:var(--bg-soft); }
+.fokus-icon { width:40px; height:40px; border-radius:50%; background:var(--q-wash);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent); }
+.fokus-text { flex:1; min-width:0; }
+.fokus-title { display:block; font-weight:600; color:var(--ink); font-size:.98rem; }
+.fokus-sub { display:block; font-size:.82rem; color:var(--ink-muted); margin-top:2px; }
+.fokus-cta { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--accent); white-space:nowrap; flex-shrink:0; }
 
 /* ── Reminder quote ── */
 .reminder { background: var(--q-wash); border-left: 4px solid var(--accent); }
@@ -895,45 +924,6 @@ html.time-fade, html.time-fade * {
   margin-bottom: 20px;
   max-width: 280px;
 }
-.hero-stats-row {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-}
-.hero-stat {
-  flex: 1;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: var(--hero-chip);
-  border: 1px solid var(--hero-chip-line);
-  border-radius: 15px;
-  padding: 11px 6px 9px;
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-}
-.hero-stat-num {
-  display: block;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 1.65rem;
-  font-weight: 600;
-  line-height: 1;
-  margin-bottom: 3px;
-}
-.hero-stat-label {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: .56rem;
-  opacity: .58;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.hero-stat-sep {
-  display: none;
-}
-
 /* ── Lernpfad rings ── */
 .lp-rings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
 .lp-ring-card { background: var(--bg); border-radius: 14px; padding: 12px 10px 10px;
@@ -2046,6 +2036,8 @@ const STRINGS = {
     heute_nicht_geuebt:'Noch nicht geübt', heute_fuenf_min:'Auch fünf Minuten zählen. Was darf es heute sein?',
     heute_vers:'Vers lesen', heute_rez:'Rezitation', heute_kontempl:'Kontemplation', heute_nur_eintragen:'Nur eintragen →',
     heute_erste_sitzung:'Erste Sitzung wartet', heute_auch_5:'Auch 5 Minuten zählen',
+    heute_sitzung_beginnen:'Sitzung beginnen', heute_ansage:'Ansage', heute_letzte_28:'letzte 28 Tage',
+    heute_a_fokus:'Aktueller Fokus', heute_woche_kurz:'Woche', heute_danach:'danach', heute_tage_kurz:'Tage', heute_a_weg:'Weg',
     heute_tage:'Tage in Folge', heute_sitzungen:'Sitzungen', heute_min_woche:'Min. / Woche',
     heute_impuls:'Impuls für heute', heute_alle_vier:'alle vier',
     heute_fokus:'Aktueller Fokus', heute_ueben:'Üben', heute_jetzt_ueben:'Jetzt üben', heute_weg:'Weg',
@@ -2153,6 +2145,8 @@ const STRINGS = {
     heute_nicht_geuebt:'Not yet practiced', heute_fuenf_min:'Even five minutes count. What shall it be today?',
     heute_vers:'Read Verse', heute_rez:'Recitation', heute_kontempl:'Contemplation', heute_nur_eintragen:'Just log →',
     heute_erste_sitzung:'First session awaits', heute_auch_5:'Even 5 minutes count',
+    heute_sitzung_beginnen:'Begin session', heute_ansage:'A note', heute_letzte_28:'last 28 days',
+    heute_a_fokus:'Current focus', heute_woche_kurz:'Week', heute_danach:'next', heute_tage_kurz:'days', heute_a_weg:'Path',
     heute_tage:'Day streak', heute_sitzungen:'Sessions', heute_min_woche:'Min. / week',
     heute_impuls:'Today\'s impulse', heute_alle_vier:'all four',
     heute_fokus:'Current focus', heute_ueben:'Practice', heute_jetzt_ueben:'Practice now', heute_weg:'Path',
@@ -2259,7 +2253,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v121';
+var APP_VER = 'v122';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -3554,6 +3548,123 @@ function readerNote() {
 //  HEUTE
 // ═══════════════════════════════════════════════
 
+// ── Dynamische Tagesansage (würdigend, nicht-punitiv) ────────────────────────
+var _ANSAGE = {
+  de: {
+    welcome: 'Schön, dass du da bist. Beginne, wann es sich richtig anfühlt — auch zehn Minuten genügen.',
+    donetoday: {
+      morgen:'Heute schon geübt — ein guter Anfang in den Tag.',
+      tag:'Heute schon geübt — schön. Du darfst auch einfach hier verweilen.',
+      abend:'Heute schon geübt — lass den Tag nun ruhig ausklingen.',
+      nacht:'Heute schon geübt — ruh dich gut aus.'
+    },
+    backwarm:'schön, dass du wieder da bist.',
+    onething:'Heute genügt eine Sache:',
+    hint:{
+      gleichmut:'einen Moment am stillen See sitzen',
+      liebe:'einem Wesen stille Güte schicken',
+      mitgefuehl:'dem Schmerz eines Wesens Raum geben',
+      freude:'dich an der Freude eines anderen mitfreuen'
+    },
+    flav:{ morgen:'bevor der Tag laut wird', tag:'mitten im Tag', abend:'wenn der Tag sich neigt', nacht:'bevor du zur Ruhe kommst' },
+    returnwarm:'Schön, dass du wieder hier bist.',
+    returnrest:'Kein Tag ist verloren — beginne einfach neu, wann es passt.',
+    ord:function(n){ return n + '. Tag in Folge'; }
+  },
+  en: {
+    welcome: 'Good to have you here. Begin whenever it feels right — even ten minutes count.',
+    donetoday: {
+      morgen:'Already practised today — a good start into the day.',
+      tag:'Already practised today — lovely. You may simply linger here.',
+      abend:'Already practised today — let the day wind down gently.',
+      nacht:'Already practised today — rest well.'
+    },
+    backwarm:'good to see you back.',
+    onething:'Today, one thing is enough:',
+    hint:{
+      gleichmut:'to sit a moment by the still lake',
+      liebe:'to send quiet kindness to one being',
+      mitgefuehl:"to give space to one being's pain",
+      freude:"to rejoice in another's joy"
+    },
+    flav:{ morgen:'before the day grows loud', tag:'in the middle of the day', abend:'as the day draws to a close', nacht:'before you come to rest' },
+    returnwarm:'Good to see you back.',
+    returnrest:'No day is lost — simply begin again, whenever it fits.',
+    ord:function(n){ return 'Day ' + n + ' in a row'; }
+  }
+};
+
+function tagesAnsage(){
+  var lang = (S.prefs && S.prefs.lang==='en') ? 'en' : 'de';
+  var A = _ANSAGE[lang];
+  var total = S.sessions.length;
+  if(total===0) return esc(A.welcome);
+  var practicedToday = S.sessions.some(function(s){ return s.date===todayISO(); });
+  var stage = currentTimeStage();
+  if(practicedToday) return esc(A.donetoday[stage] || A.donetoday.tag);
+  var str = streak();
+  var pid = (getQ(S.arc.currentPhase)||QUALITAETEN[0]).id;
+  if(str>=1){
+    return esc(A.ord(str)) + ' — <strong>' + esc(A.backwarm) + '</strong> '
+      + esc(A.onething) + ' ' + esc(A.hint[pid]||A.hint.gleichmut) + ', ' + esc(A.flav[stage]||A.flav.tag) + '.';
+  }
+  return '<strong>' + esc(A.returnwarm) + '</strong> ' + esc(A.returnrest);
+}
+
+// ── Reicher Lichtungs-Streifen für „Heute" (Seitenansicht, letzte N Tage) ────
+function renderLichtungStreifen(sessions, days){
+  days = days||28;
+  var W=560, H=118, surf=92, bandTop=86, bandBot=112;
+  var byDate={}; _wieseDays(sessions).forEach(function(d){ byDate[d.date]=d; });
+  var now=new Date(), tIso=todayISO();
+  var pad=18, slot=(W-2*pad)/days;
+  var s = '<defs>'
+    + '<filter id="lcW" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G"/></filter>'
+    + '<filter id="lcB" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4"/></filter>'
+    + '</defs>';
+  // Bodenband
+  s += '<g filter="url(#lcW)"><rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="'+(bandBot-bandTop)+'" rx="9" style="fill:var(--licht-soil)"/></g>';
+  s += '<rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="3" rx="1.5" style="fill:var(--licht-soil-edge)" opacity="0.5"/>';
+  var elems='';
+  for(var i=0;i<days;i++){
+    var dt=new Date(now.getTime()-(days-1-i)*86400000), iso=dateISO(dt);
+    var cx=pad+slot*(i+0.5);
+    if(iso===tIso){
+      s += '<line x1="'+cx.toFixed(1)+'" y1="16" x2="'+cx.toFixed(1)+'" y2="'+bandTop+'" style="stroke:var(--ink-muted)" stroke-width="1" stroke-dasharray="2 3" opacity="0.45"/>';
+      s += '<circle cx="'+cx.toFixed(1)+'" cy="14" r="1.6" style="fill:var(--accent)"/>';
+    }
+    var d=byDate[iso];
+    if(!d) continue;
+    var r1=_wieseHashF(iso+'a'), r2=_wieseHashF(iso+'b'), r3=_wieseHashF(iso+'c');
+    var x=cx+(r1-0.5)*slot*0.35;
+    if(d.focus==='gleichmut'){
+      var pw=4+r2*4;
+      elems += '<g filter="url(#lcB)"><ellipse cx="'+x.toFixed(1)+'" cy="'+(surf+2).toFixed(1)+'" rx="'+pw.toFixed(1)+'" ry="'+(pw*0.32).toFixed(1)+'" fill="'+Q_COLOR.gleichmut+'" opacity="0.7"/></g>';
+      elems += '<ellipse cx="'+(x-pw*0.2).toFixed(1)+'" cy="'+(surf+1.4).toFixed(1)+'" rx="'+(pw*0.4).toFixed(1)+'" ry="'+(pw*0.13).toFixed(1)+'" fill="#fff" opacity="0.5"/>';
+    } else if(d.focus==='liebe'){
+      var nb=3+Math.floor(r2*2), g='';
+      for(var b=0;b<nb;b++){
+        var bx=x+(b-(nb-1)/2)*2.2, bh=8+_wieseHashF(iso+'g'+b)*7, bs=(_wieseHashF(iso+'s'+b)-0.5)*3;
+        g += '<path d="M'+bx.toFixed(1)+' '+surf+' q'+bs.toFixed(1)+' '+(-bh/2).toFixed(1)+' '+(bs*0.4).toFixed(1)+' '+(-bh).toFixed(1)+'" stroke="'+Q_COLOR.liebe+'" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.9"/>';
+      }
+      elems += '<g filter="url(#lcW)">'+g+'</g>';
+    } else if(d.focus==='mitgefuehl'){
+      var fh=12+r2*6, fs=3+r3*1.5, pcx=x, pcy=surf-fh, pet='';
+      elems += '<path d="M'+x.toFixed(1)+' '+surf+' v'+(-fh).toFixed(1)+'" stroke="'+Q_COLOR.liebe+'" stroke-width="1.3" opacity="0.7" stroke-linecap="round"/>';
+      for(var p=0;p<5;p++){ var a=p/5*6.2832+r1*6.2832; pet += '<circle cx="'+(pcx+Math.cos(a)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(a)*fs).toFixed(1)+'" r="'+(fs*0.7).toFixed(1)+'" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.7"/>'; }
+      elems += '<g filter="url(#lcW)">'+pet+'</g>';
+      elems += '<circle cx="'+pcx.toFixed(1)+'" cy="'+pcy.toFixed(1)+'" r="'+(fs*0.55).toFixed(1)+'" fill="'+Q_COLOR.liebe+'"/>';
+    } else if(d.focus==='freude'){
+      var th=16+r2*10, tw=5+r3*3;
+      elems += '<rect x="'+(x-1).toFixed(1)+'" y="'+(surf-th*0.5).toFixed(1)+'" width="2" height="'+(th*0.5).toFixed(1)+'" fill="#7a5a3a" opacity="0.6"/>';
+      elems += '<g filter="url(#lcW)"><ellipse cx="'+x.toFixed(1)+'" cy="'+(surf-th*0.62).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.1).toFixed(1)+'" fill="'+Q_COLOR.freude+'" opacity="0.75"/></g>';
+    }
+  }
+  s += elems;
+  return '<svg class="lichtung-streifen" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+esc(t('wiese_streifen_aria'))+'">'+s+'</svg>';
+}
+
+
 function renderHeute() {
   try {
     const str = streak(), wk = weekSessions();
@@ -3596,64 +3707,106 @@ function renderHeute() {
 
     const greet = timeGreeting();
     const heroSvgIcon = '<svg class="hero-time-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">' + greet.svg + '</svg>';
-    // Bei echtem Nacht-Foto kein zusätzliches Dunkel-Overlay (Bild ist schon dunkel)
     const heroNightPhoto = currentTimeStage() === 'nacht'
       && HERO_NIGHT_ASSETS.indexOf(phase.id + '-hero-nacht.jpg') !== -1;
 
-    const html = '<div class="hero-today' + (heroNightPhoto ? ' hero-today--nightphoto' : '') + '" style="background:' + heroGradient(phase.id) + ';">'
+    const total = S.sessions.length;
+    let dateStr = '';
+    try { dateStr = new Date().toLocaleDateString(_wieseLocale(), {weekday:'long', day:'numeric', month:'long'}); } catch(e) {}
+    const defMin = (S.prefs && S.prefs.timerDefault) || 20;
+    const phasesOrder = ['gleichmut','liebe','mitgefuehl','freude'];
+    const pIdx = Math.max(0, phasesOrder.indexOf(phase.id));
+    const nextPhase = getQ(phasesOrder[(pIdx+1) % phasesOrder.length]);
+    const phaseWeek = (function(){ var ps = S.arc && S.arc.phaseStarted; if(!ps) return 1; var ms = Date.now() - new Date(ps).getTime(); return Math.max(1, Math.floor(ms/(7*86400000))+1); })();
+    const legendHtml = [['see','gleichmut'],['boden','liebe'],['blume','mitgefuehl'],['baum','freude']].map(function(it){
+      return '<span class="wiese-leg-item"><span class="wiese-leg-dot" style="background:'+Q_COLOR[it[1]]+'"></span>'+t('wiese_'+it[0])+'</span>';
+    }).join('');
+
+    // ── Hero (offen, hell, Stats raus) ──
+    const heroHtml = '<div class="hero-today' + (heroNightPhoto ? ' hero-today--nightphoto' : '') + '" style="background:' + heroGradient(phase.id) + ';">'
       + heroIllustration(phase.id)
-      + '<div class="hero-time-row">' + heroSvgIcon + greet.label + '</div>'
+      + '<div class="hero-time-row">' + heroSvgIcon + greet.label + (dateStr ? ' · ' + esc(dateStr) : '') + '</div>'
       + '<div class="hero-text">'
       + '<div class="hero-quality-name">' + esc(phase.name) + '</div>'
       + '<div class="hero-quality-sanskrit">' + esc(phase.sanskrit) + '</div>'
       + '<div class="hero-bild">' + esc(phase.bild) + '</div>'
-      + (S.sessions.length === 0
-          ? '<div class="hero-stats-row"><div class="hero-stat" style="flex:1;text-align:center;"><span class="hero-stat-num" style="font-size:1.1rem;opacity:.85;">'+t('heute_erste_sitzung')+'</span><span class="hero-stat-label">'+t('heute_auch_5')+'</span></div></div>'
-          : '<div class="hero-meadow" onclick="switchTab(\'bogen\')">' + renderWiesenStreifen(S.sessions)
-            + '<div class="hero-substats">' + wk.length + '\xA0' + t('heute_sitzungen') + '\u2002·\u2002' + wkMin + '\xA0' + t('heute_min_woche') + '</div>'
-            + '</div>'
-        )
-      + '</div>'
-      + '</div>'
-      + '<div class="hero-sheet">'
-      + '<div class="section reminder">'
-      + '<div class="label" style="margin-bottom:6px;">'+t('heute_impuls')+'</div>'
+      + '</div></div>';
+
+    // ── Primär-CTA: Sitzung beginnen → Praxis ──
+    const ctaHtml = '<button class="cta-sitzung" onclick="switchTab(\'praxis\')">'
+      + '<span class="cta-main">' + t('heute_sitzung_beginnen') + '<span class="cta-arrow">→</span></span>'
+      + '<span class="cta-sub">' + defMin + ' min · ' + t('heute_auch_5') + '</span>'
+      + '</button>';
+
+    // ── Ansage: dynamische, würdigende Tagesbotschaft ──
+    const ansageHtml = '<div class="section"><div class="ansage">'
+      + '<div class="label" style="margin-bottom:8px;">' + t('heute_ansage') + '</div>'
+      + '<div class="ansage-text">' + tagesAnsage() + '</div>'
+      + '</div></div>';
+
+    // ── Impuls (Zitat) ──
+    const impulsHtml = '<div class="section reminder">'
+      + '<div class="label" style="margin-bottom:6px;">' + t('heute_impuls') + '</div>'
       + '<div class="quote">„' + esc(rem.t) + '“</div>'
       + '<div style="margin-top:8px;"><span class="pill ' + remPillClass + '">' + remPillText + '</span></div>'
-      + '</div>'
-      + '<div class="section">'
-      + '<div class="label" style="margin-bottom:10px;">'+t('heute_ueben')+'</div>'
-      + '<div class="lichtung" style="font-size:1.15rem;color:var(--ink);margin-bottom:16px;line-height:1.45;">' + esc(phase.kernpunkt) + '</div>'
-      + '<div class="btn-row">'
-      + '<button class="btn-primary" onclick="switchTab(\'praxis\')">'+t('heute_jetzt_ueben')+'</button>'
-      + '<button class="btn-secondary" onclick="switchTab(\'bogen\')">'+t('heute_weg')+'</button>'
-      + '</div></div>'
-      + (needsAssessmentPrompt()
-          ? '<button class="assess-hint" onclick="showAssessmentSheet(\'' + phase.id + '\')">'
-            + '<span class="label" style="margin:0;">'+t('heute_selbst')+'</span>'
-            + '<span class="assess-hint-cta">'+t('heute_jetzt_einsch')+' →</span>'
-            + '</button>'
-          : '')
-      + sessHtml
-      + (function(){
-          var lastNr = S.prefs && S.prefs.lastReaderNr;
-          if (!lastNr) return '';
-          var lastE = EINHEITEN.find(function(x){ return x.nr===lastNr; });
-          if (!lastE) return '';
-          var hasText = typeof EINHEITEN_TEXTE !== 'undefined' && EINHEITEN_TEXTE.find(function(x){ return x.nr===lastNr; });
-          if (!hasText) return '';
-          return '<div class="card" onclick="openReader('+lastNr+')" style="cursor:pointer;display:flex;align-items:center;gap:12px;margin-top:16px;">'
-            + '<div style="font-size:1.4rem;line-height:1;">📖</div>'
-            + '<div style="flex:1;min-width:0;">'
-            + '<div class="label" style="margin-bottom:2px;">'+t('heute_weiterlesen')+'</div>'
-            + '<div class="small" style="color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(lastE.titel)+'</div>'
-            + '<div class="small muted">'+(t('lehre_einheit')||'Sitzung')+' '+lastNr+'</div>'
-            + '</div>'
-            + '<div style="color:var(--ink-muted);font-size:1.1rem;">›</div>'
-            + '</div>';
-        })()
       + '</div>';
 
+    // ── Deine Lichtung (reicher Streifen + stille Zahlen + Legende) ──
+    const lichtungHtml = '<div class="section">'
+      + '<div class="lichtung-head"><span class="label" style="margin:0;">' + t('weg_wiese') + '</span><span class="lichtung-sub">' + t('heute_letzte_28') + '</span></div>'
+      + '<div onclick="switchTab(\'bogen\')">' + renderLichtungStreifen(S.sessions) + '</div>'
+      + (total===0
+          ? '<div class="lichtung-zahlen">' + esc(t('wiese_leer')) + '</div>'
+          : '<div class="lichtung-zahlen">' + t('weg_serie') + ' ' + str + ' ' + t('heute_tage_kurz') + ' · ' + t('heute_woche_kurz') + ' ' + wkMin + ' min · ' + t('weg_gesamt_lbl') + ' ' + total + '</div>')
+      + '<div class="wiese-legende">' + legendHtml + '</div>'
+      + '</div>';
+
+    // ── Aktueller-Fokus-Statuszeile → Weg ──
+    const fokusHtml = '<button class="fokus-row" onclick="switchTab(\'bogen\')">'
+      + '<span class="fokus-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.4" fill="currentColor"/></svg></span>'
+      + '<span class="fokus-text">'
+      + '<span class="fokus-title">' + t('heute_a_fokus') + ': ' + esc(phase.name) + '</span>'
+      + '<span class="fokus-sub">' + t('heute_woche_kurz') + ' ' + phaseWeek + ' · ' + t('heute_danach') + ': ' + esc(nextPhase.name) + '</span>'
+      + '</span>'
+      + '<span class="fokus-cta">' + t('heute_a_weg') + ' ›</span>'
+      + '</button>';
+
+    const assessHtml = needsAssessmentPrompt()
+      ? '<button class="assess-hint" onclick="showAssessmentSheet(\'' + phase.id + '\')">'
+        + '<span class="label" style="margin:0;">'+t('heute_selbst')+'</span>'
+        + '<span class="assess-hint-cta">'+t('heute_jetzt_einsch')+' →</span>'
+        + '</button>'
+      : '';
+
+    const weiterHtml = (function(){
+      var lastNr = S.prefs && S.prefs.lastReaderNr;
+      if (!lastNr) return '';
+      var lastE = EINHEITEN.find(function(x){ return x.nr===lastNr; });
+      if (!lastE) return '';
+      var hasText = typeof EINHEITEN_TEXTE !== 'undefined' && EINHEITEN_TEXTE.find(function(x){ return x.nr===lastNr; });
+      if (!hasText) return '';
+      return '<div class="card" onclick="openReader('+lastNr+')" style="cursor:pointer;display:flex;align-items:center;gap:12px;margin-top:16px;">'
+        + '<div style="font-size:1.4rem;line-height:1;">📖</div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div class="label" style="margin-bottom:2px;">'+t('heute_weiterlesen')+'</div>'
+        + '<div class="small" style="color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(lastE.titel)+'</div>'
+        + '<div class="small muted">'+(t('lehre_einheit')||'Sitzung')+' '+lastNr+'</div>'
+        + '</div>'
+        + '<div style="color:var(--ink-muted);font-size:1.1rem;">›</div>'
+        + '</div>';
+    })();
+
+    const html = heroHtml
+      + '<div class="hero-sheet">'
+      + ctaHtml
+      + ansageHtml
+      + impulsHtml
+      + lichtungHtml
+      + fokusHtml
+      + assessHtml
+      + sessHtml
+      + weiterHtml
+      + '</div>';
     document.getElementById("panel-heute").innerHTML = html;
   } catch(err) {
     document.getElementById("panel-heute").innerHTML = '<div class="section"><div class="card-title">Fehler beim Laden</div><div class="small muted">' + String(err) + '</div></div>';
