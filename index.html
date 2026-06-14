@@ -91,6 +91,11 @@
   --hero-scrim: rgba(250,247,241,.55);
   --hero-chip: rgba(250,247,241,.5);
   --hero-chip-line: rgba(0,0,0,.07);
+  /* Wiese / Lichtung — Himmel & Licht (pro Tagesstufe überschrieben) */
+  --wiese-sky-top:#bcd6e8; --wiese-sky-bot:#e9efe6;
+  --wiese-ground:#c2d2a4; --wiese-ground-rich:#a6bf7c; --wiese-grass:#6f9a55;
+  --wiese-water:#8fbdd9; --wiese-water-hi:#dceef6; --wiese-shadow:#39492a;
+  --wiese-moon:#ffffff; --wiese-moon-op:0;
 }
 /* ── Tageslicht-Stufen ──
    morgen: goldenes Licht, weiche etwas längere Schatten
@@ -106,6 +111,7 @@
   --shadow-blur: 12px;
   --ink-muted: #8d7d72;
   --line: #e7ddca;
+  --wiese-sky-top:#ecd5a6; --wiese-sky-bot:#f4ecd9; --wiese-water:#a8c8dc;
 }
 :root[data-time="abend"] {
   --light-tint: #d9a05c;
@@ -116,6 +122,7 @@
   --shadow-blur: 20px;
   --ink-muted: #75645a;
   --line: #e4d5bd;
+  --wiese-sky-top:#d9a778; --wiese-sky-bot:#c9a6bd; --wiese-ground-rich:#9a8b54; --wiese-water:#8aa6c0;
 }
 :root[data-time="nacht"] {
   --bg-base: #171a22;
@@ -135,6 +142,10 @@
   --hero-scrim: rgba(13,17,30,.55);
   --hero-chip: rgba(13,17,30,.45);
   --hero-chip-line: rgba(255,255,255,.14);
+  --wiese-sky-top:#141d33; --wiese-sky-bot:#222d44;
+  --wiese-ground:#2a3730; --wiese-ground-rich:#33442d; --wiese-grass:#496a43;
+  --wiese-water:#33526f; --wiese-water-hi:#9fc0dd; --wiese-shadow:#04070e;
+  --wiese-moon:#eef2ff; --wiese-moon-op:.9;
   --kap-gleichmut-border: rgba(110,197,240,.45);
   --kap-liebe-border: rgba(245,208,112,.45);
   --kap-mitgefuehl-border: rgba(212,156,240,.45);
@@ -426,10 +437,28 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .verse-line { display: block; margin-bottom: 0.6em; }
 .verse-line:last-child { margin-bottom: 0; }
 
-/* ── Streak ── */
-.streak-num { font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-  font-size: 3.2rem; font-weight: 600; color: var(--accent); line-height: 1; }
-.streak-row { display: flex; align-items: center; gap: 20px; padding: 4px 0; }
+/* ── Wiese / Lichtung ── */
+.wiese { display:block; width:100%; height:auto; }
+.wiese-panorama { border-radius:14px; overflow:hidden; margin-bottom:10px; line-height:0; }
+.wiese-el { cursor:pointer; }
+.wiese-moon, .wiese-moonrefl { transition:opacity .8s ease; }
+.wiese-moonrefl { opacity:0; }
+:root[data-time="nacht"] .wiese-moonrefl { opacity:.5; }
+.wiese-legende { display:flex; flex-wrap:wrap; gap:6px 14px; margin-bottom:12px; }
+.wiese-leg-item { display:flex; align-items:center; gap:5px; font-family:var(--font-mono);
+  font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-muted); }
+.wiese-leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.wiese-zahlen { font-family:var(--font-mono); font-size:.8rem; color:var(--ink-muted);
+  letter-spacing:.02em; margin-bottom:14px; }
+.wiese-streifen { display:block; width:100%; height:42px; }
+.hero-meadow { cursor:pointer; }
+.hero-meadow .wiese-streifen { filter:drop-shadow(0 1px 4px rgba(0,0,0,.3)); }
+.hero-substats { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.07em;
+  text-transform:uppercase; opacity:.78; text-align:center; margin-top:7px; color:var(--hero-ink); }
+@keyframes wiese-grow { from { opacity:0; transform:scale(.4); } to { opacity:1; transform:none; } }
+.wiese-grow { transform-box:fill-box; transform-origin:center bottom;
+  animation:wiese-grow .6s cubic-bezier(.34,1.4,.6,1) both; }
+@media (prefers-reduced-motion: reduce) { .wiese-grow { animation:none; } }
 
 /* ── Reminder quote ── */
 .reminder { background: var(--q-wash); border-left: 4px solid var(--accent); }
@@ -2072,7 +2101,12 @@ const STRINGS = {
     tj_lesezeichen:'Lesezeichen', tj_alle:'Alle',
     tj_eintrag:'Tagebucheintrag', tj_bearbeiten:'Eintrag bearbeiten',
     weg_ueberblick:'Überblick', weg_lernpfad:'Lernpfad', weg_reflexion:'Reflexion',
-    weg_streak:'Streak & Ziele', weg_bearbeiten:'bearbeiten →', weg_tage:'Tage in Folge',
+    weg_streak:'Lichtung & Ziele', weg_bearbeiten:'bearbeiten →', weg_tage:'Tage in Folge',
+    weg_serie:'Serie', weg_beste_lbl:'Beste', weg_sitzungen_kurz:'Sitzungen', weg_wiese:'Deine Lichtung',
+    wiese_leer:'Hier wächst deine Lichtung – beginne mit einer Sitzung.',
+    wiese_aria:'Deine Lichtung: See aus {see} Tagen Gleichmut, Boden aus {boden} Tagen Liebe, {blumen} Blumen aus Mitgefühl, {baeume} Bäume aus Freude.',
+    wiese_aria_leer:'Deine Lichtung ist noch leer.', wiese_streifen_aria:'Deine Praxis der letzten 28 Tage.',
+    wiese_see:'See', wiese_boden:'Boden', wiese_blume:'Blume', wiese_baum:'Baum',
     weg_beste:'Bester Streak', weg_gesamt:'Sitzungen gesamt', weg_woche:'Diese Woche',
     weg_kalender:'Kalender', weg_verteilung:'Verteilung', weg_sitzungen_ges:'Sitzungen',
     weg_minuten:'Minuten', weg_phasen:'Phasen-Verlauf',
@@ -2174,7 +2208,12 @@ const STRINGS = {
     tj_lesezeichen:'Bookmarks', tj_alle:'All',
     tj_eintrag:'Journal Entry', tj_bearbeiten:'Edit entry',
     weg_ueberblick:'Overview', weg_lernpfad:'Learning path', weg_reflexion:'Reflection',
-    weg_streak:'Streak & Goals', weg_bearbeiten:'edit →', weg_tage:'Day streak',
+    weg_streak:'Meadow & goals', weg_bearbeiten:'edit →', weg_tage:'Day streak',
+    weg_serie:'Streak', weg_beste_lbl:'Best', weg_sitzungen_kurz:'sessions', weg_wiese:'Your meadow',
+    wiese_leer:'Your meadow grows here – begin with a session.',
+    wiese_aria:'Your meadow: a lake from {see} days of equanimity, ground from {boden} days of love, {blumen} flowers of compassion, {baeume} trees of joy.',
+    wiese_aria_leer:'Your meadow is still empty.', wiese_streifen_aria:'Your practice over the last 28 days.',
+    wiese_see:'Lake', wiese_boden:'Ground', wiese_blume:'Flower', wiese_baum:'Tree',
     weg_beste:'Best streak', weg_gesamt:'Sessions total', weg_woche:'This week',
     weg_kalender:'Calendar', weg_verteilung:'Distribution', weg_sitzungen_ges:'sessions',
     weg_minuten:'minutes', weg_phasen:'Phase history',
@@ -2220,7 +2259,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v119';
+var APP_VER = 'v120';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2860,6 +2899,172 @@ function longestStreak() {
   return best;
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+//  WIESE / LICHTUNG — wächst ausschließlich aus Praxis-Verhalten
+//  Nicht-punitiv: ein Tag ohne Praxis ist eine Lücke, nichts welkt.
+// ═══════════════════════════════════════════════════════════════════════
+// Deterministischer Hash (FNV-1a + Mix) → 0..1, kein Math.random
+function _wieseHashF(str){
+  var h = 2166136261 >>> 0;
+  for (var i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h,16777619); }
+  h ^= h>>>15; h = Math.imul(h,2246822507); h ^= h>>>13; h >>>= 0;
+  return h / 4294967296;
+}
+
+// Sessions → ein Eintrag pro Kalendertag mit dominantem Fokus (meiste Minuten)
+function _wieseDays(sessions){
+  var byDate = {};
+  (sessions||[]).forEach(function(s){
+    if(!s || !s.date) return;
+    var d = byDate[s.date] || (byDate[s.date] = {date:s.date, min:0, bf:{}});
+    var dur = s.duration||0; d.min += dur;
+    d.bf[s.focus] = (d.bf[s.focus]||0) + dur;
+  });
+  return Object.keys(byDate).sort().map(function(k){
+    var d = byDate[k], best=null, bm=-1;
+    for(var f in d.bf){ if(d.bf[f] > bm){ bm=d.bf[f]; best=f; } }
+    d.focus = best || 'gleichmut';
+    return d;
+  });
+}
+
+function _wieseLocale(){ return (S.prefs && S.prefs.lang==='en') ? 'en-US' : 'de-DE'; }
+
+function _wieseSky(W, horizon, gid){
+  return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1">'
+    + '<stop offset="0" style="stop-color:var(--wiese-sky-top)"/>'
+    + '<stop offset="1" style="stop-color:var(--wiese-sky-bot)"/>'
+    + '</linearGradient></defs>'
+    + '<rect x="0" y="0" width="'+W+'" height="'+horizon+'" fill="url(#'+gid+')"/>'
+    + '<circle class="wiese-moon" cx="'+(W-56)+'" cy="32" r="12" style="fill:var(--wiese-moon);opacity:var(--wiese-moon-op)"/>';
+}
+
+// Großes Panorama
+function renderWiese(sessions){
+  var W=400, H=240, horizon=112;
+  var days = _wieseDays(sessions);
+  var today = todayISO();
+  var gid = 'wsky'+Math.floor(_wieseHashF('sky:'+days.length+':'+(days.length?days[days.length-1].date:'0'))*1e9);
+
+  if(!days.length){
+    return '<svg class="wiese" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(t('wiese_aria_leer'))+'" preserveAspectRatio="xMidYMid slice">'
+      + _wieseSky(W, horizon, gid)
+      + '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground)"/>'
+      + '<text x="'+(W/2)+'" y="'+(horizon+(H-horizon)/2+4)+'" text-anchor="middle" style="fill:var(--ink-muted)" font-size="13" font-family="var(--font-display)">'+esc(t('wiese_leer'))+'</text>'
+      + '</svg>';
+  }
+
+  var cg=0,cl=0,flowers=[],trees=[];
+  days.forEach(function(d){
+    if(d.focus==='gleichmut') cg++;
+    else if(d.focus==='liebe') cl++;
+    else if(d.focus==='mitgefuehl') flowers.push(d);
+    else if(d.focus==='freude') trees.push(d);
+  });
+
+  var s = _wieseSky(W, horizon, gid);
+  // Boden — Sättigung aus Liebe (sqrt, gedeckelt)
+  var lush = Math.min(1, Math.sqrt(cl)/6);
+  s += '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground)"/>';
+  s += '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground-rich)" opacity="'+(0.12+0.5*lush).toFixed(3)+'"/>';
+  // Grasbüschel — Dichte aus Liebe
+  var tufts = Math.min(72, 8 + cl*3);
+  for(var i=0;i<tufts;i++){
+    var gx=_wieseHashF('g'+i+'x')*W;
+    var gy=horizon+5+_wieseHashF('g'+i+'y')*(H-horizon-5);
+    var gh=(4+_wieseHashF('g'+i+'h')*7)*(0.55+0.6*lush);
+    var sw=(_wieseHashF('g'+i+'s')-0.5)*4;
+    s += '<path d="M'+gx.toFixed(1)+' '+gy.toFixed(1)+' q'+sw.toFixed(1)+' '+(-gh/2).toFixed(1)+' '+(sw*0.4).toFixed(1)+' '+(-gh).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="'+(0.3+0.4*_wieseHashF('g'+i+'o')).toFixed(2)+'"/>';
+  }
+  // See — Gleichmut (sqrt), mittig-seitlich am Horizont
+  if(cg>0){
+    var lr=Math.min(140,24+Math.sqrt(cg)*20), lry=Math.min(33,8+Math.sqrt(cg)*5);
+    var lcx=152, lcy=horizon+24;
+    s += '<ellipse cx="'+lcx+'" cy="'+lcy+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="0.85"/>';
+    s += '<ellipse cx="'+(lcx-lr*0.18).toFixed(1)+'" cy="'+(lcy-lry*0.28).toFixed(1)+'" rx="'+(lr*0.5).toFixed(1)+'" ry="'+(lry*0.38).toFixed(1)+'" style="fill:var(--wiese-water-hi)" opacity="'+(0.18+Math.min(0.5,cg*0.03)).toFixed(2)+'"/>';
+    s += '<ellipse class="wiese-moonrefl" cx="'+(lcx+lr*0.28).toFixed(1)+'" cy="'+lcy+'" rx="'+(lr*0.1).toFixed(1)+'" ry="'+(lry*0.7).toFixed(1)+'" fill="#fff"/>';
+  }
+  // Bäume — Freude, Wuchsstufen nach Alter (älteste am größten)
+  var nT=trees.length, maxT=14;
+  var tDraw = nT<=maxT ? trees : trees.slice(0,maxT);
+  tDraw.forEach(function(d, idx){
+    var tx=28+_wieseHashF(d.date+'tx')*(W-56);
+    var ty=horizon+14+_wieseHashF(d.date+'ty')*(H-horizon-30);
+    var stage=Math.min(3, Math.floor((nT-1-idx)/Math.max(1,Math.ceil(nT/4))));
+    var th=[11,19,29,40][stage], tw=[6,10,15,20][stage];
+    var nw=d.date===today;
+    s += '<g class="wiese-el'+(nw?' wiese-grow':'')+'" onclick="wieseTip(\''+d.date+'\',\''+d.focus+'\','+d.min+')">';
+    s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty+2).toFixed(1)+'" rx="'+(tw*0.95).toFixed(1)+'" ry="'+(tw*0.32).toFixed(1)+'" style="fill:var(--wiese-shadow)" opacity="0.18"/>';
+    s += '<rect x="'+(tx-0.9).toFixed(1)+'" y="'+(ty-th*0.42).toFixed(1)+'" width="1.8" height="'+(th*0.42).toFixed(1)+'" fill="#7a5a3a" opacity="0.45"/>';
+    s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+Q_COLOR.freude+'" opacity="0.55"/>';
+    s += '<ellipse cx="'+(tx-tw*0.32).toFixed(1)+'" cy="'+(ty-th*0.66).toFixed(1)+'" rx="'+(tw*0.6).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+Q_COLOR.freude+'" opacity="0.4"/>';
+    s += '</g>';
+  });
+  if(nT>maxT){
+    var band=Math.min(1,(nT-maxT)/40);
+    s += '<rect x="0" y="'+(horizon+2)+'" width="'+W+'" height="13" fill="'+Q_COLOR.freude+'" opacity="'+(0.08+0.18*band).toFixed(2)+'"/>';
+  }
+  // Blumen — Mitgefühl
+  var nF=flowers.length, maxF=40;
+  var fDraw = nF<=maxF ? flowers : flowers.slice(0,maxF);
+  fDraw.forEach(function(d){
+    var fx=14+_wieseHashF(d.date+'fx')*(W-28);
+    var fy=horizon+16+_wieseHashF(d.date+'fy')*(H-horizon-24);
+    var fs=3+_wieseHashF(d.date+'fz')*2.4;
+    var nw=d.date===today;
+    s += '<g class="wiese-el'+(nw?' wiese-grow':'')+'" onclick="wieseTip(\''+d.date+'\',\''+d.focus+'\','+d.min+')">';
+    s += '<path d="M'+fx.toFixed(1)+' '+fy.toFixed(1)+' v'+(-fs*1.7).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1" opacity="0.5"/>';
+    var pcx=fx, pcy=fy-fs*1.9;
+    for(var p=0;p<5;p++){
+      var ang=p/5*6.2832+_wieseHashF(d.date+'fa')*6.2832;
+      s += '<circle cx="'+(pcx+Math.cos(ang)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(ang)*fs).toFixed(1)+'" r="'+(fs*0.6).toFixed(1)+'" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.6"/>';
+    }
+    s += '<circle cx="'+pcx.toFixed(1)+'" cy="'+pcy.toFixed(1)+'" r="'+(fs*0.5).toFixed(1)+'" fill="'+Q_COLOR.liebe+'" opacity="0.85"/>';
+    s += '</g>';
+  });
+  if(nF>maxF){
+    var ex=Math.min(60,nF-maxF);
+    for(var e=0;e<ex;e++){
+      s += '<circle cx="'+(14+_wieseHashF('cf'+e+'x')*(W-28)).toFixed(1)+'" cy="'+(horizon+18+_wieseHashF('cf'+e+'y')*(H-horizon-26)).toFixed(1)+'" r="1.6" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.5"/>';
+    }
+  }
+
+  var aria = t('wiese_aria').replace('{see}',cg).replace('{boden}',cl).replace('{blumen}',nF).replace('{baeume}',nT);
+  return '<svg class="wiese" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(aria)+'" preserveAspectRatio="xMidYMid slice">'+s+'</svg>';
+}
+
+// Schmaler Streifen — letzte N Tage, ein Slot pro Tag
+function renderWiesenStreifen(sessions, days){
+  days = days||28;
+  var W=days*10, H=44, ground=34;
+  var byDate={}; _wieseDays(sessions).forEach(function(d){ byDate[d.date]=d; });
+  var now=new Date(), tIso=todayISO();
+  var s = '<line x1="0" y1="'+ground+'" x2="'+W+'" y2="'+ground+'" style="stroke:var(--line)" stroke-width="1"/>';
+  for(var i=0;i<days;i++){
+    var dt=new Date(now.getTime()-(days-1-i)*86400000), iso=dateISO(dt);
+    var x=i*10+5, d=byDate[iso];
+    if(d){
+      var col=Q_COLOR[d.focus]||Q_COLOR.gleichmut;
+      var hh=10+_wieseHashF(iso+'sh')*8, sw=(_wieseHashF(iso+'sw')-0.5)*3;
+      s += '<path d="M'+x+' '+ground+' q'+sw.toFixed(1)+' '+(-hh/2).toFixed(1)+' '+(sw*0.3).toFixed(1)+' '+(-hh).toFixed(1)+'" stroke="'+col+'" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.9"/>';
+      s += '<circle cx="'+(x+sw*0.3).toFixed(1)+'" cy="'+(ground-hh).toFixed(1)+'" r="1.8" fill="'+col+'"/>';
+    } else {
+      s += '<circle cx="'+x+'" cy="'+ground+'" r="1" style="fill:var(--ink-muted)" opacity="0.35"/>';
+    }
+    if(iso===tIso) s += '<circle cx="'+x+'" cy="'+(ground+6)+'" r="1.6" style="fill:var(--accent)"/>';
+  }
+  return '<svg class="wiese-streifen" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+esc(t('wiese_streifen_aria'))+'">'+s+'</svg>';
+}
+
+function wieseTip(date, focus, min){
+  var q = getQ(focus);
+  var dStr;
+  try { dStr = new Date(date+'T12:00:00').toLocaleDateString(_wieseLocale(), {weekday:'short',day:'numeric',month:'short'}); }
+  catch(e){ dStr = date; }
+  toast(dStr + ' · ' + (q?q.name:focus) + ' · ' + min + ' Min.');
+}
+
+
 function thisWeekStats() {
   const today=new Date(), dow=today.getDay();
   const daysSinceMon=(dow===0)?6:dow-1;
@@ -3367,16 +3572,12 @@ function renderHeute() {
       + '<div class="hero-quality-name">' + esc(phase.name) + '</div>'
       + '<div class="hero-quality-sanskrit">' + esc(phase.sanskrit) + '</div>'
       + '<div class="hero-bild">' + esc(phase.bild) + '</div>'
-      + '<div class="hero-stats-row">'
       + (S.sessions.length === 0
-          ? '<div class="hero-stat" style="flex:1;text-align:center;"><span class="hero-stat-num" style="font-size:1.1rem;opacity:.85;">'+t('heute_erste_sitzung')+'</span><span class="hero-stat-label">'+t('heute_auch_5')+'</span></div>'
-          : '<div class="hero-stat"><span class="hero-stat-num">' + str + '</span><span class="hero-stat-label">'+t('heute_tage')+'</span></div>'
-            + '<div class="hero-stat-sep"></div>'
-            + '<div class="hero-stat"><span class="hero-stat-num">' + wk.length + '</span><span class="hero-stat-label">'+t('heute_sitzungen')+'</span></div>'
-            + '<div class="hero-stat-sep"></div>'
-            + '<div class="hero-stat"><span class="hero-stat-num">' + wkMin + '</span><span class="hero-stat-label">'+t('heute_min_woche')+'</span></div>'
+          ? '<div class="hero-stats-row"><div class="hero-stat" style="flex:1;text-align:center;"><span class="hero-stat-num" style="font-size:1.1rem;opacity:.85;">'+t('heute_erste_sitzung')+'</span><span class="hero-stat-label">'+t('heute_auch_5')+'</span></div></div>'
+          : '<div class="hero-meadow" onclick="switchTab(\'bogen\')">' + renderWiesenStreifen(S.sessions)
+            + '<div class="hero-substats">' + wk.length + '\xA0' + t('heute_sitzungen') + '\u2002·\u2002' + wkMin + '\xA0' + t('heute_min_woche') + '</div>'
+            + '</div>'
         )
-      + '</div>'
       + '</div>'
       + '</div>'
       + '<div class="hero-sheet">'
@@ -4741,13 +4942,13 @@ function renderBogen() {
       + '<div class="card-title" style="margin:0;">'+t('weg_streak')+'</div>'
       + '<button class="btn-ghost" onclick="showGoalSheet()" style="padding:4px 0;font-size:.82rem;">'+t('weg_bearbeiten')+'</button>'
       + '</div>'
-      + '<div style="display:flex;gap:24px;margin-bottom:16px;">'
-      + '<div><div class="streak-num">'+str+'</div><div class="small muted">'+t('weg_tage')+'</div></div>'
-      + '<div style="width:1px;background:var(--line);"></div>'
-      + '<div><div class="streak-num" style="font-size:2rem;">'+best+'</div><div class="small muted">'+t('weg_beste')+'</div></div>'
-      + '<div style="width:1px;background:var(--line);"></div>'
-      + '<div><div class="streak-num" style="font-size:2rem;">'+total+'</div><div class="small muted">'+t('weg_gesamt')+'</div></div>'
+      + '<div class="wiese-panorama">'+renderWiese(S.sessions)+'</div>'
+      + '<div class="wiese-legende">'
+      + [['see','gleichmut'],['boden','liebe'],['blume','mitgefuehl'],['baum','freude']].map(function(it){
+          return '<span class="wiese-leg-item"><span class="wiese-leg-dot" style="background:'+Q_COLOR[it[1]]+'"></span>'+t('wiese_'+it[0])+'</span>';
+        }).join('')
       + '</div>'
+      + '<div class="wiese-zahlen">'+t('weg_serie')+'\xA0'+str+'\u2002·\u2002'+t('weg_beste_lbl')+'\xA0'+best+'\u2002·\u2002'+t('weg_gesamt_lbl')+'\xA0'+total+'\xA0'+t('weg_sitzungen_kurz')+'</div>'
       + '<div style="margin-bottom:8px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;">'
       + '<span class="label">'+t('weg_woche')+'</span>'
