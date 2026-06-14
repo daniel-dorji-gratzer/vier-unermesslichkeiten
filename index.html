@@ -2259,7 +2259,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v120';
+var APP_VER = 'v121';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2930,26 +2930,45 @@ function _wieseDays(sessions){
 
 function _wieseLocale(){ return (S.prefs && S.prefs.lang==='en') ? 'en-US' : 'de-DE'; }
 
-function _wieseSky(W, horizon, gid){
-  return '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1">'
-    + '<stop offset="0" style="stop-color:var(--wiese-sky-top)"/>'
-    + '<stop offset="1" style="stop-color:var(--wiese-sky-bot)"/>'
-    + '</linearGradient></defs>'
-    + '<rect x="0" y="0" width="'+W+'" height="'+horizon+'" fill="url(#'+gid+')"/>'
-    + '<circle class="wiese-moon" cx="'+(W-56)+'" cy="32" r="12" style="fill:var(--wiese-moon);opacity:var(--wiese-moon-op)"/>';
+function _wieseMoon(W){
+  return '<circle class="wiese-moon" cx="'+(W-56)+'" cy="32" r="12" style="fill:var(--wiese-moon);opacity:var(--wiese-moon-op)"/>';
 }
 
-// Großes Panorama
+// Boden mit unregelmäßiger, leicht „nasser" Horizontkante
+function _wieseGround(W, H, horizon){
+  var pts = 'M-8 '+(H+8);
+  var n = 8;
+  for(var i=0;i<=n;i++){
+    var x = -8 + (i/n)*(W+16);
+    var y = horizon + 2 + (_wieseHashF('hz'+i)-0.5)*8;
+    pts += ' L'+x.toFixed(1)+' '+y.toFixed(1);
+  }
+  pts += ' L'+(W+8)+' '+(H+8)+' Z';
+  return '<g filter="url(#wcL)"><path d="'+pts+'" style="fill:var(--wiese-ground)"/></g>';
+}
+
+// Großes Panorama — Aquarell, prozedural & deterministisch
 function renderWiese(sessions){
-  var W=400, H=240, horizon=112;
+  var W=400, H=240, horizon=116;
   var days = _wieseDays(sessions);
   var today = todayISO();
   var gid = 'wsky'+Math.floor(_wieseHashF('sky:'+days.length+':'+(days.length?days[days.length-1].date:'0'))*1e9);
 
+  // Aquarell-Filter: organische Kanten (Displacement) + weiche Lasur (Blur)
+  var defs = '<defs>'
+    + '<linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wiese-sky-top)"/><stop offset="1" style="stop-color:var(--wiese-sky-bot)"/></linearGradient>'
+    + '<filter id="wcL" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="13" xChannelSelector="R" yChannelSelector="G"/></filter>'
+    + '<filter id="wcS" x="-40%" y="-40%" width="180%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/></filter>'
+    + '<filter id="wcB" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>'
+    + '<clipPath id="wclake"><rect x="-8" y="'+horizon+'" width="'+(W+16)+'" height="'+(H-horizon+8)+'"/></clipPath>'
+    + '</defs>';
+
   if(!days.length){
     return '<svg class="wiese" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(t('wiese_aria_leer'))+'" preserveAspectRatio="xMidYMid slice">'
-      + _wieseSky(W, horizon, gid)
-      + '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground)"/>'
+      + defs
+      + '<rect x="0" y="0" width="'+W+'" height="'+(horizon+24)+'" fill="url(#'+gid+')"/>'
+      + _wieseMoon(W)
+      + _wieseGround(W,H,horizon)
       + '<text x="'+(W/2)+'" y="'+(horizon+(H-horizon)/2+4)+'" text-anchor="middle" style="fill:var(--ink-muted)" font-size="13" font-family="var(--font-display)">'+esc(t('wiese_leer'))+'</text>'
       + '</svg>';
   }
@@ -2962,71 +2981,87 @@ function renderWiese(sessions){
     else if(d.focus==='freude') trees.push(d);
   });
 
-  var s = _wieseSky(W, horizon, gid);
-  // Boden — Sättigung aus Liebe (sqrt, gedeckelt)
+  var s = defs;
+  s += '<rect x="0" y="0" width="'+W+'" height="'+(horizon+24)+'" fill="url(#'+gid+')"/>';
+  s += _wieseMoon(W);
+
+  // Boden + Sättigung aus Liebe
   var lush = Math.min(1, Math.sqrt(cl)/6);
-  s += '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground)"/>';
-  s += '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground-rich)" opacity="'+(0.12+0.5*lush).toFixed(3)+'"/>';
-  // Grasbüschel — Dichte aus Liebe
-  var tufts = Math.min(72, 8 + cl*3);
+  s += _wieseGround(W,H,horizon);
+  s += '<g filter="url(#wcL)"><rect x="-8" y="'+(horizon+5)+'" width="'+(W+16)+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground-rich)" opacity="'+(0.1+0.42*lush).toFixed(3)+'"/></g>';
+
+  // Grasbüschel (verdrängte Striche)
+  var tufts = Math.min(72, 8 + cl*3), grass='';
   for(var i=0;i<tufts;i++){
     var gx=_wieseHashF('g'+i+'x')*W;
-    var gy=horizon+5+_wieseHashF('g'+i+'y')*(H-horizon-5);
+    var gy=horizon+9+_wieseHashF('g'+i+'y')*(H-horizon-9);
     var gh=(4+_wieseHashF('g'+i+'h')*7)*(0.55+0.6*lush);
     var sw=(_wieseHashF('g'+i+'s')-0.5)*4;
-    s += '<path d="M'+gx.toFixed(1)+' '+gy.toFixed(1)+' q'+sw.toFixed(1)+' '+(-gh/2).toFixed(1)+' '+(sw*0.4).toFixed(1)+' '+(-gh).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="'+(0.3+0.4*_wieseHashF('g'+i+'o')).toFixed(2)+'"/>';
+    grass += '<path d="M'+gx.toFixed(1)+' '+gy.toFixed(1)+' q'+sw.toFixed(1)+' '+(-gh/2).toFixed(1)+' '+(sw*0.4).toFixed(1)+' '+(-gh).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="'+(0.28+0.4*_wieseHashF('g'+i+'o')).toFixed(2)+'"/>';
   }
-  // See — Gleichmut (sqrt), mittig-seitlich am Horizont
+  s += '<g filter="url(#wcS)">'+grass+'</g>';
+
+  // See — Gleichmut, IMMER unterhalb des Horizonts, geschichtete Lasuren
   if(cg>0){
-    var lr=Math.min(140,24+Math.sqrt(cg)*20), lry=Math.min(33,8+Math.sqrt(cg)*5);
-    var lcx=152, lcy=horizon+24;
-    s += '<ellipse cx="'+lcx+'" cy="'+lcy+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="0.85"/>';
-    s += '<ellipse cx="'+(lcx-lr*0.18).toFixed(1)+'" cy="'+(lcy-lry*0.28).toFixed(1)+'" rx="'+(lr*0.5).toFixed(1)+'" ry="'+(lry*0.38).toFixed(1)+'" style="fill:var(--wiese-water-hi)" opacity="'+(0.18+Math.min(0.5,cg*0.03)).toFixed(2)+'"/>';
-    s += '<ellipse class="wiese-moonrefl" cx="'+(lcx+lr*0.28).toFixed(1)+'" cy="'+lcy+'" rx="'+(lr*0.1).toFixed(1)+'" ry="'+(lry*0.7).toFixed(1)+'" fill="#fff"/>';
+    var lry=Math.min(22,7+Math.sqrt(cg)*3.4);
+    var lr =Math.min(118,22+Math.sqrt(cg)*14);
+    var lcx=150, lcy=horizon+lry+4;   // Oberkante = horizon+4, nie darüber
+    var lake='';
+    lake += '<ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="0.42"/>';
+    lake += '<ellipse cx="'+(lcx-lr*0.07).toFixed(1)+'" cy="'+(lcy+lry*0.14).toFixed(1)+'" rx="'+(lr*0.8).toFixed(1)+'" ry="'+(lry*0.78).toFixed(1)+'" style="fill:var(--wiese-water)" opacity="0.4"/>';
+    s += '<g clip-path="url(#wclake)"><g filter="url(#wcL)">'+lake+'</g>';
+    s += '<ellipse filter="url(#wcB)" cx="'+(lcx-lr*0.14).toFixed(1)+'" cy="'+(lcy-lry*0.16).toFixed(1)+'" rx="'+(lr*0.4).toFixed(1)+'" ry="'+(lry*0.32).toFixed(1)+'" style="fill:var(--wiese-water-hi)" opacity="'+(0.18+Math.min(0.42,cg*0.022)).toFixed(2)+'"/>';
+    s += '<ellipse class="wiese-moonrefl" filter="url(#wcB)" cx="'+(lcx+lr*0.24).toFixed(1)+'" cy="'+lcy.toFixed(1)+'" rx="'+(lr*0.07).toFixed(1)+'" ry="'+(lry*0.85).toFixed(1)+'" fill="#fff"/></g>';
   }
-  // Bäume — Freude, Wuchsstufen nach Alter (älteste am größten)
+
+  // Bäume — Freude, Wuchsstufen, geschichtete Kronen mit Aquarellkante
   var nT=trees.length, maxT=14;
   var tDraw = nT<=maxT ? trees : trees.slice(0,maxT);
   tDraw.forEach(function(d, idx){
     var tx=28+_wieseHashF(d.date+'tx')*(W-56);
-    var ty=horizon+14+_wieseHashF(d.date+'ty')*(H-horizon-30);
+    var ty=horizon+16+_wieseHashF(d.date+'ty')*(H-horizon-32);
     var stage=Math.min(3, Math.floor((nT-1-idx)/Math.max(1,Math.ceil(nT/4))));
     var th=[11,19,29,40][stage], tw=[6,10,15,20][stage];
-    var nw=d.date===today;
+    var nw=d.date===today, cF=Q_COLOR.freude;
     s += '<g class="wiese-el'+(nw?' wiese-grow':'')+'" onclick="wieseTip(\''+d.date+'\',\''+d.focus+'\','+d.min+')">';
-    s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty+2).toFixed(1)+'" rx="'+(tw*0.95).toFixed(1)+'" ry="'+(tw*0.32).toFixed(1)+'" style="fill:var(--wiese-shadow)" opacity="0.18"/>';
-    s += '<rect x="'+(tx-0.9).toFixed(1)+'" y="'+(ty-th*0.42).toFixed(1)+'" width="1.8" height="'+(th*0.42).toFixed(1)+'" fill="#7a5a3a" opacity="0.45"/>';
-    s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+Q_COLOR.freude+'" opacity="0.55"/>';
-    s += '<ellipse cx="'+(tx-tw*0.32).toFixed(1)+'" cy="'+(ty-th*0.66).toFixed(1)+'" rx="'+(tw*0.6).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+Q_COLOR.freude+'" opacity="0.4"/>';
-    s += '</g>';
+    s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty+2).toFixed(1)+'" rx="'+(tw*0.95).toFixed(1)+'" ry="'+(tw*0.32).toFixed(1)+'" filter="url(#wcB)" style="fill:var(--wiese-shadow)" opacity="0.16"/>';
+    s += '<rect x="'+(tx-0.9).toFixed(1)+'" y="'+(ty-th*0.42).toFixed(1)+'" width="1.8" height="'+(th*0.42).toFixed(1)+'" fill="#7a5a3a" opacity="0.42"/>';
+    s += '<g filter="url(#wcL)">';
+    s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+cF+'" opacity="0.5"/>';
+    s += '<ellipse cx="'+(tx-tw*0.3).toFixed(1)+'" cy="'+(ty-th*0.68).toFixed(1)+'" rx="'+(tw*0.62).toFixed(1)+'" ry="'+(tw*0.62).toFixed(1)+'" fill="'+cF+'" opacity="0.42"/>';
+    s += '<ellipse cx="'+(tx+tw*0.32).toFixed(1)+'" cy="'+(ty-th*0.5).toFixed(1)+'" rx="'+(tw*0.55).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+cF+'" opacity="0.35"/>';
+    s += '</g></g>';
   });
   if(nT>maxT){
     var band=Math.min(1,(nT-maxT)/40);
-    s += '<rect x="0" y="'+(horizon+2)+'" width="'+W+'" height="13" fill="'+Q_COLOR.freude+'" opacity="'+(0.08+0.18*band).toFixed(2)+'"/>';
+    s += '<g filter="url(#wcL)"><rect x="-8" y="'+(horizon+3)+'" width="'+(W+16)+'" height="13" fill="'+Q_COLOR.freude+'" opacity="'+(0.08+0.16*band).toFixed(2)+'"/></g>';
   }
+
   // Blumen — Mitgefühl
   var nF=flowers.length, maxF=40;
   var fDraw = nF<=maxF ? flowers : flowers.slice(0,maxF);
   fDraw.forEach(function(d){
     var fx=14+_wieseHashF(d.date+'fx')*(W-28);
-    var fy=horizon+16+_wieseHashF(d.date+'fy')*(H-horizon-24);
+    var fy=horizon+18+_wieseHashF(d.date+'fy')*(H-horizon-26);
     var fs=3+_wieseHashF(d.date+'fz')*2.4;
-    var nw=d.date===today;
+    var nw=d.date===today, cM=Q_COLOR.mitgefuehl;
     s += '<g class="wiese-el'+(nw?' wiese-grow':'')+'" onclick="wieseTip(\''+d.date+'\',\''+d.focus+'\','+d.min+')">';
     s += '<path d="M'+fx.toFixed(1)+' '+fy.toFixed(1)+' v'+(-fs*1.7).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1" opacity="0.5"/>';
-    var pcx=fx, pcy=fy-fs*1.9;
+    var pcx=fx, pcy=fy-fs*1.9, petals='';
     for(var p=0;p<5;p++){
       var ang=p/5*6.2832+_wieseHashF(d.date+'fa')*6.2832;
-      s += '<circle cx="'+(pcx+Math.cos(ang)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(ang)*fs).toFixed(1)+'" r="'+(fs*0.6).toFixed(1)+'" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.6"/>';
+      petals += '<circle cx="'+(pcx+Math.cos(ang)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(ang)*fs).toFixed(1)+'" r="'+(fs*0.62).toFixed(1)+'" fill="'+cM+'" opacity="0.55"/>';
     }
+    s += '<g filter="url(#wcS)">'+petals+'</g>';
     s += '<circle cx="'+pcx.toFixed(1)+'" cy="'+pcy.toFixed(1)+'" r="'+(fs*0.5).toFixed(1)+'" fill="'+Q_COLOR.liebe+'" opacity="0.85"/>';
     s += '</g>';
   });
   if(nF>maxF){
-    var ex=Math.min(60,nF-maxF);
+    var ex=Math.min(60,nF-maxF), dots='';
     for(var e=0;e<ex;e++){
-      s += '<circle cx="'+(14+_wieseHashF('cf'+e+'x')*(W-28)).toFixed(1)+'" cy="'+(horizon+18+_wieseHashF('cf'+e+'y')*(H-horizon-26)).toFixed(1)+'" r="1.6" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.5"/>';
+      dots += '<circle cx="'+(14+_wieseHashF('cf'+e+'x')*(W-28)).toFixed(1)+'" cy="'+(horizon+20+_wieseHashF('cf'+e+'y')*(H-horizon-28)).toFixed(1)+'" r="1.7" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.5"/>';
     }
+    s += '<g filter="url(#wcS)">'+dots+'</g>';
   }
 
   var aria = t('wiese_aria').replace('{see}',cg).replace('{boden}',cl).replace('{blumen}',nF).replace('{baeume}',nT);
