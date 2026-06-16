@@ -2259,7 +2259,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v128';
+var APP_VER = 'v129';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2974,15 +2974,10 @@ function renderWiese(sessions){
   var Hh = Math.pow(Math.max(0.0001,Lg)*Math.max(0.0001,Ll)*Math.max(0.0001,Lf)*Math.max(0.0001,Lm), 0.25);
 
   // See-Geometrie (für clip + Reflexion)
-  var skew=13, wN=Math.min(150,42+Math.sqrt(cg)*16), wF=wN*0.58, depth=Math.min(38,16+Math.sqrt(cg)*4.6);
-  var lcx=196, farY=waterY, nearY=waterY+depth;
-  var lcy=(farY+nearY)/2, lry=depth/2, lr=wN;   // Kompatibilität für Vordergrund-Sektionen
-  var NLx=lcx-wN, NRx=lcx+wN, FLx=lcx+skew-wF, FRx=lcx+skew+wF;
-  var lakeD='M'+NLx.toFixed(1)+' '+nearY.toFixed(1)
-    +' Q'+lcx.toFixed(1)+' '+(nearY+depth*0.22).toFixed(1)+' '+NRx.toFixed(1)+' '+nearY.toFixed(1)
-    +' Q'+(lcx+skew+wF+(wN-wF)*0.5).toFixed(1)+' '+(farY+depth*0.45).toFixed(1)+' '+FRx.toFixed(1)+' '+farY.toFixed(1)
-    +' Q'+(lcx+skew).toFixed(1)+' '+(farY-depth*0.12).toFixed(1)+' '+FLx.toFixed(1)+' '+farY.toFixed(1)
-    +' Q'+(lcx+skew-wF-(wN-wF)*0.5).toFixed(1)+' '+(farY+depth*0.45).toFixed(1)+' '+NLx.toFixed(1)+' '+nearY.toFixed(1)+' Z';
+  // See-Geometrie: flache, weiche Ellipse — Perspektive durch Verkürzung (ry klein)
+  var lr=Math.min(150,44+Math.sqrt(cg)*16);
+  var lry=Math.min(15,6+Math.sqrt(cg)*2.6);
+  var lcx=198, lcy=waterY+lry+2, farY=lcy-lry, nearY=lcy+lry;
 
   // Bergpfade (auch für Spiegelung wiederverwendet)
   var rFar=_wieseRidgePath('mtnF', horizon, 44, W);
@@ -3009,7 +3004,7 @@ function renderWiese(sessions){
     + '<filter id="wcL" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>'
     + '<filter id="wcS" x="-40%" y="-40%" width="180%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>'
     + '<filter id="wcB" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter>'
-    + '<clipPath id="wlk"><path d="'+lakeD+'"/></clipPath>'
+    + '<clipPath id="wlk"><ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'"/></clipPath>'
     + '</defs>';
 
   if(!days.length){
@@ -3063,30 +3058,31 @@ function renderWiese(sessions){
     bn += _conifer(nx, ny, nh, nh*0.5, 'var(--wiese-forest)', 0.55+0.35*Lf);
   }
   s += '<g filter="url(#wcS)">'+bn+'</g>';
-  // 6) See (Gleichmut) — perspektivische Form, Spiegelung im See (auf Pfad geclippt)
+  // 6) See (Gleichmut) — flache Ellipse, weiche Kante, Spiegelung im See
   if(cg>0){
-    s += '<path d="'+lakeD+'" transform="translate(0,3)" filter="url(#wcB)" style="fill:var(--wiese-shadow)" opacity="0.1"/>';
-    s += '<g filter="url(#wcL)"><path d="'+lakeD+'" style="fill:var(--wiese-water)" opacity="'+(0.55+0.15*Lg).toFixed(2)+'"/></g>';
+    s += '<ellipse filter="url(#wcB)" cx="'+lcx+'" cy="'+(lcy+2).toFixed(1)+'" rx="'+(lr*1.12).toFixed(1)+'" ry="'+(lry*1.7).toFixed(1)+'" style="fill:var(--wiese-shadow)" opacity="0.1"/>';
+    s += '<g filter="url(#wcS)"><ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="'+(0.58+0.15*Lg).toFixed(2)+'"/></g>';
     var cR=0.5;
     s += '<g clip-path="url(#wlk)">'
-      + '<g transform="translate(0,'+(farY*(1+cR)).toFixed(1)+') scale(1,'+(-cR)+')" filter="url(#wcB)" opacity="'+(0.22+0.3*Lg*(0.5+0.5*Hh)).toFixed(2)+'">'
+      + '<g transform="translate(0,'+(farY*(1+cR)).toFixed(1)+') scale(1,'+(-cR)+')" filter="url(#wcB)" opacity="'+(0.2+0.26*Lg*(0.5+0.5*Hh)).toFixed(2)+'">'
       + '<path d="'+rFar+'" style="fill:var(--wiese-mtn-far)"/><path d="'+rNear+'" style="fill:var(--wiese-mtn-near)"/>'
       + '</g>';
-    for(var w=0;w<3;w++){ var frac=0.34+0.22*w, wy=farY+depth*frac, cwx=lcx+skew*(1-frac), hw=wF+(wN-wF)*frac; s += '<line x1="'+(cwx-hw*0.82).toFixed(1)+'" y1="'+wy.toFixed(1)+'" x2="'+(cwx+hw*0.82).toFixed(1)+'" y2="'+wy.toFixed(1)+'" style="stroke:var(--wiese-water-hi)" stroke-width="1" opacity="0.22"/>'; }
+    s += '<line x1="'+(lcx-lr*0.66).toFixed(1)+'" y1="'+(lcy+lry*0.15).toFixed(1)+'" x2="'+(lcx+lr*0.66).toFixed(1)+'" y2="'+(lcy+lry*0.15).toFixed(1)+'" style="stroke:var(--wiese-water-hi)" stroke-width="1" opacity="0.14"/>';
     s += '</g>';
-    s += '<ellipse class="wiese-moonrefl" filter="url(#wcB)" cx="'+(lcx+skew+wF*0.2).toFixed(1)+'" cy="'+(farY+depth*0.4).toFixed(1)+'" rx="'+(wF*0.12).toFixed(1)+'" ry="'+(depth*0.32).toFixed(1)+'" fill="#fff"/>';
-    s += '<path d="'+lakeD+'" fill="none" style="stroke:var(--wiese-water-hi)" stroke-width="1" opacity="0.3" filter="url(#wcL)"/>';
+    s += '<ellipse class="wiese-moonrefl" filter="url(#wcB)" cx="'+(lcx+lr*0.18).toFixed(1)+'" cy="'+lcy.toFixed(1)+'" rx="'+(lr*0.05).toFixed(1)+'" ry="'+(lry*0.7).toFixed(1)+'" fill="#fff"/>';
+    s += '<ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" fill="none" style="stroke:var(--wiese-water-hi)" stroke-width="1" opacity="0.28" filter="url(#wcS)"/>';
   }
-  // 6b) Ufer-Wald (Freude) — Koniferen rings um den See, hinten kleiner/spärlicher
+  // 6b) Ufer-Wald (Freude) — Koniferen am Seeufer entlang der Kontur, hinten kleiner/spärlicher
   var shoreN=Math.round(2+Lf*16), sf='';
   for(var k=0;k<shoreN;k++){
-    var fr=(k+0.5)/shoreN;                       // 0 fern .. 1 nah
-    var sy=farY+2 + fr*(depth-4);
-    var shw=wF+(wN-wF)*fr, sccx=lcx+skew*(1-fr);
+    var fr=(k+0.5)/shoreN;
+    var yy=farY+2 + fr*(nearY-farY-4);
+    var dyN=(yy-lcy)/lry; dyN=Math.max(-0.96,Math.min(0.96,dyN));
+    var halfw=lr*Math.sqrt(1-dyN*dyN);
     var sth=8+fr*15*(0.6+0.5*Lf);
     var sside=(_wieseHashF('sh'+k)<0.5)?-1:1;
-    var stx=sccx + sside*(shw + 4 + _wieseHashF('sh'+k+'o')*6);
-    sf += _conifer(stx, sy, sth, sth*0.5, 'var(--wiese-forest)', 0.6+0.3*Lf);
+    var stx=lcx + sside*(halfw + 3 + _wieseHashF('sh'+k+'o')*6);
+    sf += _conifer(stx, yy, sth, sth*0.5, 'var(--wiese-forest)', 0.6+0.3*Lf);
   }
   s += '<g filter="url(#wcS)">'+sf+'</g>';
   // 7) Vordergrund-Gras (Liebe-Dichte), nur vor dem See

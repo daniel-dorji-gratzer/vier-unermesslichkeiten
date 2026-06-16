@@ -1,4 +1,4 @@
-const CACHE = 'vum-v128';
+const CACHE = 'vum-v129';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll([
