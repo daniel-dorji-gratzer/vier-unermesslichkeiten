@@ -99,6 +99,7 @@
   --licht-soil:#cdbfa3; --licht-soil-edge:#bcab89;
   --wiese-haze:#e8eef0; --wiese-mtn-far:#b9c6d4; --wiese-mtn-near:#93a7b8;
   --wiese-forest:#6f8f54; --wiese-ground-dry:#c4c49a; --wiese-cloud:#ffffff;
+  --wiese-forest-far:#9fb38e; --wiese-rock:#9a948a;
 }
 /* ── Tageslicht-Stufen ──
    morgen: goldenes Licht, weiche etwas längere Schatten
@@ -152,6 +153,7 @@
   --licht-soil:#3a352c; --licht-soil-edge:#2b2820;
   --wiese-haze:#1c2740; --wiese-mtn-far:#2a3a55; --wiese-mtn-near:#1f2c44;
   --wiese-forest:#2f4a33; --wiese-ground-dry:#2a3328; --wiese-cloud:#5a6a88;
+  --wiese-forest-far:#3a5540; --wiese-rock:#4a4843;
   --kap-gleichmut-border: rgba(110,197,240,.45);
   --kap-liebe-border: rgba(245,208,112,.45);
   --kap-mitgefuehl-border: rgba(212,156,240,.45);
@@ -2257,7 +2259,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v125';
+var APP_VER = 'v126';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2978,10 +2980,14 @@ function renderWiese(sessions){
   var rFar=_wieseRidgePath('mtnF', horizon, 44, W);
   var rMid=_wieseRidgePath('mtnM', horizon, 60, W);
   var rNear=_wieseRidgePath('mtnN', horizon+2, 80, W);
+  var hpx=W*0.42, hpy=30;   // dominanter Schneegipfel
+  var heroPeak = '<path d="M'+hpx.toFixed(1)+' '+hpy+' L'+(hpx-46).toFixed(1)+' '+horizon+' L'+(hpx+46).toFixed(1)+' '+horizon+' Z" style="fill:var(--wiese-mtn-near)" opacity="0.85"/>'
+    + '<path d="M'+hpx.toFixed(1)+' '+hpy+' l-12 22 l7 -3 l5 7 l5 -7 l7 3 Z" fill="#fff" opacity="0.7"/>';
   var mountains = '<g filter="url(#wcL)">'
-    + '<path d="'+rFar+'" style="fill:var(--wiese-mtn-far)" opacity="0.6"/>'
-    + '<path d="'+rMid+'" style="fill:var(--wiese-mtn-near)" opacity="0.55"/>'
-    + '<path d="'+rNear+'" style="fill:var(--wiese-mtn-near)" opacity="0.8"/>'
+    + '<path d="'+rFar+'" style="fill:var(--wiese-mtn-far)" opacity="0.45"/>'
+    + '<path d="'+rMid+'" style="fill:var(--wiese-mtn-far)" opacity="0.6"/>'
+    + heroPeak
+    + '<path d="'+rNear+'" style="fill:var(--wiese-mtn-near)" opacity="0.78"/>'
     + '</g>';
 
   // Rollende Bodenkante (kein harter Strich)
@@ -3013,7 +3019,12 @@ function renderWiese(sessions){
   s += '<rect x="0" y="0" width="'+W+'" height="'+(horizon+24)+'" fill="url(#'+gid+')"/>';
   for(var c=0;c<3;c++){
     var clx=_wieseHashF('cl'+c+'x')*W, cly=16+_wieseHashF('cl'+c+'y')*40, clw=24+_wieseHashF('cl'+c+'w')*34;
-    s += '<g filter="url(#wcB)" opacity="'+(0.4+0.4*Hh).toFixed(2)+'"><ellipse cx="'+clx.toFixed(1)+'" cy="'+cly.toFixed(1)+'" rx="'+clw.toFixed(1)+'" ry="'+(clw*0.26).toFixed(1)+'" style="fill:var(--wiese-cloud)"/><ellipse cx="'+(clx+clw*0.45).toFixed(1)+'" cy="'+(cly+2).toFixed(1)+'" rx="'+(clw*0.5).toFixed(1)+'" ry="'+(clw*0.2).toFixed(1)+'" style="fill:var(--wiese-cloud)"/></g>';
+    s += '<g filter="url(#wcB)" opacity="'+(0.45+0.4*Hh).toFixed(2)+'">'
+      + '<ellipse cx="'+clx.toFixed(1)+'" cy="'+(cly+clw*0.12).toFixed(1)+'" rx="'+clw.toFixed(1)+'" ry="'+(clw*0.18).toFixed(1)+'" style="fill:var(--wiese-cloud)"/>'
+      + '<ellipse cx="'+(clx-clw*0.3).toFixed(1)+'" cy="'+cly.toFixed(1)+'" rx="'+(clw*0.42).toFixed(1)+'" ry="'+(clw*0.34).toFixed(1)+'" style="fill:var(--wiese-cloud)"/>'
+      + '<ellipse cx="'+(clx+clw*0.22).toFixed(1)+'" cy="'+(cly-clw*0.06).toFixed(1)+'" rx="'+(clw*0.5).toFixed(1)+'" ry="'+(clw*0.4).toFixed(1)+'" style="fill:var(--wiese-cloud)"/>'
+      + '<ellipse cx="'+(clx+clw*0.55).toFixed(1)+'" cy="'+(cly+clw*0.04).toFixed(1)+'" rx="'+(clw*0.36).toFixed(1)+'" ry="'+(clw*0.28).toFixed(1)+'" style="fill:var(--wiese-cloud)"/>'
+      + '</g>';
   }
   s += _wieseMoon(W);
   // 2) Berge + Schneekuppen
@@ -3028,17 +3039,25 @@ function renderWiese(sessions){
   // 4) Boden: trockene Basis + grüne Lasur (Liebe)
   s += '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground-dry)"/></g>';
   s += '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground)" opacity="'+(0.35+0.6*Ll).toFixed(2)+'"/></g>';
-  // 5) Waldgürtel am Übergang (Freude) — Reihe kleiner Koniferen
-  var beltTrees=Math.round(2+Lf*22), bt='';
-  for(var i=0;i<beltTrees;i++){
-    var bx=_wieseHashF('bt'+i+'x')*W;
-    var by=horizon+2+(_wieseHashF('bt'+i+'y')-0.5)*5;
-    var bh=7+_wieseHashF('bt'+i+'h')*7*(0.6+0.5*Lf);
-    bt += _conifer(bx, by, bh, bh*0.5, 'var(--wiese-forest)', 0.45+0.4*Lf);
+  // 5) Nadelwald auf den Hängen (Freude) — gestaffelt: ferne Reihe blass+klein,
+  //    nahe Reihe größer+satter. Dichte skaliert mit Lf (phasenabhängig).
+  var farN=Math.round(Lf*34), bf='';
+  for(var i=0;i<farN;i++){
+    var fx2=_wieseHashF('bf'+i+'x')*W, fy2=horizon-4+(_wieseHashF('bf'+i+'y'))*5;
+    var fh2=4+_wieseHashF('bf'+i+'h')*4;
+    bf += _conifer(fx2, fy2, fh2, fh2*0.5, 'var(--wiese-forest-far)', 0.4+0.35*Lf);
   }
-  s += '<g filter="url(#wcS)">'+bt+'</g>';
+  s += '<g filter="url(#wcS)">'+bf+'</g>';
+  var nearN=Math.round(3+Lf*20), bn='';
+  for(var i=0;i<nearN;i++){
+    var nx=_wieseHashF('bn'+i+'x')*W, ny=horizon+2+(_wieseHashF('bn'+i+'y'))*8;
+    var nh=8+_wieseHashF('bn'+i+'h')*8*(0.6+0.5*Lf);
+    bn += _conifer(nx, ny, nh, nh*0.5, 'var(--wiese-forest)', 0.55+0.35*Lf);
+  }
+  s += '<g filter="url(#wcS)">'+bn+'</g>';
   // 6) See (Gleichmut) — Wasser + Spiegelung IM See (auf Ellipse geclippt)
   if(cg>0){
+    s += '<ellipse filter="url(#wcB)" cx="'+lcx+'" cy="'+(lcy+2).toFixed(1)+'" rx="'+(lr*1.14).toFixed(1)+'" ry="'+(lry*1.6).toFixed(1)+'" style="fill:var(--wiese-shadow)" opacity="0.1"/>';
     s += '<g filter="url(#wcL)"><ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="'+(0.55+0.15*Lg).toFixed(2)+'"/></g>';
     var cR=0.5; // Stauchung
     s += '<g clip-path="url(#wlk)">'
@@ -3091,6 +3110,11 @@ function renderWiese(sessions){
     s += '<rect x="'+(tx-0.9).toFixed(1)+'" y="'+(ty-th*0.42).toFixed(1)+'" width="1.8" height="'+(th*0.42).toFixed(1)+'" fill="#7a5a3a" opacity="0.45"/>';
     s += '<g filter="url(#wcL)"><ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+cF+'" opacity="0.6"/><ellipse cx="'+(tx-tw*0.3).toFixed(1)+'" cy="'+(ty-th*0.68).toFixed(1)+'" rx="'+(tw*0.6).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+cF+'" opacity="0.45"/></g>';
     s += '</g>';
+  });
+  // 9b) Felsen im Vordergrund (Bühne, fester Seed)
+  [[46,H-26,9],[W-58,H-18,12],[88,H-9,6],[W-40,H-34,7]].forEach(function(rk){
+    var rx2=rk[0], ry2=rk[1], rr=rk[2];
+    s += '<g filter="url(#wcL)"><ellipse cx="'+rx2+'" cy="'+ry2+'" rx="'+rr+'" ry="'+(rr*0.66).toFixed(1)+'" style="fill:var(--wiese-rock)" opacity="0.7"/><ellipse cx="'+(rx2-rr*0.3).toFixed(1)+'" cy="'+(ry2-rr*0.28).toFixed(1)+'" rx="'+(rr*0.5).toFixed(1)+'" ry="'+(rr*0.3).toFixed(1)+'" fill="#fff" opacity="0.12"/></g>';
   });
   // 10) Rahmende Baumgruppen links/rechts — echte Koniferen, oben angeschnitten
   var grove=1+Math.round(Lf*2);   // 1..3 Tannen je Seite
