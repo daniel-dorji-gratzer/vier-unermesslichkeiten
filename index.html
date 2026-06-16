@@ -473,7 +473,7 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
   font-size:1.12rem; font-weight:500; letter-spacing:.01em; }
 .cta-arrow { font-weight:400; opacity:.9; }
 .cta-sub { display:block; font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; opacity:.82; margin-top:5px; }
-.ansage { border-left:3px solid var(--accent); padding-left:16px; }
+.ansage-sec { border-left:3px solid var(--accent); }
 .ansage-text { font-family:var(--font-display); font-variation-settings:"opsz" 30, "SOFT" 55;
   font-size:1.12rem; line-height:1.5; color:var(--ink); }
 .ansage-text strong { font-weight:600; }
@@ -496,7 +496,7 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
   text-transform:uppercase; color:var(--accent); white-space:nowrap; flex-shrink:0; }
 
 /* ── Reminder quote ── */
-.reminder { background: var(--q-wash); border-left: 4px solid var(--accent); }
+.reminder { background: var(--q-wash); border-left: 3px solid var(--accent); }
 .reminder .quote { font-style: italic; color: var(--ink-soft); line-height: 1.45; font-size: 1.3rem;
   font-family: var(--font-display);
   font-variation-settings: "opsz" 40, "SOFT" 70; }
@@ -2259,7 +2259,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v126';
+var APP_VER = 'v127';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -3684,57 +3684,64 @@ function tagesAnsage(){
 // ── Reicher Lichtungs-Streifen für „Heute" (Seitenansicht, letzte N Tage) ────
 function renderLichtungStreifen(sessions, days){
   days = days||28;
-  var W=560, H=118, surf=92, bandTop=86, bandBot=112;
-  var byDate={}; _wieseDays(sessions).forEach(function(d){ byDate[d.date]=d; });
+  var W=560, H=122, surf=96, bandTop=88, bandBot=116;
+  var dd=_wieseDays(sessions);
+  var byDate={}; dd.forEach(function(d){ byDate[d.date]=d; });
   var now=new Date(), tIso=todayISO();
   var pad=18, slot=(W-2*pad)/days;
+  // Jüngste Balance (r_q) im 28-Tage-Fenster — tönt den Boden lebendig
+  var rc={gleichmut:0,liebe:0,mitgefuehl:0,freude:0};
+  for(var i=0;i<days;i++){ var iso0=dateISO(new Date(now.getTime()-(days-1-i)*86400000)); var d0=byDate[iso0]; if(d0&&rc[d0.focus]!=null) rc[d0.focus]++; }
+  var rN=function(c){ return Math.min(1, c/8); };
+  var rLiebe=rN(rc.liebe), rWasser=rN(rc.gleichmut);
+
   var s = '<defs>'
     + '<filter id="lcW" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G"/></filter>'
     + '<filter id="lcB" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4"/></filter>'
     + '</defs>';
-  // Bodenband
-  s += '<g filter="url(#lcW)"><rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="'+(bandBot-bandTop)+'" rx="9" style="fill:var(--licht-soil)"/></g>';
-  s += '<rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="3" rx="1.5" style="fill:var(--licht-soil-edge)" opacity="0.5"/>';
+  // Bodenband: trockene Basis + grüne Lasur (jüngste Liebe)
+  s += '<g filter="url(#lcW)"><rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="'+(bandBot-bandTop)+'" rx="10" style="fill:var(--licht-soil)"/></g>';
+  s += '<g filter="url(#lcW)"><rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="'+(bandBot-bandTop)+'" rx="10" style="fill:var(--wiese-ground)" opacity="'+(0.12+0.5*rLiebe).toFixed(2)+'"/></g>';
+  // Wassersaum an der Basis (jüngster Gleichmut)
+  if(rWasser>0) s += '<rect x="8" y="'+(bandBot-5)+'" width="'+(W-16)+'" height="3" rx="1.5" style="fill:var(--wiese-water)" opacity="'+(0.18+0.5*rWasser).toFixed(2)+'"/>';
+  s += '<rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="3" rx="1.5" style="fill:var(--licht-soil-edge)" opacity="0.45"/>';
   var elems='';
   for(var i=0;i<days;i++){
     var dt=new Date(now.getTime()-(days-1-i)*86400000), iso=dateISO(dt);
     var cx=pad+slot*(i+0.5);
     if(iso===tIso){
       s += '<line x1="'+cx.toFixed(1)+'" y1="16" x2="'+cx.toFixed(1)+'" y2="'+bandTop+'" style="stroke:var(--ink-muted)" stroke-width="1" stroke-dasharray="2 3" opacity="0.45"/>';
-      s += '<circle cx="'+cx.toFixed(1)+'" cy="14" r="1.6" style="fill:var(--accent)"/>';
+      s += '<circle cx="'+cx.toFixed(1)+'" cy="14" r="1.8" style="fill:var(--accent)"/>';
     }
     var d=byDate[iso];
     if(!d) continue;
     var r1=_wieseHashF(iso+'a'), r2=_wieseHashF(iso+'b'), r3=_wieseHashF(iso+'c');
-    var x=cx+(r1-0.5)*slot*0.35;
+    var x=cx+(r1-0.5)*slot*0.32;
     if(d.focus==='gleichmut'){
-      var pw=4+r2*4;
-      elems += '<g filter="url(#lcB)"><ellipse cx="'+x.toFixed(1)+'" cy="'+(surf+2).toFixed(1)+'" rx="'+pw.toFixed(1)+'" ry="'+(pw*0.32).toFixed(1)+'" fill="'+Q_COLOR.gleichmut+'" opacity="0.7"/></g>';
-      elems += '<ellipse cx="'+(x-pw*0.2).toFixed(1)+'" cy="'+(surf+1.4).toFixed(1)+'" rx="'+(pw*0.4).toFixed(1)+'" ry="'+(pw*0.13).toFixed(1)+'" fill="#fff" opacity="0.5"/>';
+      var pw=5.5+r2*4.5;
+      elems += '<g filter="url(#lcB)"><ellipse cx="'+x.toFixed(1)+'" cy="'+(surf+2).toFixed(1)+'" rx="'+pw.toFixed(1)+'" ry="'+(pw*0.34).toFixed(1)+'" fill="'+Q_COLOR.gleichmut+'" opacity="0.78"/></g>';
+      elems += '<ellipse cx="'+(x-pw*0.22).toFixed(1)+'" cy="'+(surf+1.2).toFixed(1)+'" rx="'+(pw*0.42).toFixed(1)+'" ry="'+(pw*0.14).toFixed(1)+'" fill="#fff" opacity="0.5"/>';
     } else if(d.focus==='liebe'){
-      var nb=3+Math.floor(r2*2), g='';
+      var nb=4+Math.floor(r2*2), g='';
       for(var b=0;b<nb;b++){
-        var bx=x+(b-(nb-1)/2)*2.2, bh=8+_wieseHashF(iso+'g'+b)*7, bs=(_wieseHashF(iso+'s'+b)-0.5)*3;
-        g += '<path d="M'+bx.toFixed(1)+' '+surf+' q'+bs.toFixed(1)+' '+(-bh/2).toFixed(1)+' '+(bs*0.4).toFixed(1)+' '+(-bh).toFixed(1)+'" stroke="'+Q_COLOR.liebe+'" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.9"/>';
+        var bx=x+(b-(nb-1)/2)*2.4, bh=10+_wieseHashF(iso+'g'+b)*8, bs=(_wieseHashF(iso+'s'+b)-0.5)*3.5;
+        g += '<path d="M'+bx.toFixed(1)+' '+surf+' q'+bs.toFixed(1)+' '+(-bh/2).toFixed(1)+' '+(bs*0.4).toFixed(1)+' '+(-bh).toFixed(1)+'" stroke="'+Q_COLOR.liebe+'" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.92"/>';
       }
       elems += '<g filter="url(#lcW)">'+g+'</g>';
     } else if(d.focus==='mitgefuehl'){
-      var fh=12+r2*6, fs=3+r3*1.5, pcx=x, pcy=surf-fh, pet='';
-      elems += '<path d="M'+x.toFixed(1)+' '+surf+' v'+(-fh).toFixed(1)+'" stroke="'+Q_COLOR.liebe+'" stroke-width="1.3" opacity="0.7" stroke-linecap="round"/>';
-      for(var p=0;p<5;p++){ var a=p/5*6.2832+r1*6.2832; pet += '<circle cx="'+(pcx+Math.cos(a)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(a)*fs).toFixed(1)+'" r="'+(fs*0.7).toFixed(1)+'" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.7"/>'; }
+      var fh=15+r2*7, fs=3.6+r3*1.8, pcx=x, pcy=surf-fh, pet='';
+      elems += '<path d="M'+x.toFixed(1)+' '+surf+' v'+(-fh).toFixed(1)+'" stroke="'+Q_COLOR.liebe+'" stroke-width="1.4" opacity="0.7" stroke-linecap="round"/>';
+      for(var p=0;p<5;p++){ var a=p/5*6.2832+r1*6.2832; pet += '<circle cx="'+(pcx+Math.cos(a)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(a)*fs).toFixed(1)+'" r="'+(fs*0.72).toFixed(1)+'" fill="'+Q_COLOR.mitgefuehl+'" opacity="0.78"/>'; }
       elems += '<g filter="url(#lcW)">'+pet+'</g>';
       elems += '<circle cx="'+pcx.toFixed(1)+'" cy="'+pcy.toFixed(1)+'" r="'+(fs*0.55).toFixed(1)+'" fill="'+Q_COLOR.liebe+'"/>';
     } else if(d.focus==='freude'){
-      var th=16+r2*10, tw=5+r3*3;
-      elems += '<rect x="'+(x-1).toFixed(1)+'" y="'+(surf-th*0.5).toFixed(1)+'" width="2" height="'+(th*0.5).toFixed(1)+'" fill="#7a5a3a" opacity="0.6"/>';
-      elems += '<g filter="url(#lcW)"><ellipse cx="'+x.toFixed(1)+'" cy="'+(surf-th*0.62).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.1).toFixed(1)+'" fill="'+Q_COLOR.freude+'" opacity="0.75"/></g>';
+      var th=20+r2*10;
+      elems += '<g filter="url(#lcW)">'+_conifer(x, surf, th, th*0.5, Q_COLOR.freude, 0.85)+'</g>';
     }
   }
   s += elems;
   return '<svg class="lichtung-streifen" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+esc(t('wiese_streifen_aria'))+'">'+s+'</svg>';
 }
-
-
 function renderHeute() {
   try {
     const str = streak(), wk = weekSessions();
@@ -3809,10 +3816,10 @@ function renderHeute() {
       + '</button>';
 
     // ── Ansage: dynamische, würdigende Tagesbotschaft ──
-    const ansageHtml = '<div class="section"><div class="ansage">'
+    const ansageHtml = '<div class="section ansage-sec">'
       + '<div class="label" style="margin-bottom:8px;">' + t('heute_ansage') + '</div>'
       + '<div class="ansage-text">' + tagesAnsage() + '</div>'
-      + '</div></div>';
+      + '</div>';
 
     // ── Impuls (Zitat) ──
     const impulsHtml = '<div class="section reminder">'
