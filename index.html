@@ -2257,7 +2257,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v124';
+var APP_VER = 'v125';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2940,6 +2940,18 @@ function _wieseRidgePath(seed, baseY, minY, W){
   return p;
 }
 
+// Saubere Koniferen-Silhouette: Stamm + drei sich verjüngende Etagen
+function _conifer(x, baseY, h, w, fill, op){
+  var trunkH=h*0.15;
+  var out='<rect x="'+(x-w*0.05).toFixed(1)+'" y="'+(baseY-trunkH).toFixed(1)+'" width="'+(w*0.1).toFixed(1)+'" height="'+trunkH.toFixed(1)+'" fill="#5a4530" opacity="'+op.toFixed(2)+'"/>';
+  var top=baseY-trunkH, tierH=(h-trunkH)/2.6;
+  for(var k=0;k<3;k++){
+    var ty=top - k*tierH*0.78, tw=w*(1 - k*0.24);
+    out += '<path d="M'+x.toFixed(1)+' '+(ty-tierH).toFixed(1)+' L'+(x-tw/2).toFixed(1)+' '+ty.toFixed(1)+' L'+(x+tw/2).toFixed(1)+' '+ty.toFixed(1)+' Z" fill="'+fill+'" opacity="'+op.toFixed(2)+'"/>';
+  }
+  return out;
+}
+
 // Großes Panorama — geschichtete Aquarell-Tiefenvista (Longchenpa, Vers 1)
 function renderWiese(sessions){
   var W=400, H=250, horizon=116, waterY=horizon+22;
@@ -3016,9 +3028,14 @@ function renderWiese(sessions){
   // 4) Boden: trockene Basis + grüne Lasur (Liebe)
   s += '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground-dry)"/></g>';
   s += '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground)" opacity="'+(0.35+0.6*Ll).toFixed(2)+'"/></g>';
-  // 5) Waldgürtel am Übergang (Freude)
-  var beltTrees=Math.round(3+Lf*20), bt='';
-  for(var i=0;i<beltTrees;i++){ var bx=_wieseHashF('bt'+i+'x')*W, bh=4+_wieseHashF('bt'+i+'h')*6; bt += '<path d="M'+bx.toFixed(1)+' '+(horizon+3).toFixed(1)+' l'+(-bh*0.45).toFixed(1)+' 0 l'+(bh*0.45).toFixed(1)+' '+(-bh).toFixed(1)+' l'+(bh*0.45).toFixed(1)+' '+bh.toFixed(1)+' Z" style="fill:var(--wiese-forest)" opacity="'+(0.4+0.4*Lf).toFixed(2)+'"/>'; }
+  // 5) Waldgürtel am Übergang (Freude) — Reihe kleiner Koniferen
+  var beltTrees=Math.round(2+Lf*22), bt='';
+  for(var i=0;i<beltTrees;i++){
+    var bx=_wieseHashF('bt'+i+'x')*W;
+    var by=horizon+2+(_wieseHashF('bt'+i+'y')-0.5)*5;
+    var bh=7+_wieseHashF('bt'+i+'h')*7*(0.6+0.5*Lf);
+    bt += _conifer(bx, by, bh, bh*0.5, 'var(--wiese-forest)', 0.45+0.4*Lf);
+  }
   s += '<g filter="url(#wcS)">'+bt+'</g>';
   // 6) See (Gleichmut) — Wasser + Spiegelung IM See (auf Ellipse geclippt)
   if(cg>0){
@@ -3075,14 +3092,14 @@ function renderWiese(sessions){
     s += '<g filter="url(#wcL)"><ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+cF+'" opacity="0.6"/><ellipse cx="'+(tx-tw*0.3).toFixed(1)+'" cy="'+(ty-th*0.68).toFixed(1)+'" rx="'+(tw*0.6).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+cF+'" opacity="0.45"/></g>';
     s += '</g>';
   });
-  // 10) Große rahmende Koniferen vom oberen Rand (dunkel, angeschnitten)
-  [[24,1],[W-24,-1]].forEach(function(fr){
-    var fx=fr[0], topY=-10+_wieseHashF('fr'+fx)*10, botY=H-6, fw=26+Lf*10, g='';
-    g += '<rect x="'+(fx-2.5).toFixed(1)+'" y="'+((topY+botY)/2).toFixed(1)+'" width="5" height="'+((botY-topY)/2).toFixed(1)+'" fill="#4a3a28" opacity="0.6"/>';
-    var layers=7;
-    for(var L=0;L<layers;L++){
-      var ly=topY + (botY-topY)*(L/layers), lw=fw*(0.4+0.6*L/layers);
-      g += '<path d="M'+fx.toFixed(1)+' '+ly.toFixed(1)+' l'+(-lw).toFixed(1)+' '+((botY-topY)/layers*0.95).toFixed(1)+' l'+lw.toFixed(1)+' 0 l'+lw.toFixed(1)+' '+(-(botY-topY)/layers*0.95).toFixed(1)+' Z" fill="#3f5a36" opacity="'+(0.78+0.15*Lf).toFixed(2)+'"/>';
+  // 10) Rahmende Baumgruppen links/rechts — echte Koniferen, oben angeschnitten
+  var grove=1+Math.round(Lf*2);   // 1..3 Tannen je Seite
+  [ {cx:30, xs:[0,-20,24]}, {cx:W-30, xs:[0,20,-24]} ].forEach(function(side){
+    var g='';
+    for(var j=0;j<grove;j++){
+      var jx=side.cx + (side.xs[j]||0);
+      var jh=92 + _wieseHashF('frv'+side.cx+j)*46 - j*14;   // vorderste am höchsten
+      g += _conifer(jx, H-2, jh, 30+Lf*10 - j*4, '#3f5a36', 0.82+0.12*Lf);
     }
     s += '<g filter="url(#wcL)">'+g+'</g>';
   });
