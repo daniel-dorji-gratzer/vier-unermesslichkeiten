@@ -2257,7 +2257,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v123';
+var APP_VER = 'v124';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -2932,36 +2932,21 @@ function _wieseMoon(W){
   return '<circle class="wiese-moon" cx="'+(W-54)+'" cy="34" r="12" style="fill:var(--wiese-moon);opacity:var(--wiese-moon-op)"/>';
 }
 
-// Gezackte Bergsilhouette (feste Bühne, stabiler Seed)
-function _wieseRidge(seed, baseY, minY, W, fillVar, opacity){
-  var n=10, p='M0 '+baseY.toFixed(1);
-  for(var i=0;i<=n;i++){
-    var x=i/n*W;
-    var y=minY + _wieseHashF(seed+i)*(baseY-minY);
-    p += ' L'+x.toFixed(1)+' '+y.toFixed(1);
-  }
+// Pfad einer gezackten Bergsilhouette (fester Seed → stabile Bühne)
+function _wieseRidgePath(seed, baseY, minY, W){
+  var n=11, p='M0 '+baseY.toFixed(1);
+  for(var i=0;i<=n;i++){ var x=i/n*W; var y=minY + _wieseHashF(seed+i)*(baseY-minY); p += ' L'+x.toFixed(1)+' '+y.toFixed(1); }
   p += ' L'+W+' '+baseY.toFixed(1)+' Z';
-  return '<path d="'+p+'" style="fill:'+fillVar+'" opacity="'+opacity.toFixed(2)+'"/>';
+  return p;
 }
 
-// Großes Panorama — geschichtete Tiefen-Vista, Qualitäten reifen einzeln,
-// konvergieren bei Harmonie zu einem stimmigen Gesamtbild (Longchenpa, Vers 1).
+// Großes Panorama — geschichtete Aquarell-Tiefenvista (Longchenpa, Vers 1)
 function renderWiese(sessions){
-  var W=400, H=250, horizon=118;
+  var W=400, H=250, horizon=116, waterY=horizon+22;
   var days = _wieseDays(sessions);
   var today = todayISO();
   var gid = 'wsky'+Math.floor(_wieseHashF('sky:'+days.length+':'+(days.length?days[days.length-1].date:'0'))*1e9);
 
-  var defs = '<defs>'
-    + '<linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wiese-sky-top)"/><stop offset="1" style="stop-color:var(--wiese-sky-bot)"/></linearGradient>'
-    + '<linearGradient id="'+gid+'h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wiese-haze)" stop-opacity="0"/><stop offset="1" style="stop-color:var(--wiese-haze)" stop-opacity="1"/></linearGradient>'
-    + '<filter id="wcL" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G"/></filter>'
-    + '<filter id="wcS" x="-40%" y="-40%" width="180%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>'
-    + '<filter id="wcB" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>'
-    + '<clipPath id="wclake"><rect x="-8" y="'+horizon+'" width="'+(W+16)+'" height="'+(H-horizon+8)+'"/></clipPath>'
-    + '</defs>';
-
-  // Zählungen + unabhängige Reife-Level
   var cg=0,cl=0,flowers=[],trees=[];
   days.forEach(function(d){
     if(d.focus==='gleichmut') cg++;
@@ -2972,111 +2957,134 @@ function renderWiese(sessions){
   var nF=flowers.length, nT=trees.length;
   var K=7, lvl=function(c){ return Math.min(1, Math.sqrt(c)/K); };
   var Lg=lvl(cg), Ll=lvl(cl), Lf=lvl(nT), Lm=lvl(nF);
-  var Hh = Math.pow(Math.max(0.0001,Lg)*Math.max(0.0001,Ll)*Math.max(0.0001,Lf)*Math.max(0.0001,Lm), 0.25); // Harmonie 0..1
+  var Hh = Math.pow(Math.max(0.0001,Lg)*Math.max(0.0001,Ll)*Math.max(0.0001,Lf)*Math.max(0.0001,Lm), 0.25);
 
-  // Leere Lichtung
+  // See-Geometrie (für clip + Reflexion)
+  var lry=Math.min(20,8+Math.sqrt(cg)*3.0), lr=Math.min(158,44+Math.sqrt(cg)*17), lcx=200, lcy=waterY+lry;
+
+  // Bergpfade (auch für Spiegelung wiederverwendet)
+  var rFar=_wieseRidgePath('mtnF', horizon, 44, W);
+  var rMid=_wieseRidgePath('mtnM', horizon, 60, W);
+  var rNear=_wieseRidgePath('mtnN', horizon+2, 80, W);
+  var mountains = '<g filter="url(#wcL)">'
+    + '<path d="'+rFar+'" style="fill:var(--wiese-mtn-far)" opacity="0.6"/>'
+    + '<path d="'+rMid+'" style="fill:var(--wiese-mtn-near)" opacity="0.55"/>'
+    + '<path d="'+rNear+'" style="fill:var(--wiese-mtn-near)" opacity="0.8"/>'
+    + '</g>';
+
+  // Rollende Bodenkante (kein harter Strich)
+  var gp='M-8 '+(H+8)+' L-8 '+(horizon+2);
+  for(var i=0;i<=8;i++){ var gx=-8+(i/8)*(W+16); var gy=horizon-1+(_wieseHashF('gd'+i)-0.5)*7; gp+=' L'+gx.toFixed(1)+' '+gy.toFixed(1); }
+  gp+=' L'+(W+8)+' '+(H+8)+' Z';
+
+  var defs = '<defs>'
+    + '<linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wiese-sky-top)"/><stop offset="1" style="stop-color:var(--wiese-sky-bot)"/></linearGradient>'
+    + '<linearGradient id="'+gid+'h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wiese-haze)" stop-opacity="0"/><stop offset="1" style="stop-color:var(--wiese-haze)" stop-opacity="1"/></linearGradient>'
+    + '<filter id="wcL" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>'
+    + '<filter id="wcS" x="-40%" y="-40%" width="180%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>'
+    + '<filter id="wcB" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter>'
+    + '<clipPath id="wlk"><ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'"/></clipPath>'
+    + '</defs>';
+
   if(!days.length){
     return '<svg class="wiese" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(t('wiese_aria_leer'))+'" preserveAspectRatio="xMidYMid slice">'
       + defs
       + '<rect x="0" y="0" width="'+W+'" height="'+(horizon+24)+'" fill="url(#'+gid+')"/>'
-      + _wieseMoon(W)
-      + _wieseRidge('mtnF', horizon, 52, W, 'var(--wiese-mtn-far)', 0.5)
-      + '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground-dry)"/>'
-      + '<text x="'+(W/2)+'" y="'+(horizon+(H-horizon)/2+4)+'" text-anchor="middle" style="fill:var(--ink-muted)" font-size="13" font-family="var(--font-display)">'+esc(t('wiese_leer'))+'</text>'
+      + mountains
+      + '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground-dry)"/></g>'
+      + '<text x="'+(W/2)+'" y="'+(horizon+(H-horizon)/2+10)+'" text-anchor="middle" style="fill:var(--ink-muted)" font-size="13" font-family="var(--font-display)">'+esc(t('wiese_leer'))+'</text>'
       + '</svg>';
   }
 
   var s = defs;
-  // 1) Himmel + Wolken + Mond
+  // 1) Himmel + Wolken (hell, weich) + Mond
   s += '<rect x="0" y="0" width="'+W+'" height="'+(horizon+24)+'" fill="url(#'+gid+')"/>';
-  var nCloud=3;
-  for(var c=0;c<nCloud;c++){
-    var clx=_wieseHashF('cl'+c+'x')*W, cly=18+_wieseHashF('cl'+c+'y')*46, clw=22+_wieseHashF('cl'+c+'w')*30;
-    s += '<g filter="url(#wcB)" opacity="'+(0.5+0.4*Hh).toFixed(2)+'"><ellipse cx="'+clx.toFixed(1)+'" cy="'+cly.toFixed(1)+'" rx="'+clw.toFixed(1)+'" ry="'+(clw*0.32).toFixed(1)+'" style="fill:var(--wiese-cloud)"/><ellipse cx="'+(clx+clw*0.5).toFixed(1)+'" cy="'+(cly+3).toFixed(1)+'" rx="'+(clw*0.55).toFixed(1)+'" ry="'+(clw*0.26).toFixed(1)+'" style="fill:var(--wiese-cloud)"/></g>';
+  for(var c=0;c<3;c++){
+    var clx=_wieseHashF('cl'+c+'x')*W, cly=16+_wieseHashF('cl'+c+'y')*40, clw=24+_wieseHashF('cl'+c+'w')*34;
+    s += '<g filter="url(#wcB)" opacity="'+(0.4+0.4*Hh).toFixed(2)+'"><ellipse cx="'+clx.toFixed(1)+'" cy="'+cly.toFixed(1)+'" rx="'+clw.toFixed(1)+'" ry="'+(clw*0.26).toFixed(1)+'" style="fill:var(--wiese-cloud)"/><ellipse cx="'+(clx+clw*0.45).toFixed(1)+'" cy="'+(cly+2).toFixed(1)+'" rx="'+(clw*0.5).toFixed(1)+'" ry="'+(clw*0.2).toFixed(1)+'" style="fill:var(--wiese-cloud)"/></g>';
   }
   s += _wieseMoon(W);
-  // 2) Bergketten (feste Bühne) — fern hell, nah dunkler
-  s += _wieseRidge('mtnF', horizon, 50, W, 'var(--wiese-mtn-far)', 0.55);
-  s += _wieseRidge('mtnN', horizon+2, 74, W, 'var(--wiese-mtn-near)', 0.7);
-  // 3) Waldgürtel (Hügel) — Dichte/Höhe aus Freude (Lf)
-  var beltTop = horizon - 2 - Lf*8;
-  s += '<g filter="url(#wcL)"><path d="M-6 '+(horizon+4)+' L-6 '+(horizon-2)+' Q'+(W*0.3)+' '+(beltTop-4)+' '+(W*0.5)+' '+(horizon-3)+' T'+(W+6)+' '+(horizon-2)+' L'+(W+6)+' '+(horizon+4)+' Z" style="fill:var(--wiese-forest)" opacity="'+(0.3+0.55*Lf).toFixed(2)+'"/></g>';
-  var beltTrees=Math.round(3+Lf*20);
-  var bt='';
-  for(var i=0;i<beltTrees;i++){
-    var bx=_wieseHashF('bt'+i+'x')*W, bh=4+_wieseHashF('bt'+i+'h')*6;
-    bt += '<path d="M'+bx.toFixed(1)+' '+(horizon).toFixed(1)+' l'+(-bh*0.4).toFixed(1)+' 0 l'+(bh*0.4).toFixed(1)+' '+(-bh).toFixed(1)+' l'+(bh*0.4).toFixed(1)+' '+bh.toFixed(1)+' Z" style="fill:var(--wiese-forest)" opacity="'+(0.4+0.4*Lf).toFixed(2)+'"/>';
-  }
+  // 2) Berge + Schneekuppen
+  s += mountains;
+  var nearPts=[];
+  for(var i=0;i<=11;i++){ nearPts.push([i/11*W, 80+_wieseHashF('mtnN'+i)*(horizon+2-80)]); }
+  var snow='';
+  nearPts.forEach(function(pt){ if(pt[1]<104){ snow += '<path d="M'+pt[0].toFixed(1)+' '+(pt[1]-1).toFixed(1)+' l-5 8 l10 0 Z" fill="#fff" opacity="0.5"/>'; } });
+  s += '<g filter="url(#wcS)" opacity="'+(0.5+0.4*Hh).toFixed(2)+'">'+snow+'</g>';
+  // 3) Dunst (klart mit Harmonie)
+  s += '<rect x="0" y="40" width="'+W+'" height="'+(horizon-20)+'" fill="url(#'+gid+'h)" opacity="'+(0.35*(1-Hh)).toFixed(2)+'"/>';
+  // 4) Boden: trockene Basis + grüne Lasur (Liebe)
+  s += '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground-dry)"/></g>';
+  s += '<g filter="url(#wcL)"><path d="'+gp+'" style="fill:var(--wiese-ground)" opacity="'+(0.35+0.6*Ll).toFixed(2)+'"/></g>';
+  // 5) Waldgürtel am Übergang (Freude)
+  var beltTrees=Math.round(3+Lf*20), bt='';
+  for(var i=0;i<beltTrees;i++){ var bx=_wieseHashF('bt'+i+'x')*W, bh=4+_wieseHashF('bt'+i+'h')*6; bt += '<path d="M'+bx.toFixed(1)+' '+(horizon+3).toFixed(1)+' l'+(-bh*0.45).toFixed(1)+' 0 l'+(bh*0.45).toFixed(1)+' '+(-bh).toFixed(1)+' l'+(bh*0.45).toFixed(1)+' '+bh.toFixed(1)+' Z" style="fill:var(--wiese-forest)" opacity="'+(0.4+0.4*Lf).toFixed(2)+'"/>'; }
   s += '<g filter="url(#wcS)">'+bt+'</g>';
-  // 4) Dunst über der Ferne — klart mit Harmonie auf
-  s += '<rect x="0" y="46" width="'+W+'" height="'+(horizon-30)+'" fill="url(#'+gid+'h)" opacity="'+(0.5*(1-Hh)).toFixed(2)+'"/>';
-  // 5) Bodenfläche: trockene Basis + grüne Lasur (Liebe, Ll)
-  s += '<rect x="0" y="'+horizon+'" width="'+W+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground-dry)"/>';
-  s += '<g filter="url(#wcL)"><rect x="-8" y="'+(horizon+1)+'" width="'+(W+16)+'" height="'+(H-horizon)+'" style="fill:var(--wiese-ground)" opacity="'+(0.25+0.6*Ll).toFixed(2)+'"/></g>';
-  // 6) See (Gleichmut, Lg) — unter Horizont geclippt, mit Spiegelung
+  // 6) See (Gleichmut) — Wasser + Spiegelung IM See (auf Ellipse geclippt)
   if(cg>0){
-    var lry=Math.min(20,6+Math.sqrt(cg)*3.2), lr=Math.min(150,30+Math.sqrt(cg)*18);
-    var lcx=200, lcy=horizon+lry+3;
-    s += '<g clip-path="url(#wclake)">';
-    // Spiegelung der Berge (gespiegelt, weich, transparent — Stärke aus Lg/Hh)
-    s += '<g opacity="'+(0.12+0.28*Lg*(0.5+0.5*Hh)).toFixed(2)+'"><g transform="translate(0,'+(2*lcy).toFixed(1)+') scale(1,-1)" filter="url(#wcB)">'
-      + _wieseRidge('mtnF', horizon, 50, W, 'var(--wiese-mtn-far)', 0.9)
-      + _wieseRidge('mtnN', horizon+2, 74, W, 'var(--wiese-mtn-near)', 0.9)
-      + '</g></g>';
-    // Wasserkörper
-    s += '<g filter="url(#wcL)"><ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="'+(0.4+0.15*Lg).toFixed(2)+'"/></g>';
+    s += '<g filter="url(#wcL)"><ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" style="fill:var(--wiese-water)" opacity="'+(0.55+0.15*Lg).toFixed(2)+'"/></g>';
+    var cR=0.5; // Stauchung
+    s += '<g clip-path="url(#wlk)">'
+      + '<g transform="translate(0,'+(waterY*(1+cR)).toFixed(1)+') scale(1,'+(-cR)+')" filter="url(#wcB)" opacity="'+(0.22+0.3*Lg*(0.5+0.5*Hh)).toFixed(2)+'">'
+      + '<path d="'+rFar+'" style="fill:var(--wiese-mtn-far)"/><path d="'+rNear+'" style="fill:var(--wiese-mtn-near)"/>'
+      + '</g>';
+    // Wellenlinien
+    for(var w=0;w<3;w++){ var wy=lcy-lry*0.3+w*lry*0.5; s += '<line x1="'+(lcx-lr*0.8).toFixed(1)+'" y1="'+wy.toFixed(1)+'" x2="'+(lcx+lr*0.8).toFixed(1)+'" y2="'+wy.toFixed(1)+'" style="stroke:var(--wiese-water-hi)" stroke-width="1" opacity="0.25"/>'; }
     s += '</g>';
-    s += '<ellipse filter="url(#wcB)" cx="'+(lcx-lr*0.12).toFixed(1)+'" cy="'+(lcy-lry*0.2).toFixed(1)+'" rx="'+(lr*0.4).toFixed(1)+'" ry="'+(lry*0.3).toFixed(1)+'" style="fill:var(--wiese-water-hi)" opacity="'+(0.15+0.35*Lg).toFixed(2)+'"/>';
-    s += '<ellipse class="wiese-moonrefl" filter="url(#wcB)" cx="'+(lcx+lr*0.22).toFixed(1)+'" cy="'+lcy.toFixed(1)+'" rx="'+(lr*0.06).toFixed(1)+'" ry="'+(lry*0.85).toFixed(1)+'" fill="#fff"/>';
+    s += '<ellipse class="wiese-moonrefl" filter="url(#wcB)" cx="'+(lcx+lr*0.2).toFixed(1)+'" cy="'+lcy.toFixed(1)+'" rx="'+(lr*0.06).toFixed(1)+'" ry="'+(lry*0.8).toFixed(1)+'" fill="#fff"/>';
+    // weiche Uferlinie
+    s += '<ellipse cx="'+lcx+'" cy="'+lcy.toFixed(1)+'" rx="'+lr.toFixed(1)+'" ry="'+lry.toFixed(1)+'" fill="none" style="stroke:var(--wiese-water-hi)" stroke-width="1" opacity="0.3" filter="url(#wcL)"/>';
   }
-  // 7) Vordergrund-Gras (Liebe-Dichte)
-  var tufts=Math.min(60, 6+cl*3), grass='';
+  // 7) Vordergrund-Gras (Liebe-Dichte), nur vor dem See
+  var tufts=Math.min(70, 10+cl*3), grass='';
   for(var i=0;i<tufts;i++){
-    var gx=_wieseHashF('g'+i+'x')*W, gy=horizon+30+_wieseHashF('g'+i+'y')*(H-horizon-30);
-    var gh=(4+_wieseHashF('g'+i+'h')*7)*(0.5+0.7*Ll), sw=(_wieseHashF('g'+i+'s')-0.5)*4;
-    grass += '<path d="M'+gx.toFixed(1)+' '+gy.toFixed(1)+' q'+sw.toFixed(1)+' '+(-gh/2).toFixed(1)+' '+(sw*0.4).toFixed(1)+' '+(-gh).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="'+(0.28+0.4*_wieseHashF('g'+i+'o')).toFixed(2)+'"/>';
+    var gx2=_wieseHashF('g'+i+'x')*W, gy2=lcy+lry-4+_wieseHashF('g'+i+'y')*(H-(lcy+lry)+2);
+    var gh=(4+_wieseHashF('g'+i+'h')*7)*(0.5+0.7*Ll), sw2=(_wieseHashF('g'+i+'s')-0.5)*4;
+    grass += '<path d="M'+gx2.toFixed(1)+' '+gy2.toFixed(1)+' q'+sw2.toFixed(1)+' '+(-gh/2).toFixed(1)+' '+(sw2*0.4).toFixed(1)+' '+(-gh).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="'+(0.3+0.4*_wieseHashF('g'+i+'o')).toFixed(2)+'"/>';
   }
   s += '<g filter="url(#wcS)">'+grass+'</g>';
-  // 8) Blumen (Mitgefühl) — Vordergrund, Sättigung mit Lm
+  // 8) Blumen (Mitgefühl) — vorne, leichte Häufung an den unteren Ecken
   var maxF=40, fDraw=nF<=maxF?flowers:flowers.slice(0,maxF), cM=Q_COLOR.mitgefuehl;
   fDraw.forEach(function(d){
-    var fx=14+_wieseHashF(d.date+'fx')*(W-28);
-    var fy=horizon+34+_wieseHashF(d.date+'fy')*(H-horizon-40);
-    var fs=3+_wieseHashF(d.date+'fz')*2.4, nw=d.date===today;
+    var edge=_wieseHashF(d.date+'fe')<0.5?1:-1;
+    var fx=_wieseHashF(d.date+'fx')<0.45 ? (edge<0? 10+_wieseHashF(d.date+'fx2')*90 : W-10-_wieseHashF(d.date+'fx2')*90) : 14+_wieseHashF(d.date+'fx')*(W-28);
+    var fy=lcy+lry+2+_wieseHashF(d.date+'fy')*(H-(lcy+lry)-8);
+    var fs=3+_wieseHashF(d.date+'fz')*2.6, nw=d.date===today;
     s += '<g class="wiese-el'+(nw?' wiese-grow':'')+'" onclick="wieseTip(\''+d.date+'\',\''+d.focus+'\','+d.min+')">';
-    s += '<path d="M'+fx.toFixed(1)+' '+fy.toFixed(1)+' v'+(-fs*1.7).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1" opacity="0.5"/>';
-    var pcx=fx, pcy=fy-fs*1.9, pet='';
-    for(var p=0;p<5;p++){ var a=p/5*6.2832+_wieseHashF(d.date+'fa')*6.2832; pet += '<circle cx="'+(pcx+Math.cos(a)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(a)*fs).toFixed(1)+'" r="'+(fs*0.62).toFixed(1)+'" fill="'+cM+'" opacity="'+(0.45+0.35*Lm).toFixed(2)+'"/>'; }
+    s += '<path d="M'+fx.toFixed(1)+' '+fy.toFixed(1)+' v'+(-fs*1.8).toFixed(1)+'" style="stroke:var(--wiese-grass)" stroke-width="1" opacity="0.55"/>';
+    var pcx=fx, pcy=fy-fs*2, pet='';
+    for(var p=0;p<5;p++){ var a=p/5*6.2832+_wieseHashF(d.date+'fa')*6.2832; pet += '<circle cx="'+(pcx+Math.cos(a)*fs).toFixed(1)+'" cy="'+(pcy+Math.sin(a)*fs).toFixed(1)+'" r="'+(fs*0.64).toFixed(1)+'" fill="'+cM+'" opacity="'+(0.5+0.35*Lm).toFixed(2)+'"/>'; }
     s += '<g filter="url(#wcS)">'+pet+'</g>';
-    s += '<circle cx="'+pcx.toFixed(1)+'" cy="'+pcy.toFixed(1)+'" r="'+(fs*0.5).toFixed(1)+'" fill="'+Q_COLOR.liebe+'" opacity="0.85"/>';
+    s += '<circle cx="'+pcx.toFixed(1)+'" cy="'+pcy.toFixed(1)+'" r="'+(fs*0.5).toFixed(1)+'" fill="'+Q_COLOR.liebe+'" opacity="0.9"/>';
     s += '</g>';
   });
   if(nF>maxF){ var ex=Math.min(50,nF-maxF), dd='';
-    for(var e=0;e<ex;e++){ dd += '<circle cx="'+(14+_wieseHashF('cf'+e+'x')*(W-28)).toFixed(1)+'" cy="'+(horizon+38+_wieseHashF('cf'+e+'y')*(H-horizon-46)).toFixed(1)+'" r="1.7" fill="'+cM+'" opacity="0.5"/>'; }
+    for(var e=0;e<ex;e++){ dd += '<circle cx="'+(14+_wieseHashF('cf'+e+'x')*(W-28)).toFixed(1)+'" cy="'+(lcy+lry+6+_wieseHashF('cf'+e+'y')*(H-(lcy+lry)-12)).toFixed(1)+'" r="1.8" fill="'+cM+'" opacity="0.55"/>'; }
     s += '<g filter="url(#wcS)">'+dd+'</g>';
   }
-  // 9) Vordergrund-Bäume (Freude, diskret) — vor dem See
+  // 9) Vordergrund-Bäume (Freude, diskret)
   var maxT=12, tDraw=nT<=maxT?trees:trees.slice(0,maxT), cF=Q_COLOR.freude;
   tDraw.forEach(function(d, idx){
-    var tx=34+_wieseHashF(d.date+'tx')*(W-68);
-    var ty=horizon+44+_wieseHashF(d.date+'ty')*(H-horizon-54);
+    var tx=40+_wieseHashF(d.date+'tx')*(W-80);
+    var ty=lcy+lry+4+_wieseHashF(d.date+'ty')*(H-(lcy+lry)-14);
     var stage=Math.min(3, Math.floor((nT-1-idx)/Math.max(1,Math.ceil(nT/4))));
     var th=[12,20,30,42][stage], tw=[6,10,15,20][stage], nw=d.date===today;
     s += '<g class="wiese-el'+(nw?' wiese-grow':'')+'" onclick="wieseTip(\''+d.date+'\',\''+d.focus+'\','+d.min+')">';
     s += '<ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty+2).toFixed(1)+'" rx="'+(tw*0.95).toFixed(1)+'" ry="'+(tw*0.32).toFixed(1)+'" filter="url(#wcB)" style="fill:var(--wiese-shadow)" opacity="0.16"/>';
     s += '<rect x="'+(tx-0.9).toFixed(1)+'" y="'+(ty-th*0.42).toFixed(1)+'" width="1.8" height="'+(th*0.42).toFixed(1)+'" fill="#7a5a3a" opacity="0.45"/>';
-    s += '<g filter="url(#wcL)"><ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+cF+'" opacity="0.55"/><ellipse cx="'+(tx-tw*0.3).toFixed(1)+'" cy="'+(ty-th*0.68).toFixed(1)+'" rx="'+(tw*0.6).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+cF+'" opacity="0.42"/></g>';
+    s += '<g filter="url(#wcL)"><ellipse cx="'+tx.toFixed(1)+'" cy="'+(ty-th*0.55).toFixed(1)+'" rx="'+tw.toFixed(1)+'" ry="'+(tw*1.05).toFixed(1)+'" fill="'+cF+'" opacity="0.6"/><ellipse cx="'+(tx-tw*0.3).toFixed(1)+'" cy="'+(ty-th*0.68).toFixed(1)+'" rx="'+(tw*0.6).toFixed(1)+'" ry="'+(tw*0.6).toFixed(1)+'" fill="'+cF+'" opacity="0.45"/></g>';
     s += '</g>';
   });
-  // 10) Rahmende Koniferen links/rechts (Bühne + Fülle aus Lf)
-  [[14,1],[W-14,-1]].forEach(function(fr, k){
-    var fx=fr[0], dir=fr[1], fh=120+Lf*40, fw=20+Lf*12;
-    var g='<rect x="'+(fx-2).toFixed(1)+'" y="'+(H-fh*0.5).toFixed(1)+'" width="4" height="'+(fh*0.5).toFixed(1)+'" fill="#5a4530" opacity="0.5"/>';
-    for(var L=0;L<5;L++){
-      var ly=H-fh*0.45 - L*fh*0.13, lw=fw*(1-L*0.14);
-      g += '<path d="M'+fx.toFixed(1)+' '+(ly-fh*0.16).toFixed(1)+' l'+(-lw).toFixed(1)+' '+(fh*0.13).toFixed(1)+' l'+lw.toFixed(1)+' 0 l'+lw.toFixed(1)+' '+(-fh*0.13).toFixed(1)+' Z" style="fill:var(--wiese-forest)" opacity="'+(0.6+0.3*Lf).toFixed(2)+'"/>';
+  // 10) Große rahmende Koniferen vom oberen Rand (dunkel, angeschnitten)
+  [[24,1],[W-24,-1]].forEach(function(fr){
+    var fx=fr[0], topY=-10+_wieseHashF('fr'+fx)*10, botY=H-6, fw=26+Lf*10, g='';
+    g += '<rect x="'+(fx-2.5).toFixed(1)+'" y="'+((topY+botY)/2).toFixed(1)+'" width="5" height="'+((botY-topY)/2).toFixed(1)+'" fill="#4a3a28" opacity="0.6"/>';
+    var layers=7;
+    for(var L=0;L<layers;L++){
+      var ly=topY + (botY-topY)*(L/layers), lw=fw*(0.4+0.6*L/layers);
+      g += '<path d="M'+fx.toFixed(1)+' '+ly.toFixed(1)+' l'+(-lw).toFixed(1)+' '+((botY-topY)/layers*0.95).toFixed(1)+' l'+lw.toFixed(1)+' 0 l'+lw.toFixed(1)+' '+(-(botY-topY)/layers*0.95).toFixed(1)+' Z" fill="#3f5a36" opacity="'+(0.78+0.15*Lf).toFixed(2)+'"/>';
     }
-    s += '<g filter="url(#wcL)" transform="translate('+(dir<0?0:0)+',0)">'+g+'</g>';
+    s += '<g filter="url(#wcL)">'+g+'</g>';
   });
 
   var aria = t('wiese_aria').replace('{see}',cg).replace('{boden}',cl).replace('{blumen}',nF).replace('{baeume}',nT);
