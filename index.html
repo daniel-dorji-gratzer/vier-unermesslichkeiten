@@ -47,7 +47,7 @@
   --shadow-blur: 8px;
   /* Basisflächen — die sichtbaren Flächen werden unten per color-mix
      mit der Lichtfarbe der Tagesstufe eingefärbt */
-  --bg-base: #f4f1ee;
+  --bg-base: #f7f5f2;
   --bg-card-base: #ffffff;
   --bg-soft-base: #ede8e3;
   --bg: color-mix(in oklab, var(--bg-base) calc(100% - var(--light-mix)), var(--light-tint));
@@ -553,7 +553,7 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .j-entry + .j-entry { margin-top: 0; }
 /* Journal: dezente Kartenstruktur (Kopf + je Eintrag) */
 .j-head-card, .j-card { background: var(--bg-card); border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid transparent; }
+  box-shadow: 0 1px 3px rgba(0,0,0,.045); border: 1px solid transparent; }
 :root[data-time="nacht"] .j-head-card, :root[data-time="nacht"] .j-card {
   box-shadow: none; border-color: var(--line); }
 .j-head-card { padding: 16px 18px; margin-bottom: 14px; }
@@ -2266,7 +2266,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v131';
+var APP_VER = 'v132';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
