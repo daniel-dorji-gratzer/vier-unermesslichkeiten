@@ -551,6 +551,13 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 /* ── Journal ── */
 .j-entry { padding: 16px 0; border-bottom: 1px solid var(--line); }
 .j-entry + .j-entry { margin-top: 0; }
+/* Journal: dezente Kartenstruktur (Kopf + je Eintrag) */
+.j-head-card, .j-card { background: var(--bg-card); border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid transparent; }
+:root[data-time="nacht"] .j-head-card, :root[data-time="nacht"] .j-card {
+  box-shadow: none; border-color: var(--line); }
+.j-head-card { padding: 16px 18px; margin-bottom: 14px; }
+.j-entry.j-card { padding: 12px 16px 14px; margin-bottom: 10px; border-bottom: none; }
 .j-date-hdr { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
   text-transform: uppercase; letter-spacing: .12em; color: var(--ink-faint); padding: 20px 0 6px; }
 .j-date-hdr:first-child { padding-top: 4px; }
@@ -2259,7 +2266,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v130';
+var APP_VER = 'v131';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -4730,7 +4737,7 @@ function _jSourceBlock(s) {
 function renderTagebuch() {
   _bmFilter = false; // reset filter on re-render
   document.getElementById("panel-tagebuch").innerHTML = `
-    <div class="section">
+    <div class="j-head-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div class="card-title" style="margin:0;">${t('tj_title')}</div>
         <button class="btn-primary" onclick="showLogSheet()" style="padding:8px 14px;font-size:.85rem;">${t('tj_neu')}</button>
@@ -4744,7 +4751,7 @@ function renderTagebuch() {
           style="white-space:nowrap;padding:8px 12px;font-size:.82rem;flex-shrink:0;">★ ${t('tj_lesezeichen')}</button>
       </div>
     </div>
-    <div class="section" id="j-list">
+    <div id="j-list">
       ${S.sessions.length===0?`<div class="muted small">${t('tj_leer')}</div>`:
         (()=>{
           // group by date (sessions are newest-first)
@@ -4759,7 +4766,7 @@ function renderTagebuch() {
               const q=getQ(s.focus);
               const snippet = s.source && s.source.snippet ? s.source.snippet : '';
               const searchData = esc((s.notes||'')+(s.mode||'')+(q?.name||'')+snippet);
-              return `<div class="j-entry" data-s="${searchData}" data-jid="${s.id}" data-bm="${s.bookmarked?'1':'0'}">
+              return `<div class="j-entry j-card" data-s="${searchData}" data-jid="${s.id}" data-bm="${s.bookmarked?'1':'0'}">
                 <div class="j-date">
                   ${s.duration?s.duration+' min · ':''}
                   ${q?`<span class="pill ${q.farbe}">${q.name}</span>`:(s.focus==='alle'?'<span class="pill neutral">alle vier</span>':'')}
