@@ -2273,7 +2273,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v136';
+var APP_VER = 'v137';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -3731,12 +3731,11 @@ function renderLichtungStreifen(sessions, days){
   s += '<g filter="url(#lcW)"><rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="'+(bandBot-bandTop)+'" rx="10" style="fill:var(--licht-soil)"/></g>';
   s += '<g filter="url(#lcW)"><rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="'+(bandBot-bandTop)+'" rx="10" style="fill:var(--wiese-ground)" opacity="'+(0.12+0.5*rLiebe).toFixed(2)+'"/></g>';
   // Wassersaum an der Basis (jüngster Gleichmut)
-  // See als eigene Zone: Wasserband am Fuß, Höhe steigt mit jüngstem Gleichmut
-  if(rWasser>0){
-    var wH=4+rWasser*9, wTop=bandBot-wH;
-    s += '<g filter="url(#lcB)"><rect x="6" y="'+wTop.toFixed(1)+'" width="'+(W-12)+'" height="'+wH.toFixed(1)+'" rx="4" style="fill:var(--wiese-water)" opacity="0.8"/></g>';
-    s += '<rect x="12" y="'+(wTop+1).toFixed(1)+'" width="'+(W-24)+'" height="1.5" rx="0.75" fill="#fff" opacity="0.35"/>';
-  }
+  // See als konstante, ruhige Zone: Wasserband am Fuß (kein Sumpf);
+  // einzelne Gleichmut-Tage markieren sich als Wellen darauf
+  var wH=8, wTop=bandBot-wH;
+  s += '<g filter="url(#lcB)"><rect x="6" y="'+wTop.toFixed(1)+'" width="'+(W-12)+'" height="'+wH.toFixed(1)+'" rx="4" style="fill:var(--wiese-water)" opacity="0.8"/></g>';
+  s += '<rect x="12" y="'+(wTop+1).toFixed(1)+'" width="'+(W-24)+'" height="1.5" rx="0.75" fill="#fff" opacity="0.32"/>';
   s += '<rect x="2" y="'+bandTop+'" width="'+(W-4)+'" height="3" rx="1.5" style="fill:var(--licht-soil-edge)" opacity="0.45"/>';
   var elems='';
   for(var i=0;i<days;i++){
@@ -3751,7 +3750,9 @@ function renderLichtungStreifen(sessions, days){
     var r1=_wieseHashF(iso+'a'), r2=_wieseHashF(iso+'b'), r3=_wieseHashF(iso+'c');
     var x=cx+(r1-0.5)*slot*0.32;
     if(d.focus==='gleichmut'){
-      /* See als eigenes Wasserband unten — keine Einzelpfütze (kein Sumpf) */
+      var wy=wTop+2.6;
+      elems += '<ellipse cx="'+x.toFixed(1)+'" cy="'+wy.toFixed(1)+'" rx="4.6" ry="1.6" fill="none" stroke="#5a8fb0" stroke-width="0.9" opacity="0.5"/>';
+      elems += '<ellipse cx="'+x.toFixed(1)+'" cy="'+wy.toFixed(1)+'" rx="2.4" ry="0.9" fill="none" stroke="#ffffff" stroke-width="0.9" opacity="0.78"/>';
     } else if(d.focus==='liebe'){
       var nb=4+Math.floor(r2*2), g='';
       for(var b=0;b<nb;b++){
