@@ -522,6 +522,7 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .mode-btn .m-desc  { font-size: .8rem; color: var(--ink-muted); line-height: 1.4; }
 .mode-btn .m-badge { font-size: .7rem; color: var(--ink-muted); margin-top: 4px; }
 .praxis-recent { margin-top: 4px; }
+.section.praxis-recent { border-bottom: none; }
 .praxis-recent-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
 
 /* ── Practice runner ── */
@@ -679,7 +680,7 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
 .done-ring-arc   { stroke:var(--accent); stroke-linecap:round;
   animation:ring-draw .65s cubic-bezier(.4,0,.2,1) .05s both; }
 .done-check { animation:check-pop .38s cubic-bezier(.34,1.56,.64,1) .55s both;
-  display:inline-block; }
+  display:inline-block; transform-box:fill-box; transform-origin:center; }
 .done-label { font-weight:700; font-size:1.05rem; margin-bottom:3px;
   animation:fade-up .35s ease .7s both; }
 .done-sub   { font-size:.82rem; color:var(--ink-muted);
@@ -2270,7 +2271,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v134';
+var APP_VER = 'v135';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
