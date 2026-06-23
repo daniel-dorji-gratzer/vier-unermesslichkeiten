@@ -645,7 +645,11 @@ button.btn-ghost { background: transparent; color: var(--ink-soft); border: none
   font-style: italic; margin: 0;
 }
 /* In journal list: tighter spacing */
-.j-source-context { margin-bottom: 8px; }
+/* Journal: entschachtelte, ruhige Quellreferenz — keine Box, eine Linie */
+.j-source-context { background: transparent; border-left: none; border-radius: 0;
+  padding: 0; margin-bottom: 10px; }
+.j-source-context .source-ref { margin-bottom: 4px; }
+.j-source-quote { border-left: 2px solid var(--accent); padding-left: 12px; }
 
 /* ── Bookmark button & filter ── */
 .j-bm-btn { background: none; border: none; font-size: 1.15rem; cursor: pointer;
@@ -2266,7 +2270,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v132';
+var APP_VER = 'v133';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -4728,9 +4732,11 @@ function _jSourceBlock(s) {
   if (!s.source || !s.source.snippet) return '';
   var ref = (t('lehre_einheit')||'Sitzung') + ' ' + s.source.sitzungNr
     + (s.source.paraIdx ? ' · ' + (t('reader_abschnitt')||'Abschnitt') + ' ' + s.source.paraIdx : '');
+  var q = getQ(s.focus);
+  var lineCol = q ? 'color-mix(in oklab, var(--q-' + q.id + ') 70%, var(--bg-card))' : 'var(--accent)';
   return '<div class="source-context j-source-context">'
     + '<div class="source-ref">' + esc(ref) + '</div>'
-    + '<blockquote class="j-source-quote">„' + esc(s.source.snippet) + '"</blockquote>'
+    + '<blockquote class="j-source-quote" style="border-left-color:' + lineCol + '">„' + esc(s.source.snippet) + '"</blockquote>'
     + '</div>';
 }
 
