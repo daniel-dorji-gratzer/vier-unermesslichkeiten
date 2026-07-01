@@ -2273,7 +2273,7 @@ const STRINGS = {
 
 
 // ── Adaptive quality accent ──────────────────────────────────────────────────
-var APP_VER = 'v137';
+var APP_VER = 'v138';
 
 var Q_ACCENT_LIGHT = {
   gleichmut:  { a:'#4a8fb5', bg:'#e2eff8', txt:'#fff'    },
@@ -3224,12 +3224,22 @@ function renderCalMonth(datesSet) {
   const monthSess=S.sessions.filter(s=>s.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`));
   const monthDays=new Set(monthSess.map(s=>s.date)).size;
   const monthMin=monthSess.reduce((s,x)=>s+(x.duration||0),0);
+  const CAL_COL={gleichmut:'#4a8fb5',liebe:'#c99200',mitgefuehl:'#8a4bb8',freude:'#2e9462'};
+  const focusByDate={};
+  S.sessions.forEach(s=>{
+    if(!s.date) return;
+    const e=focusByDate[s.date]||(focusByDate[s.date]={min:{},best:null,bm:-1});
+    e.min[s.focus]=(e.min[s.focus]||0)+(s.duration||0);
+    if(e.min[s.focus]>e.bm){ e.bm=e.min[s.focus]; e.best=s.focus; }
+  });
   let cells='';
   for(let i=0;i<startDow;i++) cells+='<div></div>';
   for(let d=1;d<=last.getDate();d++){
     const dt=new Date(y,m,d), iso=dateISO(dt);
     const done=datesSet.has(iso), today=iso===todayISO(), future=dt>now;
-    cells+=`<div class="cal-day${done?' done':''}${today?' today':''}${future?' future':''}">${d}</div>`;
+    const f=done&&focusByDate[iso]?focusByDate[iso].best:null;
+    const bg=f&&CAL_COL[f]?CAL_COL[f]:'var(--accent)';
+    cells+=`<div class="cal-day${done?' done':''}${today?' today':''}${future?' future':''}"${done?` style="background:${bg}"`:''}>${d}</div>`;
   }
   return `
     <div class="cal-nav">
